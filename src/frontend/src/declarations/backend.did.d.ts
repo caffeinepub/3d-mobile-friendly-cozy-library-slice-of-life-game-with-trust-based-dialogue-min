@@ -35,6 +35,7 @@ export interface _SERVICE {
   'completeActivity' : ActorMethod<[string], undefined>,
   'continueGame' : ActorMethod<[], GameState>,
   'getGameState' : ActorMethod<[], GameState>,
+  'isAvailable' : ActorMethod<[], boolean>,
   'makeChoice' : ActorMethod<[bigint, bigint], undefined>,
   'placeCustomization' : ActorMethod<[string, string, string], undefined>,
   'resetProgress' : ActorMethod<[], undefined>,

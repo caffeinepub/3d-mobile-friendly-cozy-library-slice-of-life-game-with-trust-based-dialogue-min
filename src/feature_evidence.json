@@ -2,12 +2,12 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-detect-internet-computer-replica-rejection-errors-where-the-reject-message-contains-is-stopped-e-g-ic0508-reject-code-5-for-backend-calls-used-to-start-gameplay-startnewgame-continuegame-and-convert-them-into-a-user-friendly-english-error-summary-that-clearly-indicates-the-game-server-is-temporarily-offline-stopped-and-the-user-should-try-again-later",
-      "featureTitle": "Detect Internet Computer replica rejection errors where the reject_message contains \"is stopped\" (e.g., IC0508 / reject_code 5) for backend calls used to start gameplay (startNewGame, continueGame), and convert them into a user-friendly, English error summary that clearly indicates the game server is temporarily offline/stopped and the user should try again later.",
+      "featureId": "feature-add-a-frontend-preflight-check-that-verifies-backend-availability-on-the-title-screen-and-immediately-before-invoking-new-game-continue-and-present-clear-english-ui-when-the-server-is-offline-stopped",
+      "featureTitle": "Add a frontend preflight check that verifies backend availability on the Title screen and immediately before invoking New Game / Continue, and present clear English UI when the server is offline/stopped.",
       "files": [
         "frontend/src/App.tsx",
-        "frontend/src/ui/GameLaunchErrorScreen.tsx",
-        "frontend/src/utils/launchErrorNormalization.ts"
+        "frontend/src/hooks/useBackendAvailability.ts",
+        "frontend/src/ui/TitleScreen.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -17,16 +17,15 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-22"
+        "REQ-26"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-add-a-retry-path-on-the-launch-error-screen-that-allows-the-user-to-retry-the-last-failed-launch-action-new-game-or-continue-without-requiring-a-full-page-refresh-and-ensure-the-ui-reflects-retry-in-progress-state-and-prevents-double-submission",
-      "featureTitle": "Add a retry path on the launch error screen that allows the user to retry the last failed launch action (New Game or Continue) without requiring a full page refresh, and ensure the UI reflects retry-in-progress state and prevents double-submission.",
+      "featureId": "feature-add-a-small-developer-facing-operations-document-that-explains-how-to-keep-the-internet-computer-game-canister-online-in-production-e-g-ensure-it-is-started-and-funded-with-cycles-and-clarifies-the-platform-limitation-that-a-stopped-canister-cannot-be-programmatically-restarted-by-the-canister-itself",
+      "featureTitle": "Add a small, developer-facing operations document that explains how to keep the Internet Computer game canister online in production (e.g., ensure it is started and funded with cycles) and clarifies the platform limitation that a stopped canister cannot be programmatically restarted by the canister itself.",
       "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/ui/GameLaunchErrorScreen.tsx"
+        "frontend/OPS_CANISTER_AVAILABILITY.md"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -36,27 +35,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-23"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-implement-a-small-centralized-frontend-error-normalization-utility-for-backend-actor-call-failures-used-during-launch-so-that-app-diagnostics-and-gamelauncherrorscreen-can-present-consistent-summaries-e-g-distinguish-no-saved-game-vs-canister-stopped-vs-generic-connectivity-errors-without-losing-the-original-raw-error-message-for-technical-details",
-      "featureTitle": "Implement a small, centralized frontend error-normalization utility for backend actor call failures used during launch so that App diagnostics and GameLaunchErrorScreen can present consistent summaries (e.g., distinguish \"no saved game\" vs \"canister stopped\" vs generic connectivity errors), without losing the original raw error message for technical details.",
-      "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/ui/GameLaunchErrorScreen.tsx",
-        "frontend/src/utils/launchErrorNormalization.ts"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-24"
+        "REQ-27"
       ],
       "confidence": "high"
     }

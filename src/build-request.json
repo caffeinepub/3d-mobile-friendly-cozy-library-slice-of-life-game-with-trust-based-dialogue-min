@@ -1,73 +1,71 @@
 {
   "kind": "build_request",
-  "title": "Handle IC0508 'canister is stopped' errors during New Game/Continue with retries and user-friendly messaging",
+  "title": "Improve backend canister availability so the game server stays online",
   "priority": "high",
   "requirements": [
     {
-      "id": "REQ-22",
-      "text": "Detect Internet Computer replica rejection errors where the reject_message contains \"is stopped\" (e.g., IC0508 / reject_code 5) for backend calls used to start gameplay (startNewGame, continueGame), and convert them into a user-friendly, English error summary that clearly indicates the game server is temporarily offline/stopped and the user should try again later.",
-      "target": "frontend",
+      "id": "REQ-25",
+      "text": "Add a lightweight backend availability endpoint that the frontend can call to confirm the game canister is running before attempting launch actions.",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-6"
+          "msg-4"
         ],
         "quotes": [
-          "Error: ... reject_message\": \"Canister pmng3-byaaa-aaaag-awtia-cai is stopped\" ... Method name: startNewGame ... error_code\": \"IC0508\", \"reject_code\": 5"
+          "Make the game server always online"
         ]
       },
       "acceptanceCriteria": [
-        "When startNewGame fails with an IC0508/reject_code 5 \"Canister ... is stopped\" rejection, the launch error screen shows a clear English summary such as \"The game server is temporarily offline (canister is stopped). Please try again in a moment.\" (wording may vary but must be clear and non-technical).",
-        "The technical details view still preserves the underlying error string (including reject code/message and canister id) so the full context can be copied if needed.",
-        "The same handling applies to continueGame failures with the same stopped-canister signature."
+        "backend/main.mo exposes a non-throwing availability method (e.g., a query health/status call) that returns successfully when the canister is running",
+        "Calling the availability method does not require any existing saved game state and does not trap under normal conditions"
       ]
     },
     {
-      "id": "REQ-23",
-      "text": "Add a retry path on the launch error screen that allows the user to retry the last failed launch action (New Game or Continue) without requiring a full page refresh, and ensure the UI reflects retry-in-progress state and prevents double-submission.",
+      "id": "REQ-26",
+      "text": "Add a frontend preflight check that verifies backend availability on the Title screen and immediately before invoking New Game / Continue, and present clear English UI when the server is offline/stopped.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-6"
+          "msg-4"
         ],
         "quotes": [
-          "Action: New Game",
-          "Stage: failed",
-          "Game Mounted: No"
+          "Make the game server always online"
         ]
       },
       "acceptanceCriteria": [
-        "On the \"Unable to Start Game\" screen, a primary action \"Retry\" is available when lastLaunchAction is present.",
-        "Clicking \"Retry\" re-attempts the same action (startNewGame or continueGame) and shows a loading/disabled state until completion.",
-        "If the retry succeeds, the app transitions to gameplay as normal and diagnostics reflect a successful launch (launchStage complete, gameMounted true).",
-        "If the retry fails again, the user remains on the error screen with the updated user-friendly summary and updated technical details."
+        "When the user opens the app (Title screen), the frontend performs a backend availability check and records the result in state used by the launch UI",
+        "When backend availability check indicates failure (including canister stopped-like failures), the Title screen disables or warns on New Game / Continue with English text indicating the game server is offline and to try again later",
+        "When backend availability later becomes healthy, the Title screen reflects the healthy state without requiring a full page refresh (e.g., via retry / periodic recheck)"
       ]
     },
     {
-      "id": "REQ-24",
-      "text": "Implement a small, centralized frontend error-normalization utility for backend actor call failures used during launch so that App diagnostics and GameLaunchErrorScreen can present consistent summaries (e.g., distinguish \"no saved game\" vs \"canister stopped\" vs generic connectivity errors), without losing the original raw error message for technical details.",
-      "target": "frontend",
+      "id": "REQ-27",
+      "text": "Add a small, developer-facing operations document that explains how to keep the Internet Computer game canister online in production (e.g., ensure it is started and funded with cycles) and clarifies the platform limitation that a stopped canister cannot be programmatically restarted by the canister itself.",
+      "target": "unknown",
       "source": {
         "messageIds": [
-          "msg-6"
+          "msg-4"
         ],
         "quotes": [
-          "The replica returned a rejection error: ... reject_code: 5 ... \"Canister pmng3-byaaa-aaaag-awtia-cai is stopped\""
+          "Make the game server always online"
         ]
       },
       "acceptanceCriteria": [
-        "Launch failures produce consistent, human-readable summaries in English across both New Game and Continue.",
-        "The raw error message is still stored and displayed in the technical details section exactly (or functionally) as today.",
-        "Existing \"No saved game found\" messaging remains intact for the continue flow when applicable and is not replaced by the generic messaging."
+        "A new documentation file is added that includes explicit English guidance for keeping the canister running (started, funded) and what to check when users see 'server offline/stopped' errors",
+        "The document explicitly states that the app cannot guarantee 100% uptime purely through frontend/backend code and that starting/stopping is an operational/controller responsibility"
       ]
     }
   ],
   "constraints": [
-    "Do not edit files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or any files under frontend/src/components/ui (compose them instead).",
-    "Keep all user-facing text in English."
+    "Backend must remain a single Motoko actor in backend/main.mo (no additional backend services).",
+    "Only create backend/migration.mo if an upgrade requires state migration (conditional migration policy).",
+    "Do not modify frontend immutable paths: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui.",
+    "Use English for all user-facing text."
   ],
   "nonGoals": [
-    "Preventing a canister from being stopped at the IC/relica level (operational/deployment concern) is out of scope for code changes here.",
-    "Adding new authentication providers or external monitoring/alerting integrations."
+    "Guaranteeing absolute 'always online' uptime in all circumstances (e.g., controller-stopped canister, network-wide outages).",
+    "Implementing third-party uptime monitoring services, external cron jobs, or WebSocket-based real-time connectivity.",
+    "Adding new authentication providers beyond Internet Identity."
   ],
   "imageRequirements": {
     "required": [],

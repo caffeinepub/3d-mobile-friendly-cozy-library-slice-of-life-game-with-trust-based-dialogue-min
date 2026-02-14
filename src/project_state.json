@@ -1,19 +1,20 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 9,
+  "projectStateVersion": 11,
   "summary": "3D mobile-friendly slice-of-life adventure/visual-novel hybrid set entirely in Puro’s library, focused on building friendship/trust through dialogue and cozy activities, featuring multiple endings including a low-friendship Betrayal ending with Special Edition variants.",
   "architectural_notes": [
     "Core gameplay loop centered on a hub-based, single-location library environment with repeatable daily activities and relationship progression.",
     "Ending selection logic driven primarily by Trust/Friendship thresholds (including Special Edition sub-variants for very low vs slightly low friendship).",
     "Project should include a clear startup/entrypoint file (e.g., main executable scene/script) used by build/deployment to launch the game.",
-    "Startup/New Game depends on an Internet Computer canister method call (startNewGame); app should handle canister availability (stopped) with preflight/health checks and user-facing recovery messaging."
+    "Startup/New Game depends on an Internet Computer canister method call (startNewGame); app should handle canister availability (stopped) with preflight/health checks and user-facing recovery messaging.",
+    "Backend availability requirement: keep the Internet Computer canister running/always-online (monitoring + auto-restart/ops process) to prevent launch flows (startNewGame/continueGame) from failing due to a stopped canister."
   ],
   "known_issues": [
     "Art/style scope conflict: user requests a 3D game, but gameplay style mentions 2D pixel art aesthetics—needs final decision on visual style.",
     "App/game fails to start when clicking the startup/entrypoint (startup launch issue reported by user).",
     "New Game fails with IC0508 non_replicated_rejection: canister pmng3-byaaa-aaaag-awtia-cai is stopped (reject_code 5), resulting in Game Mounted: No."
   ],
-  "isFixRequest": true,
+  "isFixRequest": false,
   "existing_features": [
     {
       "id": "feature-create-a-single-location-3d-game-scene-set-entirely-in-a-dim-cozy-dusty-library-with-bookshelves-vents-and-a-central-fruit-bearing-bonsai-tree-that-the-player-can-explore",
@@ -206,6 +207,22 @@
         "REQ-24"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-add-a-frontend-preflight-check-that-verifies-backend-availability-on-the-title-screen-and-immediately-before-invoking-new-game-continue-and-present-clear-english-ui-when-the-server-is-offline-stopped",
+      "title": "Add a frontend preflight check that verifies backend availability on the Title screen and immediately before invoking New Game / Continue, and present clear English UI when the server is offline/stopped.",
+      "reqIds": [
+        "REQ-26"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-small-developer-facing-operations-document-that-explains-how-to-keep-the-internet-computer-game-canister-online-in-production-e-g-ensure-it-is-started-and-funded-with-cycles-and-clarifies-the-platform-limitation-that-a-stopped-canister-cannot-be-programmatically-restarted-by-the-canister-itself",
+      "title": "Add a small, developer-facing operations document that explains how to keep the Internet Computer game canister online in production (e.g., ensure it is started and funded with cycles) and clarifies the platform limitation that a stopped canister cannot be programmatically restarted by the canister itself.",
+      "reqIds": [
+        "REQ-27"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -291,6 +308,20 @@
       "id": "AR-14",
       "summary": "Add a startup/entrypoint file to the project so the game can be launched/run reliably (build/deployment entrypoint)",
       "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-15",
+      "summary": "Ensure the game server/backend canister is always online (high availability) so New Game/Continue do not fail due to the canister being stopped",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-16",
+      "summary": "Add a lightweight backend availability endpoint that the frontend can call to confirm the game canister is running before attempting launch actions.",
+      "reqIds": [
+        "REQ-25"
+      ],
       "status": "pending"
     }
   ],

@@ -32,6 +32,7 @@ export interface backendInterface {
     completeActivity(activityName: string): Promise<void>;
     continueGame(): Promise<GameState>;
     getGameState(): Promise<GameState>;
+    isAvailable(): Promise<boolean>;
     makeChoice(nodeId: bigint, choiceId: bigint): Promise<void>;
     placeCustomization(itemName: string, description: string, location: string): Promise<void>;
     resetProgress(): Promise<void>;

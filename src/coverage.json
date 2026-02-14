@@ -1,68 +1,64 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-14T23:45:03.709Z",
+  "generatedAt": "2026-02-14T23:52:20.767Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
     "total": 3,
-    "implemented": 3,
+    "implemented": 2,
     "items": [
       {
-        "id": "REQ-22",
-        "summary": "Detect Internet Computer replica rejection errors where the reject_message contains \"is stopped\" (e.g., IC0508 / reject_code 5) for backend calls used to start gameplay (startNewGame, continueGame), and convert them into a user-friendly, English error summary that clearly indicates the game server is temporarily offline/stopped and the user should try again later.",
+        "id": "REQ-25",
+        "summary": "Add a lightweight backend availability endpoint that the frontend can call to confirm the game canister is running before attempting launch actions.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-26",
+        "summary": "Add a frontend preflight check that verifies backend availability on the Title screen and immediately before invoking New Game / Continue, and present clear English UI when the server is offline/stopped.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/utils/launchErrorNormalization.ts",
+          "frontend/src/hooks/useBackendAvailability.ts",
           "frontend/src/App.tsx",
-          "frontend/src/ui/GameLaunchErrorScreen.tsx"
+          "frontend/src/ui/TitleScreen.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/utils/launchErrorNormalization.ts",
+          "frontend/src/hooks/useBackendAvailability.ts",
           "frontend/src/App.tsx",
-          "frontend/src/ui/GameLaunchErrorScreen.tsx"
+          "frontend/src/ui/TitleScreen.tsx"
         ]
       },
       {
-        "id": "REQ-23",
-        "summary": "Add a retry path on the launch error screen that allows the user to retry the last failed launch action (New Game or Continue) without requiring a full page refresh, and ensure the UI reflects retry-in-progress state and prevents double-submission.",
+        "id": "REQ-27",
+        "summary": "Add a small, developer-facing operations document that explains how to keep the Internet Computer game canister online in production (e.g., ensure it is started and funded with cycles) and clarifies the platform limitation that a stopped canister cannot be programmatically restarted by the canister itself.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/App.tsx",
-          "frontend/src/ui/GameLaunchErrorScreen.tsx"
+          "frontend/OPS_CANISTER_AVAILABILITY.md"
         ],
         "matchedFiles": [
-          "frontend/src/App.tsx",
-          "frontend/src/ui/GameLaunchErrorScreen.tsx"
-        ]
-      },
-      {
-        "id": "REQ-24",
-        "summary": "Implement a small, centralized frontend error-normalization utility for backend actor call failures used during launch so that App diagnostics and GameLaunchErrorScreen can present consistent summaries (e.g., distinguish \"no saved game\" vs \"canister stopped\" vs generic connectivity errors), without losing the original raw error message for technical details.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/utils/launchErrorNormalization.ts",
-          "frontend/src/App.tsx",
-          "frontend/src/ui/GameLaunchErrorScreen.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/utils/launchErrorNormalization.ts",
-          "frontend/src/App.tsx",
-          "frontend/src/ui/GameLaunchErrorScreen.tsx"
+          "frontend/OPS_CANISTER_AVAILABILITY.md"
         ]
       }
     ]
   },
   "changedFiles": [
+    "backend/main.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
+    "frontend/OPS_CANISTER_AVAILABILITY.md",
     "frontend/src/App.tsx",
-    "frontend/src/ui/GameLaunchErrorScreen.tsx",
-    "frontend/src/utils/launchErrorNormalization.ts",
+    "frontend/src/backend.d.ts",
+    "frontend/src/backend.ts",
+    "frontend/src/declarations/backend.did.d.ts",
+    "frontend/src/declarations/backend.did.js",
+    "frontend/src/hooks/useBackendAvailability.ts",
+    "frontend/src/ui/TitleScreen.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

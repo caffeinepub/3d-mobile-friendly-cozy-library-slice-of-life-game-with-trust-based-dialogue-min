@@ -1,11 +1,12 @@
 # Specification
 
 ## Summary
-**Goal:** Improve launch-time failure handling for New Game/Continue by detecting “canister is stopped” replica rejections, showing a clear user-friendly message, and allowing users to retry without refreshing.
+**Goal:** Improve game canister availability handling by adding a backend health/availability check and frontend preflight UI so players get clear feedback when the server is offline/stopped.
 
 **Planned changes:**
-- Add centralized frontend error-normalization for launch-related backend call failures, producing consistent English summaries while preserving the raw error text for technical details.
-- Detect IC replica rejection errors indicating a stopped canister (e.g., IC0508 / reject_code 5 with reject_message containing “is stopped”) for `startNewGame` and `continueGame`, and map them to a non-technical “server temporarily offline/stopped” summary.
-- Update the launch error screen to include a “Retry” action that re-attempts the last failed launch action (New Game or Continue), shows retry-in-progress state, and prevents double-submission.
+- Add a lightweight, non-throwing backend availability query method in `backend/main.mo` that returns successfully when the canister is running and does not depend on saved game state.
+- Add a frontend preflight availability check on the Title screen and immediately before New Game / Continue; disable or warn with clear English text when the server is offline/stopped.
+- Add retry/periodic recheck behavior so the Title screen updates to “healthy” without requiring a full page refresh.
+- Add a small developer-facing operations document describing how to keep the canister online in production (started, funded with cycles) and clarifying that a stopped canister cannot be restarted programmatically by the canister itself.
 
-**User-visible outcome:** When New Game or Continue fails due to a stopped canister, the error screen displays a clear English explanation and still provides technical details; users can tap “Retry” to try the same launch action again without reloading the page.
+**User-visible outcome:** Players see an immediate server status check on the Title screen; if the game server is offline/stopped, New Game/Continue is disabled or shows an English warning, and the UI can recover automatically once the backend is available again.

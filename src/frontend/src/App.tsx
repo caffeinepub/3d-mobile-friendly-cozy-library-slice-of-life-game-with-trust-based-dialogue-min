@@ -9,6 +9,7 @@ import { ThemeProvider } from 'next-themes';
 import { Toaster } from 'sonner';
 import { runStartup } from './startup';
 import { useStartNewGame, useContinueGame } from './hooks/useQueries';
+import { useBackendAvailability } from './hooks/useBackendAvailability';
 import { normalizeLaunchError } from './utils/launchErrorNormalization';
 
 type Screen = 'title' | 'game' | 'settings' | 'credits' | 'launch-error';
@@ -39,6 +40,12 @@ export default function App() {
 
   const startNewGameMutation = useStartNewGame();
   const continueGameMutation = useContinueGame();
+
+  // Backend availability check - only active on title screen
+  const backendAvailability = useBackendAvailability({
+    enabled: currentScreen === 'title',
+    refetchInterval: currentScreen === 'title' ? 30000 : undefined, // Poll every 30s on title screen
+  });
 
   // Run startup sequence on mount
   useEffect(() => {
@@ -72,6 +79,20 @@ export default function App() {
   }, []);
 
   const handleNewGame = async () => {
+    // Preflight availability check
+    if (!backendAvailability.isHealthy) {
+      setDiagnostics({
+        startupComplete: diagnostics.startupComplete,
+        lastLaunchAction: 'new-game',
+        launchStage: 'failed',
+        gameMounted: false,
+        errorMessage: backendAvailability.lastError || 'Game server is offline',
+        userFriendlySummary: 'The game server is currently offline. Please try again later.',
+      });
+      setCurrentScreen('launch-error');
+      return;
+    }
+
     setDiagnostics({
       startupComplete: diagnostics.startupComplete,
       lastLaunchAction: 'new-game',
@@ -100,6 +121,20 @@ export default function App() {
   };
 
   const handleContinue = async () => {
+    // Preflight availability check
+    if (!backendAvailability.isHealthy) {
+      setDiagnostics({
+        startupComplete: diagnostics.startupComplete,
+        lastLaunchAction: 'continue',
+        launchStage: 'failed',
+        gameMounted: false,
+        errorMessage: backendAvailability.lastError || 'Game server is offline',
+        userFriendlySummary: 'The game server is currently offline. Please try again later.',
+      });
+      setCurrentScreen('launch-error');
+      return;
+    }
+
     setDiagnostics({
       startupComplete: diagnostics.startupComplete,
       lastLaunchAction: 'continue',
@@ -214,6 +249,7 @@ export default function App() {
             onCredits={() => setCurrentScreen('credits')}
             isLaunching={isLaunching}
             continueDisabled={false}
+            backendAvailability={backendAvailability}
           />
         )}
         {currentScreen === 'game' && (

@@ -1,79 +1,46 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "User-friendly launch error handling for stopped canister + retry on launch error screen",
+  "title": "Frontend preflight backend availability check + ops documentation",
   "requirements": [
     {
-      "id": "REQ-22",
-      "summary": "Detect stopped-canister replica rejection errors for launch calls and show a clear, non-technical English summary while preserving raw technical details.",
+      "id": "REQ-26",
+      "summary": "Add a Title screen backend availability preflight check (on load + before New Game/Continue) with clear offline UI and retry/polling.",
       "acceptanceCriteria": [
-        "When startNewGame fails with an IC0508/reject_code 5 \"Canister ... is stopped\" rejection, the launch error screen shows a clear English summary such as \"The game server is temporarily offline (canister is stopped). Please try again in a moment.\" (wording may vary but must be clear and non-technical).",
-        "The technical details view still preserves the underlying error string (including reject code/message and canister id) so the full context can be copied if needed.",
-        "The same handling applies to continueGame failures with the same stopped-canister signature."
+        "When the user opens the app (Title screen), the frontend performs a backend availability check and records the result in state used by the launch UI",
+        "When backend availability check indicates failure (including canister stopped-like failures), the Title screen disables or warns on New Game / Continue with English text indicating the game server is offline and to try again later",
+        "When backend availability later becomes healthy, the Title screen reflects the healthy state without requiring a full page refresh (e.g., via retry / periodic recheck)"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/utils/launchErrorNormalization.ts",
+          "path": "frontend/src/hooks/useBackendAvailability.ts",
           "operation": "create",
-          "description": "Create a centralized launch error-normalization utility that inspects raw actor-call errors (including strings that contain reject_message with \"is stopped\" / IC0508 / reject_code 5) and returns a user-friendly English summary plus the preserved raw error text for technical details."
+          "description": "Create a small hook that calls the backend actor's availability method (e.g., isAvailable) and normalizes results into UI-friendly states (checking/healthy/unhealthy + lastChecked + lastError), supporting manual retry and optional periodic recheck while on the Title screen."
         },
         {
           "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Use the centralized launch error-normalization utility for errors thrown from startNewGame/continueGame so stopped-canister failures produce the friendly summary while diagnostics continue to store the original raw error text for the technical details view."
+          "description": "Integrate backend availability state into the Title screen flow: run an availability check when the Title screen is shown, recheck periodically or via explicit retry, and perform an immediate preflight availability check inside the New Game / Continue handlers before calling launch mutations; if unavailable, keep user on the Title screen and surface a clear English message instead of attempting launch."
         },
         {
-          "path": "frontend/src/ui/GameLaunchErrorScreen.tsx",
+          "path": "frontend/src/ui/TitleScreen.tsx",
           "operation": "modify",
-          "description": "Update the error summary selection to prefer the normalized, non-technical English summary for stopped-canister failures, while continuing to render the preserved raw error text in the technical details section. Use existing shadcn-ui Card/Button components (from the shadcn-ui selected component) for UI; verify the component's usage instructions before implementing."
+          "description": "Update the Title screen UI to reflect backend availability status: show an English 'server offline/stopped' warning when unhealthy, disable or guard New Game/Continue accordingly, and provide a Retry action that triggers a recheck; use shadcn-ui components (e.g., Button/Card) for consistent styling. Verify the component's usage instructions before implementing."
         }
       ]
     },
     {
-      "id": "REQ-23",
-      "summary": "Add an in-app Retry action on the launch error screen to re-attempt the last failed New Game/Continue action with loading state and double-submit prevention.",
+      "id": "REQ-27",
+      "summary": "Add a developer-facing operations document explaining how to keep the IC game canister online and the limitation that stopped canisters cannot self-restart.",
       "acceptanceCriteria": [
-        "On the \"Unable to Start Game\" screen, a primary action \"Retry\" is available when lastLaunchAction is present.",
-        "Clicking \"Retry\" re-attempts the same action (startNewGame or continueGame) and shows a loading/disabled state until completion.",
-        "If the retry succeeds, the app transitions to gameplay as normal and diagnostics reflect a successful launch (launchStage complete, gameMounted true).",
-        "If the retry fails again, the user remains on the error screen with the updated user-friendly summary and updated technical details."
+        "A new documentation file is added that includes explicit English guidance for keeping the canister running (started, funded) and what to check when users see 'server offline/stopped' errors",
+        "The document explicitly states that the app cannot guarantee 100% uptime purely through frontend/backend code and that starting/stopping is an operational/controller responsibility"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Add a retry handler that re-runs the lastLaunchAction (new-game or continue) without full refresh, reusing the existing launch flow, updating diagnostics appropriately, and guarding against double-submission when a launch attempt is already in progress."
-        },
-        {
-          "path": "frontend/src/ui/GameLaunchErrorScreen.tsx",
-          "operation": "modify",
-          "description": "Add a primary \"Retry\" action when diagnostics.lastLaunchAction is present; wire it to an onRetry prop from App, reflect retry-in-progress via disabled/loading state, and ensure the existing \"Back to Title\" remains available. Use existing shadcn-ui Button component (from the shadcn-ui selected component); verify the component's usage instructions before implementing."
-        }
-      ]
-    },
-    {
-      "id": "REQ-24",
-      "summary": "Centralize launch error normalization so App diagnostics and the launch error screen present consistent summaries (no-saved-game vs canister-stopped vs generic), while preserving raw error text.",
-      "acceptanceCriteria": [
-        "Launch failures produce consistent, human-readable summaries in English across both New Game and Continue.",
-        "The raw error message is still stored and displayed in the technical details section exactly (or functionally) as today.",
-        "Existing \"No saved game found\" messaging remains intact for the continue flow when applicable and is not replaced by the generic messaging."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/utils/launchErrorNormalization.ts",
+          "path": "frontend/OPS_CANISTER_AVAILABILITY.md",
           "operation": "create",
-          "description": "Implement classification for launch-related failures (at minimum: NO_SAVED_GAME, CANISTER_STOPPED, GENERIC_CONNECTIVITY/UNKNOWN) and return both user-facing summary (English) and raw error text, ensuring the 'No saved game found' case remains specific and not overridden by generic messaging."
-        },
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Refactor launch error handling to store both a normalized user-facing summary and the preserved raw error string in diagnostics for both New Game and Continue flows, so the launch error screen and diagnostics remain consistent across actions."
-        },
-        {
-          "path": "frontend/src/ui/GameLaunchErrorScreen.tsx",
-          "operation": "modify",
-          "description": "Consume the normalized summary from diagnostics (instead of inferring solely from action/stage) and keep the technical details section displaying the preserved raw error text; keep all user-facing text in English. Use existing shadcn-ui Card/Button components (from the shadcn-ui selected component) for presentation; verify the component's usage instructions before implementing."
+          "description": "Add an operations guide describing how to keep the game canister online in production (ensure it is started and funded with cycles), common checks when users see 'server offline/stopped' messaging, and an explicit note that the app cannot guarantee 100% uptime because a stopped canister cannot be programmatically restarted by the canister/frontend; starting/stopping is an operational/controller responsibility."
         }
       ]
     }

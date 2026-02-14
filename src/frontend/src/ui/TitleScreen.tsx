@@ -1,6 +1,8 @@
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { BookOpen, Settings, Info, Loader2 } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { BookOpen, Settings, Info, Loader2, AlertCircle, RefreshCw } from 'lucide-react';
+import type { BackendAvailabilityState } from '../hooks/useBackendAvailability';
 
 interface TitleScreenProps {
   onNewGame: () => void;
@@ -9,6 +11,7 @@ interface TitleScreenProps {
   onCredits: () => void;
   isLaunching?: boolean;
   continueDisabled?: boolean;
+  backendAvailability?: BackendAvailabilityState;
 }
 
 export default function TitleScreen({
@@ -18,7 +21,11 @@ export default function TitleScreen({
   onCredits,
   isLaunching = false,
   continueDisabled = false,
+  backendAvailability,
 }: TitleScreenProps) {
+  const isServerOffline = backendAvailability && !backendAvailability.isHealthy && !backendAvailability.isChecking;
+  const isCheckingServer = backendAvailability?.isChecking;
+
   return (
     <div
       className="w-full h-full flex items-center justify-center relative"
@@ -38,12 +45,38 @@ export default function TitleScreen({
             className="w-full max-w-sm"
           />
 
+          {isServerOffline && (
+            <Alert variant="destructive" className="w-full">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Server Offline</AlertTitle>
+              <AlertDescription className="flex flex-col gap-2">
+                <span>The game server is currently offline or stopped. Please try again later.</span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => backendAvailability.refetch()}
+                  className="w-fit mt-1"
+                >
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Retry Connection
+                </Button>
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {isCheckingServer && (
+            <div className="w-full text-center text-sm text-muted-foreground flex items-center justify-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Checking server status...
+            </div>
+          )}
+
           <div className="flex flex-col gap-3 w-full">
             <Button
               onClick={onNewGame}
               size="lg"
               className="w-full text-lg"
-              disabled={isLaunching}
+              disabled={isLaunching || isServerOffline || isCheckingServer}
             >
               {isLaunching ? (
                 <>
@@ -63,7 +96,7 @@ export default function TitleScreen({
               variant="secondary"
               size="lg"
               className="w-full text-lg"
-              disabled={isLaunching || continueDisabled}
+              disabled={isLaunching || continueDisabled || isServerOffline || isCheckingServer}
             >
               {isLaunching ? (
                 <>

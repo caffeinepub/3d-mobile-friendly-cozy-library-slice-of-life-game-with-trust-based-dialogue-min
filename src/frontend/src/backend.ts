@@ -114,6 +114,7 @@ export interface backendInterface {
     completeActivity(activityName: string): Promise<void>;
     continueGame(): Promise<GameState>;
     getGameState(): Promise<GameState>;
+    isAvailable(): Promise<boolean>;
     makeChoice(nodeId: bigint, choiceId: bigint): Promise<void>;
     placeCustomization(itemName: string, description: string, location: string): Promise<void>;
     resetProgress(): Promise<void>;
@@ -165,6 +166,20 @@ export class Backend implements backendInterface {
         } else {
             const result = await this.actor.getGameState();
             return from_candid_GameState_n1(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async isAvailable(): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.isAvailable();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.isAvailable();
+            return result;
         }
     }
     async makeChoice(arg0: bigint, arg1: bigint): Promise<void> {

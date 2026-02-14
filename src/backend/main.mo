@@ -8,6 +8,10 @@ import Time "mo:core/Time";
 import Principal "mo:core/Principal";
 
 actor {
+  public query ({ caller }) func isAvailable() : async Bool {
+    true;
+  };
+
   type DialogueNode = {
     id : Nat;
     text : Text;
