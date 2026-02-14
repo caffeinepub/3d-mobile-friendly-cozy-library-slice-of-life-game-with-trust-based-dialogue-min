@@ -1,50 +1,208 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import TitleScreen from './ui/TitleScreen';
 import CreditsScreen from './ui/CreditsScreen';
 import SettingsScreen from './game/ui/SettingsScreen';
 import GameView from './game/GameView';
+import GameLaunchErrorScreen from './ui/GameLaunchErrorScreen';
+import GameRuntimeErrorBoundary from './ui/GameRuntimeErrorBoundary';
 import { ThemeProvider } from 'next-themes';
 import { Toaster } from 'sonner';
+import { runStartup } from './startup';
+import { useStartNewGame, useContinueGame } from './hooks/useQueries';
 
-type Screen = 'title' | 'game' | 'settings' | 'credits';
+type Screen = 'title' | 'game' | 'settings' | 'credits' | 'launch-error';
+
+interface DiagnosticsState {
+  startupComplete: boolean;
+  lastLaunchAction: 'new-game' | 'continue' | null;
+  launchStage: 'idle' | 'calling-backend' | 'mounting-game' | 'complete' | 'failed';
+  gameMounted: boolean;
+  errorMessage: string | null;
+}
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('title');
   const [isNewGame, setIsNewGame] = useState(false);
+  const [isReady, setIsReady] = useState(false);
+  const [startupError, setStartupError] = useState<string | null>(null);
+  const [diagnostics, setDiagnostics] = useState<DiagnosticsState>({
+    startupComplete: false,
+    lastLaunchAction: null,
+    launchStage: 'idle',
+    gameMounted: false,
+    errorMessage: null,
+  });
 
-  const handleNewGame = () => {
-    setIsNewGame(true);
-    setCurrentScreen('game');
+  const startNewGameMutation = useStartNewGame();
+  const continueGameMutation = useContinueGame();
+
+  // Run startup sequence on mount
+  useEffect(() => {
+    runStartup()
+      .then((result) => {
+        if (result.success) {
+          setIsReady(true);
+          setDiagnostics((prev) => ({ ...prev, startupComplete: true }));
+        } else {
+          setStartupError(result.error || 'Startup failed');
+          setIsReady(true); // Still allow app to load
+          setDiagnostics((prev) => ({
+            ...prev,
+            startupComplete: false,
+            errorMessage: result.error || 'Startup initialization failed',
+          }));
+        }
+      })
+      .catch((error) => {
+        console.error('Unexpected startup error:', error);
+        setStartupError('Unexpected error during startup');
+        setIsReady(true); // Still allow app to load
+        setDiagnostics((prev) => ({
+          ...prev,
+          startupComplete: false,
+          errorMessage: 'Unexpected error during startup',
+        }));
+      });
+  }, []);
+
+  const handleNewGame = async () => {
+    setDiagnostics({
+      startupComplete: diagnostics.startupComplete,
+      lastLaunchAction: 'new-game',
+      launchStage: 'calling-backend',
+      gameMounted: false,
+      errorMessage: null,
+    });
+
+    try {
+      await startNewGameMutation.mutateAsync();
+      setDiagnostics((prev) => ({ ...prev, launchStage: 'mounting-game' }));
+      setIsNewGame(true);
+      setCurrentScreen('game');
+    } catch (error) {
+      console.error('Failed to start new game:', error);
+      setDiagnostics((prev) => ({
+        ...prev,
+        launchStage: 'failed',
+        errorMessage: error instanceof Error ? error.message : 'Failed to start new game',
+      }));
+      setCurrentScreen('launch-error');
+    }
   };
 
-  const handleContinue = () => {
-    setIsNewGame(false);
-    setCurrentScreen('game');
+  const handleContinue = async () => {
+    setDiagnostics({
+      startupComplete: diagnostics.startupComplete,
+      lastLaunchAction: 'continue',
+      launchStage: 'calling-backend',
+      gameMounted: false,
+      errorMessage: null,
+    });
+
+    try {
+      await continueGameMutation.mutateAsync();
+      setDiagnostics((prev) => ({ ...prev, launchStage: 'mounting-game' }));
+      setIsNewGame(false);
+      setCurrentScreen('game');
+    } catch (error) {
+      console.error('Failed to continue game:', error);
+      setDiagnostics((prev) => ({
+        ...prev,
+        launchStage: 'failed',
+        errorMessage: error instanceof Error ? error.message : 'Failed to continue game. No saved game found.',
+      }));
+      setCurrentScreen('launch-error');
+    }
   };
 
   const handleBackToTitle = () => {
+    setDiagnostics({
+      startupComplete: diagnostics.startupComplete,
+      lastLaunchAction: null,
+      launchStage: 'idle',
+      gameMounted: false,
+      errorMessage: null,
+    });
     setCurrentScreen('title');
   };
+
+  const handleGameMounted = () => {
+    setDiagnostics((prev) => ({
+      ...prev,
+      launchStage: 'complete',
+      gameMounted: true,
+    }));
+  };
+
+  const handleGameMountError = (error: string) => {
+    setDiagnostics((prev) => ({
+      ...prev,
+      launchStage: 'failed',
+      gameMounted: false,
+      errorMessage: error,
+    }));
+    setCurrentScreen('launch-error');
+  };
+
+  // Show loading state during startup
+  if (!isReady) {
+    return (
+      <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+        <div className="w-full h-screen flex items-center justify-center bg-background">
+          <div className="text-center space-y-4">
+            <div className="animate-pulse text-2xl font-serif text-foreground">
+              Loading...
+            </div>
+          </div>
+        </div>
+      </ThemeProvider>
+    );
+  }
+
+  const isLaunching =
+    startNewGameMutation.isPending ||
+    continueGameMutation.isPending ||
+    diagnostics.launchStage === 'mounting-game';
 
   return (
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
       <div className="w-full h-screen overflow-hidden">
+        {startupError && currentScreen === 'title' && (
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 bg-destructive/10 border border-destructive text-destructive px-4 py-2 rounded-lg text-sm max-w-md text-center">
+            Warning: {startupError}
+          </div>
+        )}
         {currentScreen === 'title' && (
           <TitleScreen
             onNewGame={handleNewGame}
             onContinue={handleContinue}
             onSettings={() => setCurrentScreen('settings')}
             onCredits={() => setCurrentScreen('credits')}
+            isLaunching={isLaunching}
+            continueDisabled={false}
           />
         )}
         {currentScreen === 'game' && (
-          <GameView isNewGame={isNewGame} onBackToTitle={handleBackToTitle} />
+          <GameRuntimeErrorBoundary onBackToTitle={handleBackToTitle}>
+            <GameView
+              isNewGame={isNewGame}
+              onBackToTitle={handleBackToTitle}
+              onMounted={handleGameMounted}
+              onMountError={handleGameMountError}
+            />
+          </GameRuntimeErrorBoundary>
         )}
         {currentScreen === 'settings' && (
           <SettingsScreen onBack={() => setCurrentScreen('title')} />
         )}
         {currentScreen === 'credits' && (
           <CreditsScreen onBack={() => setCurrentScreen('title')} />
+        )}
+        {currentScreen === 'launch-error' && (
+          <GameLaunchErrorScreen
+            diagnostics={diagnostics}
+            onBackToTitle={handleBackToTitle}
+          />
         )}
         <Toaster position="top-center" />
       </div>

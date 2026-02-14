@@ -1,401 +1,92 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-14T23:21:06.016Z",
+  "generatedAt": "2026-02-14T23:37:51.833Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 15,
-    "implemented": 15,
+    "total": 4,
+    "implemented": 4,
     "items": [
       {
-        "id": "REQ-1",
-        "summary": "Create a single-location 3D game scene set entirely in a dim, cozy, dusty library with bookshelves, vents, and a central fruit-bearing bonsai tree that the player can explore.",
+        "id": "REQ-18",
+        "summary": "Ensure the game reliably transitions from the Title screen to gameplay when the user clicks the start action (\"New Game\" and \"Continue\"), and prevent silent failures that leave the app appearing to not start.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/package.json",
           "frontend/src/App.tsx",
-          "frontend/src/game/GameView.tsx",
-          "frontend/src/game/scene/LibraryScene.tsx",
-          "frontend/public/assets/generated/wood-paper-texture-tile.dim_512x512.png",
-          "frontend/public/assets/generated/bonsai-fruit-icon.dim_256x256.png"
-        ],
-        "matchedFiles": [
-          "frontend/src/App.tsx",
-          "frontend/src/game/GameView.tsx",
-          "frontend/src/game/scene/LibraryScene.tsx",
-          "frontend/public/assets/generated/wood-paper-texture-tile.dim_512x512.png",
-          "frontend/public/assets/generated/bonsai-fruit-icon.dim_256x256.png"
-        ]
-      },
-      {
-        "id": "REQ-10",
-        "summary": "Add a 'Memorable Moments' feature that lets players revisit unlocked heartwarming scenes (e.g., sitting with Puro on his mat; watching him eat a snack).",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/game/moments/momentsData.ts",
-          "frontend/src/game/ui/MomentsMenu.tsx",
-          "frontend/src/game/moments/MomentPlayer.tsx",
-          "frontend/src/game/GameView.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/game/moments/momentsData.ts",
-          "frontend/src/game/ui/MomentsMenu.tsx",
-          "frontend/src/game/moments/MomentPlayer.tsx",
-          "frontend/src/game/GameView.tsx"
-        ]
-      },
-      {
-        "id": "REQ-11",
-        "summary": "Add a Letter Writing system: players can write short letters and place them in vents; letters are saved and can later receive an in-game response (non-hostile, friendly tone).",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/game/letters/letterTemplates.ts",
-          "frontend/src/game/ui/LettersPanel.tsx",
-          "frontend/src/game/state/useGameStore.ts",
-          "frontend/src/game/scene/LibraryScene.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/game/letters/letterTemplates.ts",
-          "frontend/src/game/ui/LettersPanel.tsx",
-          "frontend/src/game/state/useGameStore.ts",
-          "frontend/src/game/scene/LibraryScene.tsx"
-        ]
-      },
-      {
-        "id": "REQ-12",
-        "summary": "Set the game’s tone and presentation to calm, cozy, and slightly melancholic with English on-screen text; include lofi retro-style piano background music and basic sound toggles.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/public/assets/audio/lofi-retro-piano.mp3",
-          "frontend/src/game/audio/useAudio.ts",
-          "frontend/src/game/ui/SettingsScreen.tsx",
-          "frontend/src/App.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/game/audio/useAudio.ts",
-          "frontend/src/game/ui/SettingsScreen.tsx",
-          "frontend/src/App.tsx"
-        ]
-      },
-      {
-        "id": "REQ-13",
-        "summary": "Resolve the art-style direction by implementing a coherent 3D visual style that still nods to pixel-art aesthetics (e.g., low-poly geometry with pixelated/retro textures), and apply it consistently across the library, UI, and mini-games.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/game/scene/retroMaterials.ts",
-          "frontend/src/game/scene/LibraryScene.tsx",
-          "frontend/src/game/minigames/minigameTheme.ts",
-          "frontend/src/game/minigames/BookSortingMiniGame.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/game/scene/LibraryScene.tsx",
-          "frontend/src/game/minigames/BookSortingMiniGame.tsx"
-        ]
-      },
-      {
-        "id": "REQ-14",
-        "summary": "Create a coherent, distinct visual theme for the UI (colors, typography, layout) that matches the cozy library mood; avoid a blue/purple-dominant palette and apply the theme consistently across menus, dialogue UI, and HUD.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/index.css",
           "frontend/src/ui/TitleScreen.tsx",
-          "frontend/src/ui/CreditsScreen.tsx",
-          "frontend/src/App.tsx",
-          "frontend/public/assets/generated/menu-library-bg.dim_1920x1080.png",
-          "frontend/public/assets/generated/game-logo.dim_1024x512.png"
+          "frontend/src/game/GameView.tsx",
+          "frontend/src/ui/GameLaunchErrorScreen.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/index.css",
+          "frontend/src/App.tsx",
           "frontend/src/ui/TitleScreen.tsx",
-          "frontend/src/ui/CreditsScreen.tsx",
-          "frontend/src/App.tsx",
-          "frontend/public/assets/generated/menu-library-bg.dim_1920x1080.png",
-          "frontend/public/assets/generated/game-logo.dim_1024x512.png"
-        ]
-      },
-      {
-        "id": "REQ-15",
-        "summary": "Add basic game state management: new game/continue, autosave on key events (dialogue choice, activity completion, customization placement), and a way to reset progress.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/game/state/autosave.ts",
-          "frontend/src/ui/PauseMenu.tsx",
-          "frontend/src/App.tsx",
-          "frontend/src/game/GameView.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/App.tsx",
-          "frontend/src/game/GameView.tsx"
-        ]
-      },
-      {
-        "id": "REQ-2",
-        "summary": "Implement mobile-friendly controls for the 3D gameplay, including touch movement and camera control, with a desktop fallback (keyboard/mouse) for testing.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/game/controls/usePlayerControls.ts",
-          "frontend/src/game/controls/MobileControlsOverlay.tsx",
           "frontend/src/game/GameView.tsx",
-          "frontend/public/assets/generated/joystick-base-and-stick.dim_512x512.png"
-        ],
-        "matchedFiles": [
-          "frontend/src/game/controls/usePlayerControls.ts",
-          "frontend/src/game/controls/MobileControlsOverlay.tsx",
-          "frontend/src/game/GameView.tsx",
-          "frontend/public/assets/generated/joystick-base-and-stick.dim_512x512.png"
+          "frontend/src/ui/GameLaunchErrorScreen.tsx"
         ]
       },
       {
-        "id": "REQ-3",
-        "summary": "Add a Relationship system with a visible Trust/Friendship meter that changes based on player choices and activities, and use it to gate or alter dialogue openness and story outcomes.",
+        "id": "REQ-19",
+        "summary": "Add a top-level runtime error boundary around the gameplay rendering path (including the React Three Fiber Canvas / scene) so that runtime exceptions (e.g., texture loading failures, WebGL issues) are caught and surfaced to the user with English error text and a recovery option.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/game/state/gameState.ts",
-          "frontend/src/game/state/useGameStore.ts",
-          "frontend/src/game/state/persistence.ts",
-          "frontend/src/game/ui/TrustMeter.tsx",
+          "frontend/src/ui/GameRuntimeErrorBoundary.tsx",
+          "frontend/src/App.tsx",
           "frontend/src/game/GameView.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/game/state/useGameStore.ts",
-          "frontend/src/game/ui/TrustMeter.tsx",
+          "frontend/src/ui/GameRuntimeErrorBoundary.tsx",
+          "frontend/src/App.tsx",
           "frontend/src/game/GameView.tsx"
         ]
       },
       {
-        "id": "REQ-4",
-        "summary": "Implement an interactive dialogue tree system for conversations with Puro, including choices that can increase or decrease Trust/Friendship and questions about the lab, the Pale virus, Puro’s nature, and his interest in humans.",
+        "id": "REQ-20",
+        "summary": "Harden the asset startup and in-game asset loading flow so missing static assets do not prevent the game from starting (e.g., generated textures or audio files). Where assets are required for rendering, provide safe fallbacks instead of throwing.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/game/dialogue/dialogueData.ts",
-          "frontend/src/game/dialogue/useDialogueController.ts",
-          "frontend/src/game/ui/DialoguePanel.tsx",
-          "frontend/src/game/GameView.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/game/dialogue/dialogueData.ts",
-          "frontend/src/game/ui/DialoguePanel.tsx",
-          "frontend/src/game/GameView.tsx"
-        ]
-      },
-      {
-        "id": "REQ-5",
-        "summary": "Create a Hangout/Daily routine loop inside the library with at least these activities: reading together, listening to Puro’s stories, and feeding oranges from the bonsai tree.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/game/activities/activities.ts",
-          "frontend/src/game/ui/ActivityMenu.tsx",
+          "frontend/src/startup.ts",
           "frontend/src/game/scene/LibraryScene.tsx",
-          "frontend/src/game/GameView.tsx"
+          "frontend/src/game/audio/useAudio.ts"
         ],
         "matchedFiles": [
-          "frontend/src/game/activities/activities.ts",
-          "frontend/src/game/ui/ActivityMenu.tsx",
+          "frontend/src/startup.ts",
           "frontend/src/game/scene/LibraryScene.tsx",
-          "frontend/src/game/GameView.tsx"
+          "frontend/src/game/audio/useAudio.ts"
         ]
       },
       {
-        "id": "REQ-6",
-        "summary": "Add cozy mini-games accessible from the library: (1) Book Sorting, (2) Drawing Lessons/Viewing Drawings, (3) Hide-and-Seek among the bookshelves.",
+        "id": "REQ-21",
+        "summary": "Add lightweight startup + navigation diagnostics in the UI to help identify why startup/game launch failed (without requiring devtools), including a clear indicator of whether startup initialization completed and whether the game view mounted successfully.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/game/minigames/MiniGameLauncher.tsx",
-          "frontend/src/game/minigames/BookSortingMiniGame.tsx",
-          "frontend/src/game/minigames/DrawingMiniGame.tsx",
-          "frontend/src/game/minigames/HideAndSeekMiniGame.tsx",
-          "frontend/src/game/GameView.tsx"
+          "frontend/src/App.tsx",
+          "frontend/src/ui/GameLaunchErrorScreen.tsx",
+          "frontend/src/ui/GameRuntimeErrorBoundary.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/game/minigames/MiniGameLauncher.tsx",
-          "frontend/src/game/minigames/BookSortingMiniGame.tsx",
-          "frontend/src/game/minigames/DrawingMiniGame.tsx",
-          "frontend/src/game/minigames/HideAndSeekMiniGame.tsx",
-          "frontend/src/game/GameView.tsx"
-        ]
-      },
-      {
-        "id": "REQ-7",
-        "summary": "Implement library customization: allow the player to find items in vents and place them in the library to make it more comfortable.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/game/customization/customizationData.ts",
-          "frontend/src/game/customization/useCustomization.ts",
-          "frontend/src/game/ui/CustomizationPanel.tsx",
-          "frontend/src/game/scene/LibraryScene.tsx",
-          "frontend/src/game/GameView.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/game/customization/customizationData.ts",
-          "frontend/src/game/ui/CustomizationPanel.tsx",
-          "frontend/src/game/scene/LibraryScene.tsx",
-          "frontend/src/game/GameView.tsx"
-        ]
-      },
-      {
-        "id": "REQ-8",
-        "summary": "Ensure the game contains no transfurring mechanic: any accidental contact with Puro is treated as a benign interaction (hug/playful shove) and cannot harm or transform the player.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/game/characters/Puro.tsx",
-          "frontend/src/game/scene/LibraryScene.tsx",
-          "frontend/src/game/ui/ToastNarration.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/game/characters/Puro.tsx",
-          "frontend/src/game/scene/LibraryScene.tsx"
-        ]
-      },
-      {
-        "id": "REQ-9",
-        "summary": "Implement story progression with multiple endings based on Trust/Friendship: a Good Ending at high friendship, and a Betrayal Ending at low friendship with Special Edition variants (complete assimilation at very low friendship; 'Purlin' shared-mind fusion at slightly higher but still low friendship).",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/game/story/endings.ts",
-          "frontend/src/game/story/EndingScene.tsx",
-          "frontend/src/game/state/useGameStore.ts",
-          "frontend/src/game/GameView.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/game/story/endings.ts",
-          "frontend/src/game/story/EndingScene.tsx",
-          "frontend/src/game/state/useGameStore.ts",
-          "frontend/src/game/GameView.tsx"
+          "frontend/src/App.tsx",
+          "frontend/src/ui/GameLaunchErrorScreen.tsx",
+          "frontend/src/ui/GameRuntimeErrorBoundary.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
-    "backend/main.mo",
     "build-request.json",
-    "build-template/Dockerfile",
-    "build-template/LICENSE",
-    "build-template/README.md",
-    "build-template/deploy.sh",
-    "build-template/icp.yaml",
-    "build-template/package.json",
-    "build-template/pnpm-lock.yaml",
-    "build-template/pnpm-workspace.yaml",
-    "build-template/scripts/prune-unused-images.js",
-    "build-template/scripts/resize-images.js",
-    "build-template/src/backend/canister.yaml",
-    "build-template/src/backend/system-idl/aaaaa-aa.did",
-    "build-template/src/frontend/canister.yaml",
-    "build-template/src/frontend/components.json",
-    "build-template/src/frontend/env.json",
-    "build-template/src/frontend/eslint-rules/no-bigint-in-query-keys.js",
-    "build-template/src/frontend/eslint-rules/require-internet-identity-provider.js",
-    "build-template/src/frontend/eslint.config.js",
-    "build-template/src/frontend/package.json",
-    "build-template/src/frontend/postcss.config.js",
-    "build-template/src/frontend/src/components/ui/accordion.tsx",
-    "build-template/src/frontend/src/components/ui/alert-dialog.tsx",
-    "build-template/src/frontend/src/components/ui/alert.tsx",
-    "build-template/src/frontend/src/components/ui/aspect-ratio.tsx",
-    "build-template/src/frontend/src/components/ui/avatar.tsx",
-    "build-template/src/frontend/src/components/ui/badge.tsx",
-    "build-template/src/frontend/src/components/ui/breadcrumb.tsx",
-    "build-template/src/frontend/src/components/ui/button.tsx",
-    "build-template/src/frontend/src/components/ui/calendar.tsx",
-    "build-template/src/frontend/src/components/ui/card.tsx",
-    "build-template/src/frontend/src/components/ui/carousel.tsx",
-    "build-template/src/frontend/src/components/ui/chart.tsx",
-    "build-template/src/frontend/src/components/ui/checkbox.tsx",
-    "build-template/src/frontend/src/components/ui/collapsible.tsx",
-    "build-template/src/frontend/src/components/ui/command.tsx",
-    "build-template/src/frontend/src/components/ui/context-menu.tsx",
-    "build-template/src/frontend/src/components/ui/dialog.tsx",
-    "build-template/src/frontend/src/components/ui/drawer.tsx",
-    "build-template/src/frontend/src/components/ui/dropdown-menu.tsx",
-    "build-template/src/frontend/src/components/ui/form.tsx",
-    "build-template/src/frontend/src/components/ui/hover-card.tsx",
-    "build-template/src/frontend/src/components/ui/input-otp.tsx",
-    "build-template/src/frontend/src/components/ui/input.tsx",
-    "build-template/src/frontend/src/components/ui/label.tsx",
-    "build-template/src/frontend/src/components/ui/menubar.tsx",
-    "build-template/src/frontend/src/components/ui/navigation-menu.tsx",
-    "build-template/src/frontend/src/components/ui/pagination.tsx",
-    "build-template/src/frontend/src/components/ui/popover.tsx",
-    "build-template/src/frontend/src/components/ui/progress.tsx",
-    "build-template/src/frontend/src/components/ui/radio-group.tsx",
-    "build-template/src/frontend/src/components/ui/resizable.tsx",
-    "build-template/src/frontend/src/components/ui/scroll-area.tsx",
-    "build-template/src/frontend/src/components/ui/select.tsx",
-    "build-template/src/frontend/src/components/ui/separator.tsx",
-    "build-template/src/frontend/src/components/ui/sheet.tsx",
-    "build-template/src/frontend/src/components/ui/sidebar.tsx",
-    "build-template/src/frontend/src/components/ui/skeleton.tsx",
-    "build-template/src/frontend/src/components/ui/slider.tsx",
-    "build-template/src/frontend/src/components/ui/sonner.tsx",
-    "build-template/src/frontend/src/components/ui/switch.tsx",
-    "build-template/src/frontend/src/components/ui/table.tsx",
-    "build-template/src/frontend/src/components/ui/tabs.tsx",
-    "build-template/src/frontend/src/components/ui/textarea.tsx",
-    "build-template/src/frontend/src/components/ui/toggle-group.tsx",
-    "build-template/src/frontend/src/components/ui/toggle.tsx",
-    "build-template/src/frontend/src/components/ui/tooltip.tsx",
-    "build-template/src/frontend/src/hooks/use-mobile.tsx",
-    "build-template/src/frontend/src/lib/utils.ts",
-    "build-template/src/frontend/tsconfig.json",
-    "build-template/src/frontend/vite.config.js",
-    "build-template/tsconfig.json",
-    "caffeine.lock.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/index.css",
-    "frontend/index.html",
-    "frontend/public/assets/generated/bonsai-fruit-icon.dim_256x256.png",
-    "frontend/public/assets/generated/game-logo.dim_1024x512.png",
-    "frontend/public/assets/generated/joystick-base-and-stick.dim_512x512.png",
-    "frontend/public/assets/generated/menu-library-bg.dim_1920x1080.png",
-    "frontend/public/assets/generated/wood-paper-texture-tile.dim_512x512.png",
     "frontend/src/App.tsx",
-    "frontend/src/backend.d.ts",
-    "frontend/src/backend.ts",
-    "frontend/src/config.ts",
-    "frontend/src/declarations/backend.did.d.ts",
-    "frontend/src/declarations/backend.did.js",
     "frontend/src/game/GameView.tsx",
-    "frontend/src/game/activities/activities.ts",
     "frontend/src/game/audio/useAudio.ts",
-    "frontend/src/game/characters/Puro.tsx",
-    "frontend/src/game/controls/MobileControlsOverlay.tsx",
-    "frontend/src/game/controls/usePlayerControls.ts",
-    "frontend/src/game/customization/customizationData.ts",
-    "frontend/src/game/dialogue/dialogueData.ts",
-    "frontend/src/game/letters/letterTemplates.ts",
-    "frontend/src/game/minigames/BookSortingMiniGame.tsx",
-    "frontend/src/game/minigames/DrawingMiniGame.tsx",
-    "frontend/src/game/minigames/HideAndSeekMiniGame.tsx",
-    "frontend/src/game/minigames/MiniGameLauncher.tsx",
-    "frontend/src/game/moments/MomentPlayer.tsx",
-    "frontend/src/game/moments/momentsData.ts",
     "frontend/src/game/scene/LibraryScene.tsx",
-    "frontend/src/game/state/useGameStore.ts",
-    "frontend/src/game/story/EndingScene.tsx",
-    "frontend/src/game/story/endings.ts",
-    "frontend/src/game/ui/ActivityMenu.tsx",
-    "frontend/src/game/ui/CustomizationPanel.tsx",
-    "frontend/src/game/ui/DialoguePanel.tsx",
-    "frontend/src/game/ui/LettersPanel.tsx",
-    "frontend/src/game/ui/MomentsMenu.tsx",
-    "frontend/src/game/ui/PauseMenu.tsx",
-    "frontend/src/game/ui/SettingsScreen.tsx",
-    "frontend/src/game/ui/TrustMeter.tsx",
-    "frontend/src/hooks/useActor.ts",
-    "frontend/src/hooks/useInternetIdentity.ts",
-    "frontend/src/hooks/useQueries.ts",
-    "frontend/src/index.css",
-    "frontend/src/main.tsx",
-    "frontend/src/ui-summary.json",
-    "frontend/src/ui/CreditsScreen.tsx",
+    "frontend/src/startup.ts",
+    "frontend/src/ui/GameLaunchErrorScreen.tsx",
+    "frontend/src/ui/GameRuntimeErrorBoundary.tsx",
     "frontend/src/ui/TitleScreen.tsx",
-    "frontend/src/utils/StorageClient.ts",
-    "frontend/tailwind.config.js",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

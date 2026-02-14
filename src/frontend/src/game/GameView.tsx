@@ -19,17 +19,44 @@ import { Button } from '@/components/ui/button';
 interface GameViewProps {
   isNewGame: boolean;
   onBackToTitle: () => void;
+  onMounted?: () => void;
+  onMountError?: (error: string) => void;
 }
 
-export default function GameView({ isNewGame, onBackToTitle }: GameViewProps) {
-  const { initializeGame, showDialogue, showActivities, showMiniGames, showCustomization, showMoments, showLetters, showEnding, isPaused, setPaused } = useGameStore();
+export default function GameView({ isNewGame, onBackToTitle, onMounted, onMountError }: GameViewProps) {
+  const {
+    initializeGame,
+    showDialogue,
+    showActivities,
+    showMiniGames,
+    showCustomization,
+    showMoments,
+    showLetters,
+    showEnding,
+    isPaused,
+    setPaused,
+  } = useGameStore();
   const [showPauseMenu, setShowPauseMenu] = useState(false);
+  const [canvasMounted, setCanvasMounted] = useState(false);
   const { playBackgroundMusic } = useAudioManager();
 
   useEffect(() => {
-    initializeGame(isNewGame);
-    playBackgroundMusic();
-  }, [isNewGame, initializeGame, playBackgroundMusic]);
+    try {
+      initializeGame(isNewGame);
+      playBackgroundMusic();
+    } catch (error) {
+      console.error('Failed to initialize game:', error);
+      onMountError?.(error instanceof Error ? error.message : 'Failed to initialize game');
+    }
+  }, [isNewGame, initializeGame, playBackgroundMusic, onMountError]);
+
+  const handleCanvasCreated = () => {
+    setCanvasMounted(true);
+    // Give the scene a moment to render before signaling success
+    setTimeout(() => {
+      onMounted?.();
+    }, 100);
+  };
 
   const handlePause = () => {
     setPaused(true);
@@ -47,6 +74,7 @@ export default function GameView({ isNewGame, onBackToTitle }: GameViewProps) {
       <Canvas
         camera={{ position: [0, 1.6, 5], fov: 60 }}
         className="w-full h-full"
+        onCreated={handleCanvasCreated}
       >
         <LibraryScene />
       </Canvas>

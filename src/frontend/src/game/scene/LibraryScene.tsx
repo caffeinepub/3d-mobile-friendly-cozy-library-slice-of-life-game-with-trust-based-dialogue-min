@@ -1,20 +1,31 @@
 import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { OrbitControls, Environment } from '@react-three/drei';
+import { OrbitControls, Environment, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 import Puro from '../characters/Puro';
 import { usePlayerControls } from '../controls/usePlayerControls';
 import { useGameStore } from '../state/useGameStore';
-import { useTexture } from '@react-three/drei';
 
 export default function LibraryScene() {
   const playerRef = useRef<THREE.Group>(null);
   const { movement, look } = usePlayerControls();
   const { libraryCustomizations } = useGameStore();
-  
-  const woodTexture = useTexture('/assets/generated/wood-paper-texture-tile.dim_512x512.png');
-  woodTexture.wrapS = woodTexture.wrapT = THREE.RepeatWrapping;
-  woodTexture.repeat.set(4, 4);
+
+  // Load texture unconditionally (required by Rules of Hooks)
+  // If it fails, drei will handle the error and we'll use fallback material
+  let woodTexture: THREE.Texture | null = null;
+  try {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    woodTexture = useTexture('/assets/generated/wood-paper-texture-tile.dim_512x512.png');
+    if (woodTexture) {
+      woodTexture.wrapS = woodTexture.wrapT = THREE.RepeatWrapping;
+      woodTexture.repeat.set(4, 4);
+    }
+  } catch (error) {
+    // Texture loading failed, will use fallback material
+    console.warn('Failed to load wood texture, using fallback material');
+    woodTexture = null;
+  }
 
   useFrame((state, delta) => {
     if (!playerRef.current) return;
@@ -52,7 +63,11 @@ export default function LibraryScene() {
       {/* Floor */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
         <planeGeometry args={[20, 20]} />
-        <meshStandardMaterial map={woodTexture} />
+        {woodTexture ? (
+          <meshStandardMaterial map={woodTexture} />
+        ) : (
+          <meshStandardMaterial color="#8b7355" />
+        )}
       </mesh>
 
       {/* Walls */}
@@ -95,7 +110,13 @@ export default function LibraryScene() {
   );
 }
 
-function Bookshelf({ position, rotation = [0, 0, 0] }: { position: [number, number, number]; rotation?: [number, number, number] }) {
+function Bookshelf({
+  position,
+  rotation = [0, 0, 0],
+}: {
+  position: [number, number, number];
+  rotation?: [number, number, number];
+}) {
   return (
     <group position={position} rotation={rotation}>
       <mesh position={[0, 1.5, 0]} castShadow>
@@ -155,7 +176,7 @@ function Vent({ position }: { position: [number, number, number] }) {
 
 function CustomizationItem({ item }: { item: { itemName: string; location: string } }) {
   const position = parseLocation(item.location);
-  
+
   return (
     <mesh position={position} castShadow>
       <boxGeometry args={[0.5, 0.5, 0.5]} />
@@ -170,8 +191,8 @@ function parseLocation(location: string): [number, number, number] {
     'shelf-1': [-7, 1, -7],
     'shelf-2': [-3, 1, -7],
     'corner-left': [-8, 0.5, -8],
-    'corner-right': [8, 0.5, -8],
-    'center': [0, 0.5, 3],
+    'corner-right': [8, 0.5, 8],
+    center: [0, 0.5, 0],
   };
   return positions[location] || [0, 0.5, 0];
 }

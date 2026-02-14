@@ -1,499 +1,114 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Cozy Library: 3D slice-of-life (React Three Fiber) with trust-based dialogue, mini-games, customization, and endings",
+  "title": "Reliable game launch with gameplay error recovery, asset fallbacks, and UI diagnostics",
   "requirements": [
     {
-      "id": "REQ-1",
-      "summary": "Render a single-location, explorable 3D cozy library scene (bookshelves, vents, bonsai with fruit) in React Three Fiber.",
+      "id": "REQ-18",
+      "summary": "Make TitleScreen \"New Game\" / \"Continue\" reliably transition into gameplay, with explicit user-facing failure states and recovery back to title.",
       "acceptanceCriteria": [
-        "A playable 3D scene renders in the browser using React Three Fiber.",
-        "The library contains clearly identifiable: bookshelves, at least one vent, and a central bonsai tree with visible fruit.",
-        "The player can move around the library and look around without leaving the library area."
+        "Clicking \"New Game\" on the title screen always navigates to the gameplay view (3D canvas visible) or shows a clear, user-facing error screen if gameplay initialization fails.",
+        "Clicking \"Continue\" navigates to gameplay using existing saved state (or shows a clear message if continuing is not possible due to missing/corrupt saved data).",
+        "If gameplay fails to mount for any reason, the user is presented with an on-screen error state (not a blank screen) that includes a \"Back to Title\" action."
       ],
       "file_operations": [
-        {
-          "path": "frontend/package.json",
-          "operation": "modify",
-          "description": "Add required 3D runtime dependencies for a 3D game (React Three Fiber + Three.js helpers) to support rendering the library scene."
-        },
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "create",
-          "description": "Create the app shell and route structure (Title/New/Continue/Settings/Credits + in-game view) and wire navigation into the app."
-        },
-        {
-          "path": "frontend/src/game/GameView.tsx",
-          "operation": "create",
-          "description": "Create the main in-game view that hosts the 3D canvas and overlays (HUD/dialogue/menus) while keeping the player inside the library."
-        },
-        {
-          "path": "frontend/src/game/scene/LibraryScene.tsx",
-          "operation": "create",
-          "description": "Implement the 3D library scene (bookshelves, vents, central bonsai tree with visible fruit) using React Three Fiber primitives and consistent materials."
-        },
-        {
-          "path": "frontend/public/assets/generated/wood-paper-texture-tile.dim_512x512.png",
-          "operation": "create",
-          "description": "Add the generated pixelated wood-and-paper texture tile asset for use in the 3D scene and UI."
-        },
-        {
-          "path": "frontend/public/assets/generated/bonsai-fruit-icon.dim_256x256.png",
-          "operation": "create",
-          "description": "Add the generated bonsai fruit icon asset to visually represent fruit interactions and inventory-like UI."
-        }
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "summary": "Implement mobile-friendly touch controls (movement + camera) with desktop keyboard/mouse fallback.",
-      "acceptanceCriteria": [
-        "On touch devices, the player can move using on-screen touch controls (e.g., virtual joystick or touch drag) and adjust camera view with touch gestures.",
-        "On desktop, WASD/arrow keys move the player and mouse controls the camera.",
-        "Controls are usable without requiring external hardware/gamepads."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/game/controls/usePlayerControls.ts",
-          "operation": "create",
-          "description": "Implement unified control logic supporting touch (virtual joystick + camera gesture) and desktop (WASD/arrow + mouse look) for the 3D game."
-        },
-        {
-          "path": "frontend/src/game/controls/MobileControlsOverlay.tsx",
-          "operation": "create",
-          "description": "Create an on-screen mobile controls overlay (virtual joystick and touch zones) and integrate it into the in-game view; use shadcn-ui for panels/buttons where helpful (verify the component's usage instructions before implementing)."
-        },
-        {
-          "path": "frontend/src/game/GameView.tsx",
-          "operation": "modify",
-          "description": "Wire the control system into the 3D player/camera update loop and conditionally render the mobile overlay on touch-capable devices."
-        },
-        {
-          "path": "frontend/public/assets/generated/joystick-base-and-stick.dim_512x512.png",
-          "operation": "create",
-          "description": "Add the generated mobile control icons set for the virtual joystick visuals."
-        }
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "summary": "Add a Trust/Friendship relationship meter that persists and gates dialogue openness/outcomes.",
-      "acceptanceCriteria": [
-        "Trust/Friendship value is stored per signed-in user (or per local session if not signed in) and persists across refresh.",
-        "UI shows the current Trust/Friendship meter in-game.",
-        "At least two thresholds are reflected in gameplay: low trust (distant/polite responses) and high trust (more intimate/comfortable responses)."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/game/state/gameState.ts",
-          "operation": "create",
-          "description": "Define a frontend game state model (trust, progression, unlocks) that can sync to the existing backendInterface when signed in and fall back to local persistence when anonymous."
-        },
-        {
-          "path": "frontend/src/game/state/useGameStore.ts",
-          "operation": "create",
-          "description": "Implement a lightweight state store for Trust/Friendship and core progression; include methods to apply trust deltas and trigger autosave calls."
-        },
-        {
-          "path": "frontend/src/game/state/persistence.ts",
-          "operation": "create",
-          "description": "Implement persistence that uses the backend canister when identity is available and uses localStorage/session storage otherwise (no new auth introduced)."
-        },
-        {
-          "path": "frontend/src/game/ui/TrustMeter.tsx",
-          "operation": "create",
-          "description": "Add an in-game Trust/Friendship meter UI (HUD). Use shadcn-ui (e.g., Progress) to present a themed meter (verify the component's usage instructions before implementing)."
-        },
-        {
-          "path": "frontend/src/game/GameView.tsx",
-          "operation": "modify",
-          "description": "Wire TrustMeter into the in-game HUD and ensure trust thresholds are accessible to dialogue/endings logic."
-        }
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "summary": "Implement a branching dialogue tree with Puro, including trust-affecting choices and multiple topics.",
-      "acceptanceCriteria": [
-        "Dialogue presents multiple-choice options and branches to different lines.",
-        "At least 3 conversation topics exist (lab backstory, the Pale virus, fascination with humans).",
-        "Some choices modify Trust/Friendship (positive and negative examples present).",
-        "Dialogue state and Trust/Friendship changes are saved."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/game/dialogue/dialogueData.ts",
-          "operation": "create",
-          "description": "Create a dialogue tree definition including at least 3 topics (lab backstory, Pale virus, fascination with humans) and choice metadata including trust deltas."
-        },
-        {
-          "path": "frontend/src/game/dialogue/useDialogueController.ts",
-          "operation": "create",
-          "description": "Implement a dialogue controller hook that advances nodes, applies trust changes, and triggers persistence after choices."
-        },
-        {
-          "path": "frontend/src/game/ui/DialoguePanel.tsx",
-          "operation": "create",
-          "description": "Create an in-game dialogue UI with multiple-choice selection and branching display. Use shadcn-ui (e.g., Card/Button/Dialog) for consistent panels (verify the component's usage instructions before implementing)."
-        },
-        {
-          "path": "frontend/src/game/GameView.tsx",
-          "operation": "modify",
-          "description": "Wire DialoguePanel to the in-game overlay layer and connect it to trust thresholds to vary tone/lines (low vs high trust)."
-        }
-      ]
-    },
-    {
-      "id": "REQ-5",
-      "summary": "Create a hangout/daily routine loop with activities (reading, stories, feeding bonsai oranges) accessible in the library.",
-      "acceptanceCriteria": [
-        "Player can select an activity from an in-game menu or interactable hotspots in the 3D scene.",
-        "Each activity plays a short scene (dialogue and/or simple interaction) and affects Trust/Friendship (not all activities have the same effect).",
-        "Feeding uses a visible bonsai fruit interaction (e.g., pick fruit then offer to Puro) without leaving the library."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/game/activities/activities.ts",
-          "operation": "create",
-          "description": "Define the three hangout activities (reading together, listening to stories, feeding bonsai oranges) including trust effects and short follow-up lines/scenes."
-        },
-        {
-          "path": "frontend/src/game/ui/ActivityMenu.tsx",
-          "operation": "create",
-          "description": "Add an in-game activity menu to start hangouts and show completion prompts. Use shadcn-ui (e.g., Sheet/Dialog/Button) for the menu UI (verify the component's usage instructions before implementing)."
-        },
-        {
-          "path": "frontend/src/game/scene/LibraryScene.tsx",
-          "operation": "modify",
-          "description": "Add interactable hotspots in the 3D scene for reading/stories and a bonsai fruit interaction loop (pick fruit then offer) that does not leave the library."
-        },
-        {
-          "path": "frontend/src/game/GameView.tsx",
-          "operation": "modify",
-          "description": "Wire activity selection + completion into the state store, apply trust deltas, and trigger autosave after each activity completes."
-        }
-      ]
-    },
-    {
-      "id": "REQ-6",
-      "summary": "Add three replayable cozy mini-games (Book Sorting, Drawing Lessons/Viewing Drawings, Hide-and-Seek) launched from the library.",
-      "acceptanceCriteria": [
-        "Each mini-game is playable and has a clear win/complete condition.",
-        "Completing a mini-game results in a Trust/Friendship change and a short follow-up line/scene.",
-        "Mini-games can be replayed from within the library."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/game/minigames/MiniGameLauncher.tsx",
-          "operation": "create",
-          "description": "Create a mini-game launcher overlay accessible from the in-library menu/hotspots; use shadcn-ui for the launcher UI (verify the component's usage instructions before implementing)."
-        },
-        {
-          "path": "frontend/src/game/minigames/BookSortingMiniGame.tsx",
-          "operation": "create",
-          "description": "Implement Book Sorting as a simple drag/reorder or tap-to-sort mini-game with a clear completion condition and trust reward/penalty."
-        },
-        {
-          "path": "frontend/src/game/minigames/DrawingMiniGame.tsx",
-          "operation": "create",
-          "description": "Implement Drawing Lessons/Viewing Drawings with a small interactive step (e.g., trace/fill) and a gallery of completed drawings; include a completion condition and trust change."
-        },
-        {
-          "path": "frontend/src/game/minigames/HideAndSeekMiniGame.tsx",
-          "operation": "create",
-          "description": "Implement Hide-and-Seek among bookshelves as a timed 'find the hiding spot' interaction using the existing library context with a clear complete state and trust change."
-        },
-        {
-          "path": "frontend/src/game/GameView.tsx",
-          "operation": "modify",
-          "description": "Wire mini-game start/finish into the in-game overlay; on completion apply trust deltas, show a short follow-up line/scene, and autosave."
-        }
-      ]
-    },
-    {
-      "id": "REQ-7",
-      "summary": "Enable library customization by discovering items in vents and placing/removing them at predefined spots with persistence.",
-      "acceptanceCriteria": [
-        "At least 5 customizable items exist (decor objects) that can be discovered via vent interactions.",
-        "Player can place/remove items at predefined placement points in the library.",
-        "Placed items persist across refresh (saved per user/session)."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/game/customization/customizationData.ts",
-          "operation": "create",
-          "description": "Define at least 5 decor items (name/description) and predefined placement points in the library."
-        },
-        {
-          "path": "frontend/src/game/customization/useCustomization.ts",
-          "operation": "create",
-          "description": "Implement customization logic: discover items via vent interactions, place/remove at allowed points, and persist changes via the game persistence layer."
-        },
-        {
-          "path": "frontend/src/game/ui/CustomizationPanel.tsx",
-          "operation": "create",
-          "description": "Create a customization UI panel for managing discovered items and placement slots. Use shadcn-ui components for lists/buttons/dialog confirmations (verify the component's usage instructions before implementing)."
-        },
-        {
-          "path": "frontend/src/game/scene/LibraryScene.tsx",
-          "operation": "modify",
-          "description": "Add vent interactables that can reveal items and add visible placed decor objects at predefined points based on saved customization state."
-        },
-        {
-          "path": "frontend/src/game/GameView.tsx",
-          "operation": "modify",
-          "description": "Wire customization discovery/placement UI into the in-game menu flow and autosave after each placement/removal."
-        }
-      ]
-    },
-    {
-      "id": "REQ-8",
-      "summary": "Ensure close contact with Puro is always benign (no transfurring mechanic) and shows a safe reaction.",
-      "acceptanceCriteria": [
-        "There are no mechanics that transform the player due to contact during normal gameplay.",
-        "If the player collides/interacts closely with Puro, the game shows a safe/benign reaction (animation/text) and continues."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/game/characters/Puro.tsx",
-          "operation": "create",
-          "description": "Add a simple in-scene representation for Puro (non-threatening) with proximity/collision detection hooks to trigger benign reactions only."
-        },
-        {
-          "path": "frontend/src/game/scene/LibraryScene.tsx",
-          "operation": "modify",
-          "description": "Integrate Puro into the library scene and implement a benign interaction on close contact (e.g., brief text prompt / gentle shove) with no harmful/transformation mechanics."
-        },
-        {
-          "path": "frontend/src/game/ui/ToastNarration.tsx",
-          "operation": "create",
-          "description": "Create a lightweight narration/toast UI for benign interaction feedback. Use shadcn-ui toast/sonner-style component if present in the template (verify the component's usage instructions before implementing)."
-        }
-      ]
-    },
-    {
-      "id": "REQ-9",
-      "summary": "Implement story progression and at least three reproducible endings determined by Trust/Friendship thresholds, with end scene + credits/return option.",
-      "acceptanceCriteria": [
-        "The game can reach at least 3 distinct endings: Good Ending, Betrayal (Complete Assimilation), Betrayal (Purlin Fusion).",
-        "Ending selection is determined by Trust/Friendship thresholds and is reproducible via saved values.",
-        "Each ending presents a clear end scene and credits/return-to-menu option."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/game/story/endings.ts",
-          "operation": "create",
-          "description": "Define trust thresholds and ending metadata for: Good Ending, Betrayal (Complete Assimilation), Betrayal (Purlin Fusion), including end-scene text and unlock keys."
-        },
-        {
-          "path": "frontend/src/game/story/EndingScene.tsx",
-          "operation": "create",
-          "description": "Create an ending scene overlay that displays the selected ending, provides credits/return-to-menu, and triggers autosave on completion. Use shadcn-ui for buttons/dialog framing (verify the component's usage instructions before implementing)."
-        },
-        {
-          "path": "frontend/src/game/state/useGameStore.ts",
-          "operation": "modify",
-          "description": "Add story progression + ending evaluation helpers and ensure ending unlocks are stored in persisted state."
-        },
-        {
-          "path": "frontend/src/game/GameView.tsx",
-          "operation": "modify",
-          "description": "Wire a reproducible 'reach ending' trigger (via menu action or story milestone) that evaluates trust and displays the correct ending scene."
-        }
-      ]
-    },
-    {
-      "id": "REQ-10",
-      "summary": "Add a Memorable Moments feature to unlock and replay heartwarming scenes without affecting Trust (unless clearly indicated).",
-      "acceptanceCriteria": [
-        "At least 2 moments can be unlocked through normal play and appear in a Moments list.",
-        "Selecting a moment replays its scene without altering Trust/Friendship (or clearly indicates if it does).",
-        "Unlocked moments persist across refresh."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/game/moments/momentsData.ts",
-          "operation": "create",
-          "description": "Define at least two memorable moments (e.g., sitting on Puro’s mat; watching him eat a snack) with unlock conditions and replay scripts."
-        },
-        {
-          "path": "frontend/src/game/ui/MomentsMenu.tsx",
-          "operation": "create",
-          "description": "Create a Moments list UI to view unlocked moments and replay them. Use shadcn-ui for list/menus/dialogs (verify the component's usage instructions before implementing)."
-        },
-        {
-          "path": "frontend/src/game/moments/MomentPlayer.tsx",
-          "operation": "create",
-          "description": "Implement a simple moment replay overlay that plays a short scene and explicitly does not change trust by default."
-        },
-        {
-          "path": "frontend/src/game/GameView.tsx",
-          "operation": "modify",
-          "description": "Wire moments unlocking into normal play events (activities/mini-games/dialogue) and add access to the Moments menu from the in-game UI."
-        }
-      ]
-    },
-    {
-      "id": "REQ-11",
-      "summary": "Implement a letter-writing system via vent interactions with saved letters and friendly in-game responses from predefined templates/logic.",
-      "acceptanceCriteria": [
-        "Player can compose and save a letter (with a length limit) and submit it via a vent interaction.",
-        "The game can display previously sent letters and at least one response per letter (generated from predefined templates/logic, not external services).",
-        "Letters and responses persist across refresh (per user/session)."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/game/letters/letterTemplates.ts",
-          "operation": "create",
-          "description": "Add predefined friendly response templates/logic for letters (no external services)."
-        },
-        {
-          "path": "frontend/src/game/ui/LettersPanel.tsx",
-          "operation": "create",
-          "description": "Create a letter composition + inbox UI (length-limited) that submits letters via vent interaction and shows responses. Use shadcn-ui input/textarea/dialog components (verify the component's usage instructions before implementing)."
-        },
-        {
-          "path": "frontend/src/game/state/useGameStore.ts",
-          "operation": "modify",
-          "description": "Add actions for writing letters, appending responses, and persisting letters per user/session through the persistence layer."
-        },
-        {
-          "path": "frontend/src/game/scene/LibraryScene.tsx",
-          "operation": "modify",
-          "description": "Wire a vent interaction to open the LettersPanel and allow placing/submitting letters within the library context."
-        }
-      ]
-    },
-    {
-      "id": "REQ-12",
-      "summary": "Set calm/cozy/melancholic tone with English text, lofi retro piano background music, and sound toggles.",
-      "acceptanceCriteria": [
-        "Background music plays in-game and matches a lofi/retro piano style.",
-        "UI includes at least mute/volume controls for music (and optionally SFX).",
-        "All player-facing UI strings and dialogue are in English."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/public/assets/audio/lofi-retro-piano.mp3",
-          "operation": "create",
-          "description": "Add a lofi retro-style piano background music asset to be used as in-game BGM."
-        },
-        {
-          "path": "frontend/src/game/audio/useAudio.ts",
-          "operation": "create",
-          "description": "Implement simple audio playback management (play/pause, volume, mute) for background music with persisted settings."
-        },
-        {
-          "path": "frontend/src/game/ui/SettingsScreen.tsx",
-          "operation": "create",
-          "description": "Create Settings (audio) screen with music mute/volume controls; use shadcn-ui sliders/switches (verify the component's usage instructions before implementing)."
-        },
         {
           "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Wire Settings screen into navigation and ensure audio settings apply to the in-game view."
-        }
-      ]
-    },
-    {
-      "id": "REQ-13",
-      "summary": "Apply a coherent 3D visual style that nods to pixel-art aesthetics (low-poly + retro textures) across scene, UI, and mini-games.",
-      "acceptanceCriteria": [
-        "3D scene uses a consistent retro-inspired visual treatment (materials/textures/lighting) across major objects.",
-        "UI and mini-game visuals align with the same retro/cozy art direction."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/game/scene/retroMaterials.ts",
-          "operation": "create",
-          "description": "Centralize retro-inspired material/lighting presets (low-poly shading, pixelated texture sampling, warm dim lighting) for consistent 3D styling."
-        },
-        {
-          "path": "frontend/src/game/scene/LibraryScene.tsx",
-          "operation": "modify",
-          "description": "Apply the retro material/lighting presets consistently across bookshelves, vents, bonsai, and other major props; reuse the generated texture tile where appropriate."
-        },
-        {
-          "path": "frontend/src/game/minigames/minigameTheme.ts",
-          "operation": "create",
-          "description": "Define a shared mini-game visual theme (colors, borders, textures) that matches the retro/cozy style used in the main UI."
-        },
-        {
-          "path": "frontend/src/game/minigames/BookSortingMiniGame.tsx",
-          "operation": "modify",
-          "description": "Apply the shared mini-game theme styling so the mini-game aligns visually with the rest of the game."
-        }
-      ]
-    },
-    {
-      "id": "REQ-14",
-      "summary": "Create a cozy UI theme (non blue/purple-dominant) and implement required menus: Title, New/Continue, Settings, Credits/About.",
-      "acceptanceCriteria": [
-        "UI uses a consistent palette, typography, and component styling across all screens.",
-        "Primary UI colors are not predominantly blue/purple.",
-        "Menus include at minimum: Title screen, New/Continue, Settings (audio), and Credits/About."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/index.css",
-          "operation": "create",
-          "description": "Define global theme tokens and base styles (warm cozy palette avoiding blue/purple dominance; readable typography) compatible with the existing Tailwind/shadcn setup."
+          "description": "Harden the Title -> Game transition by making New Game / Continue actions asynchronous and stateful: show a non-blocking launching state, invoke existing backend calls via React Query hooks (startNewGame / continueGame) before switching to gameplay, and route failures to a dedicated game-launch error UI that includes a Back to Title action. Also track and reset per-launch diagnostics state to prevent silent failures."
         },
         {
           "path": "frontend/src/ui/TitleScreen.tsx",
-          "operation": "create",
-          "description": "Create a Title screen with logo, New/Continue buttons, Settings, and Credits/About navigation. Use shadcn-ui buttons/cards for consistent UI (verify the component's usage instructions before implementing)."
-        },
-        {
-          "path": "frontend/src/ui/CreditsScreen.tsx",
-          "operation": "create",
-          "description": "Create a Credits/About screen consistent with the theme. Use shadcn-ui for layout components where appropriate (verify the component's usage instructions before implementing)."
-        },
-        {
-          "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Wire Title/New/Continue/Settings/Credits screens into the app’s navigation so they are reachable and styled consistently."
-        },
-        {
-          "path": "frontend/public/assets/generated/menu-library-bg.dim_1920x1080.png",
-          "operation": "create",
-          "description": "Add the generated cozy dim library interior background illustration for the title/menu screen."
-        },
-        {
-          "path": "frontend/public/assets/generated/game-logo.dim_1024x512.png",
-          "operation": "create",
-          "description": "Add the generated retro-styled game logo text mark for the title screen."
-        }
-      ]
-    },
-    {
-      "id": "REQ-15",
-      "summary": "Add game state management: New/Continue, autosave on key events, and reset progress; include all required state fields.",
-      "acceptanceCriteria": [
-        "A player can start a new game, continue from last save, and reset progress from a menu.",
-        "Game autosaves after at least: completing an activity, finishing a mini-game, changing customization, and finishing an ending.",
-        "State includes Trust/Friendship, unlocked moments, placed items, letters, and story progression."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/game/state/autosave.ts",
-          "operation": "create",
-          "description": "Implement autosave triggers and a debounced save helper called after key events (dialogue choice, activity completion, mini-game completion, customization changes, ending completion)."
-        },
-        {
-          "path": "frontend/src/ui/PauseMenu.tsx",
-          "operation": "create",
-          "description": "Create an in-game menu with Continue, Reset Progress, Settings, Credits, and Return to Title actions. Use shadcn-ui for menu UI and confirmation dialogs (verify the component's usage instructions before implementing)."
-        },
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Wire New Game / Continue flows and provide Reset Progress in UI, using the persistence layer to load/save state across refresh."
+          "description": "Disable or visually indicate TitleScreen actions while a launch is in progress, and surface a concise Continue-not-possible message when the app detects missing/corrupt state. Use shadcn-ui Button/Card composition for consistent styling (verify the component's usage instructions before implementing)."
         },
         {
           "path": "frontend/src/game/GameView.tsx",
           "operation": "modify",
-          "description": "Invoke autosave on the required events and ensure the stored state includes trust, unlocked moments, placed items, letters, and story progression."
+          "description": "Add explicit \"mounted successfully\" signaling (e.g., via an onMounted callback and/or Canvas onCreated) so App can confirm the gameplay view is visible; on mount failure/timeouts, allow App to show a user-facing error state rather than a blank screen."
+        },
+        {
+          "path": "frontend/src/ui/GameLaunchErrorScreen.tsx",
+          "operation": "create",
+          "description": "Create a dedicated, mobile-readable error screen shown when game launch/continue fails or when the game view fails to mount. Include: plain-English error summary, optional expandable technical details, and a \"Back to Title\" button. Compose with shadcn-ui Card/Button for theme consistency (verify the component's usage instructions before implementing)."
+        }
+      ]
+    },
+    {
+      "id": "REQ-19",
+      "summary": "Add a top-level runtime error boundary around the gameplay rendering path (React Three Fiber Canvas/scene) to catch runtime exceptions and provide recovery UI.",
+      "acceptanceCriteria": [
+        "A runtime error occurring during GameView/Canvas/scene rendering does not crash the entire app or result in a blank screen.",
+        "When an error is caught, a fallback UI is shown with: (1) a short plain-English message, (2) an optional expandable technical detail section, and (3) a \"Back to Title\" button that returns to the title screen.",
+        "The fallback UI is styled consistently with the existing Tailwind theme and remains readable on mobile."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/ui/GameRuntimeErrorBoundary.tsx",
+          "operation": "create",
+          "description": "Implement a React error boundary dedicated to the gameplay rendering subtree. It should capture errors from GameView/Canvas/scene rendering, store error details safely, and render a styled fallback UI with an optional technical details section and a Back to Title action. Compose fallback with shadcn-ui Card/Button to match existing theme (verify the component's usage instructions before implementing)."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Wrap the gameplay rendering path with the new GameRuntimeErrorBoundary so runtime exceptions in Canvas/scene do not blank the screen. Wire the boundary's \"Back to Title\" recovery to the existing title navigation."
+        },
+        {
+          "path": "frontend/src/game/GameView.tsx",
+          "operation": "modify",
+          "description": "Ensure GameView renders in a way that allows the error boundary to catch failures from Canvas/scene, and report mount success/failure stage to App for coordinated recovery UI."
+        }
+      ]
+    },
+    {
+      "id": "REQ-20",
+      "summary": "Harden startup and in-game asset loading so missing textures/audio do not block the game; provide safe runtime fallbacks instead of throwing.",
+      "acceptanceCriteria": [
+        "Startup preloading failures never block the app from becoming interactive (title screen still renders, and navigation still works).",
+        "If a required 3D texture fails to load at runtime, the scene renders with a fallback material (e.g., a solid color) instead of throwing and blocking gameplay.",
+        "If background music fails to play/load (including autoplay restrictions), gameplay still starts and the app remains responsive; the app does not show a blocking error modal for audio issues."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/startup.ts",
+          "operation": "modify",
+          "description": "Keep startup idempotent and non-blocking, but improve resilience by capturing preload results (success/failure per asset) without throwing, returning a concise message suitable for user-facing warnings while still allowing the app to become interactive."
+        },
+        {
+          "path": "frontend/src/game/scene/LibraryScene.tsx",
+          "operation": "modify",
+          "description": "Replace/augment the current texture loading approach with a safe, non-throwing load path that falls back to a basic/solid material when the texture at frontend/public/assets/generated/wood-paper-texture-tile.dim_512x512.png fails to load, preventing runtime exceptions from blocking scene rendering."
+        },
+        {
+          "path": "frontend/src/game/audio/useAudio.ts",
+          "operation": "modify",
+          "description": "Harden audio initialization and playback: guard Audio construction, handle missing file load errors, and ensure playBackgroundMusic never throws and never blocks gameplay. Maintain silent/non-blocking behavior for autoplay restrictions while optionally reporting a non-sensitive diagnostic reason to the launch diagnostics system."
+        }
+      ]
+    },
+    {
+      "id": "REQ-21",
+      "summary": "Add lightweight UI diagnostics for startup/game launch stages (startup complete vs game view mounted) that appear only on error/fallback screens without exposing sensitive data.",
+      "acceptanceCriteria": [
+        "When startup fails or gameplay fails to mount, the user can see a concise English message describing the stage that failed (e.g., \"Startup initialization failed\" vs \"Game view failed to load\").",
+        "Diagnostics messaging does not appear during a normal successful flow (or is only visible in the error/fallback UI).",
+        "No sensitive information (keys, identities, principals) is shown in user-facing diagnostics."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Introduce a minimal diagnostics model in App (startup complete flag, last launch action, launch stage, game mounted flag, and sanitized error message). Ensure diagnostics are only rendered in error/fallback UIs and never include identities/principals or other sensitive values."
+        },
+        {
+          "path": "frontend/src/ui/GameLaunchErrorScreen.tsx",
+          "operation": "modify",
+          "description": "Display concise stage-based diagnostics (e.g., \"Startup initialization failed\" vs \"Game view failed to load\" vs \"Continue failed\") and an optional expandable technical detail section that is sanitized and non-sensitive. Compose with shadcn-ui components for consistent styling (verify the component's usage instructions before implementing)."
+        },
+        {
+          "path": "frontend/src/ui/GameRuntimeErrorBoundary.tsx",
+          "operation": "modify",
+          "description": "Augment the runtime error fallback UI to include stage-aware diagnostics (e.g., indicate that the game view mounted vs failed during rendering) and ensure technical details are optional/expandable and do not include sensitive information. Compose with shadcn-ui Card/Button (verify the component's usage instructions before implementing)."
         }
       ]
     }
