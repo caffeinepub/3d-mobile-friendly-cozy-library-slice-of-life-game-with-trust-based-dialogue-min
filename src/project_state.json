@@ -1,0 +1,220 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 3,
+  "summary": "3D mobile-friendly slice-of-life adventure/visual-novel hybrid set entirely in Puro’s library, focused on building friendship/trust through dialogue and cozy activities, featuring multiple endings including a low-friendship Betrayal ending with Special Edition variants.",
+  "architectural_notes": [
+    "Core gameplay loop centered on a hub-based, single-location library environment with repeatable daily activities and relationship progression.",
+    "Ending selection logic driven primarily by Trust/Friendship thresholds (including Special Edition sub-variants for very low vs slightly low friendship)."
+  ],
+  "known_issues": [
+    "Art/style scope conflict: user requests a 3D game, but gameplay style mentions 2D pixel art aesthetics—needs final decision on visual style."
+  ],
+  "isFixRequest": false,
+  "imageRequirements": "## Required Images\n- Cozy dim library interior background illustration for title/menu (menu-library-bg.dim_1920x1080.png)\n- Retro-styled game logo text mark with warm cozy colors (game-logo.dim_1024x512.png)\n- On-screen mobile control icons set (joystick-base-and-stick.dim_512x512.png)\n- Pixelated wood-and-paper texture tile (wood-paper-texture-tile.dim_512x512.png)\n- Bonsai tree fruit icon (bonsai-fruit-icon.dim_256x256.png)",
+  "existing_features": [
+    {
+      "id": "feature-create-a-single-location-3d-game-scene-set-entirely-in-a-dim-cozy-dusty-library-with-bookshelves-vents-and-a-central-fruit-bearing-bonsai-tree-that-the-player-can-explore",
+      "title": "Create a single-location 3D game scene set entirely in a dim, cozy, dusty library with bookshelves, vents, and a central fruit-bearing bonsai tree that the player can explore.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-mobile-friendly-controls-for-the-3d-gameplay-including-touch-movement-and-camera-control-with-a-desktop-fallback-keyboard-mouse-for-testing",
+      "title": "Implement mobile-friendly controls for the 3D gameplay, including touch movement and camera control, with a desktop fallback (keyboard/mouse) for testing.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-relationship-system-with-a-visible-trust-friendship-meter-that-changes-based-on-player-choices-and-activities-and-use-it-to-gate-or-alter-dialogue-openness-and-story-outcomes",
+      "title": "Add a Relationship system with a visible Trust/Friendship meter that changes based on player choices and activities, and use it to gate or alter dialogue openness and story outcomes.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-an-interactive-dialogue-tree-system-for-conversations-with-puro-including-choices-that-can-increase-or-decrease-trust-friendship-and-questions-about-the-lab-the-pale-virus-puro-s-nature-and-his-interest-in-humans",
+      "title": "Implement an interactive dialogue tree system for conversations with Puro, including choices that can increase or decrease Trust/Friendship and questions about the lab, the Pale virus, Puro’s nature, and his interest in humans.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-hangout-daily-routine-loop-inside-the-library-with-at-least-these-activities-reading-together-listening-to-puro-s-stories-and-feeding-oranges-from-the-bonsai-tree",
+      "title": "Create a Hangout/Daily routine loop inside the library with at least these activities: reading together, listening to Puro’s stories, and feeding oranges from the bonsai tree.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-cozy-mini-games-accessible-from-the-library-1-book-sorting-2-drawing-lessons-viewing-drawings-3-hide-and-seek-among-the-bookshelves",
+      "title": "Add cozy mini-games accessible from the library: (1) Book Sorting, (2) Drawing Lessons/Viewing Drawings, (3) Hide-and-Seek among the bookshelves.",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-library-customization-allow-the-player-to-find-items-in-vents-and-place-them-in-the-library-to-make-it-more-comfortable",
+      "title": "Implement library customization: allow the player to find items in vents and place them in the library to make it more comfortable.",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-the-game-contains-no-transfurring-mechanic-any-accidental-contact-with-puro-is-treated-as-a-benign-interaction-hug-playful-shove-and-cannot-harm-or-transform-the-player",
+      "title": "Ensure the game contains no transfurring mechanic: any accidental contact with Puro is treated as a benign interaction (hug/playful shove) and cannot harm or transform the player.",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-story-progression-with-multiple-endings-based-on-trust-friendship-a-good-ending-at-high-friendship-and-a-betrayal-ending-at-low-friendship-with-special-edition-variants-complete-assimilation-at-very-low-friendship-purlin-shared-mind-fusion-at-slightly-higher-but-still-low-friendship",
+      "title": "Implement story progression with multiple endings based on Trust/Friendship: a Good Ending at high friendship, and a Betrayal Ending at low friendship with Special Edition variants (complete assimilation at very low friendship; 'Purlin' shared-mind fusion at slightly higher but still low friendship).",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-memorable-moments-feature-that-lets-players-revisit-unlocked-heartwarming-scenes-e-g-sitting-with-puro-on-his-mat-watching-him-eat-a-snack",
+      "title": "Add a 'Memorable Moments' feature that lets players revisit unlocked heartwarming scenes (e.g., sitting with Puro on his mat; watching him eat a snack).",
+      "reqIds": [
+        "REQ-10"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-letter-writing-system-players-can-write-short-letters-and-place-them-in-vents-letters-are-saved-and-can-later-receive-an-in-game-response-non-hostile-friendly-tone",
+      "title": "Add a Letter Writing system: players can write short letters and place them in vents; letters are saved and can later receive an in-game response (non-hostile, friendly tone).",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-set-the-game-s-tone-and-presentation-to-calm-cozy-and-slightly-melancholic-with-english-on-screen-text-include-lofi-retro-style-piano-background-music-and-basic-sound-toggles",
+      "title": "Set the game’s tone and presentation to calm, cozy, and slightly melancholic with English on-screen text; include lofi retro-style piano background music and basic sound toggles.",
+      "reqIds": [
+        "REQ-12"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-resolve-the-art-style-direction-by-implementing-a-coherent-3d-visual-style-that-still-nods-to-pixel-art-aesthetics-e-g-low-poly-geometry-with-pixelated-retro-textures-and-apply-it-consistently-across-the-library-ui-and-mini-games",
+      "title": "Resolve the art-style direction by implementing a coherent 3D visual style that still nods to pixel-art aesthetics (e.g., low-poly geometry with pixelated/retro textures), and apply it consistently across the library, UI, and mini-games.",
+      "reqIds": [
+        "REQ-13"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-coherent-distinct-visual-theme-for-the-ui-colors-typography-layout-that-matches-the-cozy-library-mood-avoid-a-blue-purple-dominant-palette-and-apply-the-theme-consistently-across-menus-dialogue-ui-and-hud",
+      "title": "Create a coherent, distinct visual theme for the UI (colors, typography, layout) that matches the cozy library mood; avoid a blue/purple-dominant palette and apply the theme consistently across menus, dialogue UI, and HUD.",
+      "reqIds": [
+        "REQ-14"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-basic-game-state-management-new-game-continue-autosave-on-key-events-dialogue-choice-activity-completion-customization-placement-and-a-way-to-reset-progress",
+      "title": "Add basic game state management: new game/continue, autosave on key events (dialogue choice, activity completion, customization placement), and a way to reset progress.",
+      "reqIds": [
+        "REQ-15"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Create a 3D mobile game with touch/mobile-friendly controls",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Single-location setting: explorable cozy/dim library hub with bookshelves, vents, and a central fruit-bearing bonsai tree",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Relationship system: Trust/Friendship meter that affects dialogue openness, interactions, and endings",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Interactive dialogue tree system for conversations and questions about lore/backstory",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Hangout/daily routine system (reading together, listening to stories, feeding bonsai oranges)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Cozy mini-games: book sorting, drawing lessons/viewing drawings, hide-and-seek among shelves",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-7",
+      "summary": "Library customization via items found in vents to decorate/upgrade the space",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "Multiple endings including low-friendship Betrayal ending where Colin becomes Puro’s host; Special Edition variants (complete assimilation vs shared-mind 'Purlin' fusion) based on how low friendship is",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-9",
+      "summary": "Good ending path: help Puro find a sustainable way to live in the lab and create a permanent home together",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-10",
+      "summary": "Atmosphere/audio direction: calm, cozy, slightly melancholic tone with lofi retro-style piano soundtrack",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-11",
+      "summary": "Feature to revisit iconic/heartwarming moments (e.g., sitting on mat, watching Puro eat a snack)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-12",
+      "summary": "Letter-writing system: write letters placed in vents hoping for responses from friendly latex creatures",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-13",
+      "summary": "Safety mechanic: no transfurring on contact; accidental contact treated as benign (hug/playful shove)",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "3d",
+  "projectName": "3D mobile-friendly cozy library slice-of-life game with trust-based dialogue, mini-games, customization, and multiple endings",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

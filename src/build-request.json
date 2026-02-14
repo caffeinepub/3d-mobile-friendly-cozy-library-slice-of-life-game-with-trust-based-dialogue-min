@@ -1,0 +1,291 @@
+{
+  "kind": "build_request",
+  "title": "3D mobile-friendly cozy library slice-of-life game with trust-based dialogue, mini-games, customization, and multiple endings",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "text": "Create a single-location 3D game scene set entirely in a dim, cozy, dusty library with bookshelves, vents, and a central fruit-bearing bonsai tree that the player can explore.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-2"
+        ],
+        "quotes": [
+          "The game takes place entirely within the quiet library... dimly lit, cozy, and dusty space filled with books, shelves, and a large, central bonsai tree that bears fruit."
+        ]
+      },
+      "acceptanceCriteria": [
+        "A playable 3D scene renders in the browser using React Three Fiber.",
+        "The library contains clearly identifiable: bookshelves, at least one vent, and a central bonsai tree with visible fruit.",
+        "The player can move around the library and look around without leaving the library area."
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "Implement mobile-friendly controls for the 3D gameplay, including touch movement and camera control, with a desktop fallback (keyboard/mouse) for testing.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-2"
+        ],
+        "quotes": [
+          "Make a 3d game with mobile controls"
+        ]
+      },
+      "acceptanceCriteria": [
+        "On touch devices, the player can move using on-screen touch controls (e.g., virtual joystick or touch drag) and adjust camera view with touch gestures.",
+        "On desktop, WASD/arrow keys move the player and mouse controls the camera.",
+        "Controls are usable without requiring external hardware/gamepads."
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Add a Relationship system with a visible Trust/Friendship meter that changes based on player choices and activities, and use it to gate or alter dialogue openness and story outcomes.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-2"
+        ],
+        "quotes": [
+          "Trust Meter: A \"Trust\" meter determines how open Puro is with the player."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Trust/Friendship value is stored per signed-in user (or per local session if not signed in) and persists across refresh.",
+        "UI shows the current Trust/Friendship meter in-game.",
+        "At least two thresholds are reflected in gameplay: low trust (distant/polite responses) and high trust (more intimate/comfortable responses)."
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "Implement an interactive dialogue tree system for conversations with Puro, including choices that can increase or decrease Trust/Friendship and questions about the lab, the Pale virus, Puro’s nature, and his interest in humans.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-2"
+        ],
+        "quotes": [
+          "Interactive Dialogue: The game features a dialogue tree system. Players can ask Puro questions about the \"Pale\" virus..."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Dialogue presents multiple-choice options and branches to different lines.",
+        "At least 3 conversation topics exist (lab backstory, the Pale virus, fascination with humans).",
+        "Some choices modify Trust/Friendship (positive and negative examples present).",
+        "Dialogue state and Trust/Friendship changes are saved."
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "text": "Create a Hangout/Daily routine loop inside the library with at least these activities: reading together, listening to Puro’s stories, and feeding oranges from the bonsai tree.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-2"
+        ],
+        "quotes": [
+          "Hangout System... reading books together... listening to his stories... feeding him the oranges from the bonsai tree."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Player can select an activity from an in-game menu or interactable hotspots in the 3D scene.",
+        "Each activity plays a short scene (dialogue and/or simple interaction) and affects Trust/Friendship (not all activities have the same effect).",
+        "Feeding uses a visible bonsai fruit interaction (e.g., pick fruit then offer to Puro) without leaving the library."
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "text": "Add cozy mini-games accessible from the library: (1) Book Sorting, (2) Drawing Lessons/Viewing Drawings, (3) Hide-and-Seek among the bookshelves.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-2"
+        ],
+        "quotes": [
+          "Mini-Games: Book Sorting... Drawing Lessons... Hide-and-Seek..."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Each mini-game is playable and has a clear win/complete condition.",
+        "Completing a mini-game results in a Trust/Friendship change and a short follow-up line/scene.",
+        "Mini-games can be replayed from within the library."
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "text": "Implement library customization: allow the player to find items in vents and place them in the library to make it more comfortable.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-2"
+        ],
+        "quotes": [
+          "Customization: The player can customize the library with items found in the vents..."
+        ]
+      },
+      "acceptanceCriteria": [
+        "At least 5 customizable items exist (decor objects) that can be discovered via vent interactions.",
+        "Player can place/remove items at predefined placement points in the library.",
+        "Placed items persist across refresh (saved per user/session)."
+      ]
+    },
+    {
+      "id": "REQ-8",
+      "text": "Ensure the game contains no transfurring mechanic: any accidental contact with Puro is treated as a benign interaction (hug/playful shove) and cannot harm or transform the player.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-2"
+        ],
+        "quotes": [
+          "No Transfurring... any \"accidental\" contact with Puro is treated as a hug or playful shove"
+        ]
+      },
+      "acceptanceCriteria": [
+        "There are no mechanics that transform the player due to contact during normal gameplay.",
+        "If the player collides/interacts closely with Puro, the game shows a safe/benign reaction (animation/text) and continues."
+      ]
+    },
+    {
+      "id": "REQ-9",
+      "text": "Implement story progression with multiple endings based on Trust/Friendship: a Good Ending at high friendship, and a Betrayal Ending at low friendship with Special Edition variants (complete assimilation at very low friendship; 'Purlin' shared-mind fusion at slightly higher but still low friendship).",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-2"
+        ],
+        "quotes": [
+          "the Betrayal ending occurs when players have low friendship... Special Edition adds variants... complete assimilation... \"Purlin\" fusion... The \"good ending\" involves..."
+        ]
+      },
+      "acceptanceCriteria": [
+        "The game can reach at least 3 distinct endings: Good Ending, Betrayal (Complete Assimilation), Betrayal (Purlin Fusion).",
+        "Ending selection is determined by Trust/Friendship thresholds and is reproducible via saved values.",
+        "Each ending presents a clear end scene and credits/return-to-menu option."
+      ]
+    },
+    {
+      "id": "REQ-10",
+      "text": "Add a 'Memorable Moments' feature that lets players revisit unlocked heartwarming scenes (e.g., sitting with Puro on his mat; watching him eat a snack).",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-2"
+        ],
+        "quotes": [
+          "Memorable Moments: A feature to revisit iconic, heartwarming moments..."
+        ]
+      },
+      "acceptanceCriteria": [
+        "At least 2 moments can be unlocked through normal play and appear in a Moments list.",
+        "Selecting a moment replays its scene without altering Trust/Friendship (or clearly indicates if it does).",
+        "Unlocked moments persist across refresh."
+      ]
+    },
+    {
+      "id": "REQ-11",
+      "text": "Add a Letter Writing system: players can write short letters and place them in vents; letters are saved and can later receive an in-game response (non-hostile, friendly tone).",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-2"
+        ],
+        "quotes": [
+          "Letter Writing: Writing letters to put in the vents, hoping for a response..."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Player can compose and save a letter (with a length limit) and submit it via a vent interaction.",
+        "The game can display previously sent letters and at least one response per letter (generated from predefined templates/logic, not external services).",
+        "Letters and responses persist across refresh (per user/session)."
+      ]
+    },
+    {
+      "id": "REQ-12",
+      "text": "Set the game’s tone and presentation to calm, cozy, and slightly melancholic with English on-screen text; include lofi retro-style piano background music and basic sound toggles.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-2"
+        ],
+        "quotes": [
+          "Atmosphere: Calm, slightly melancholic, and cozy... lofi, retro-style piano music."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Background music plays in-game and matches a lofi/retro piano style.",
+        "UI includes at least mute/volume controls for music (and optionally SFX).",
+        "All player-facing UI strings and dialogue are in English."
+      ]
+    },
+    {
+      "id": "REQ-13",
+      "text": "Resolve the art-style direction by implementing a coherent 3D visual style that still nods to pixel-art aesthetics (e.g., low-poly geometry with pixelated/retro textures), and apply it consistently across the library, UI, and mini-games.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-2"
+        ],
+        "quotes": [
+          "Make a 3d game... featuring a relaxed pace and 2D pixel art style similar to the original game's aesthetics."
+        ]
+      },
+      "acceptanceCriteria": [
+        "3D scene uses a consistent retro-inspired visual treatment (materials/textures/lighting) across major objects.",
+        "UI and mini-game visuals align with the same retro/cozy art direction."
+      ]
+    },
+    {
+      "id": "REQ-14",
+      "text": "Create a coherent, distinct visual theme for the UI (colors, typography, layout) that matches the cozy library mood; avoid a blue/purple-dominant palette and apply the theme consistently across menus, dialogue UI, and HUD.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-2"
+        ]
+      },
+      "acceptanceCriteria": [
+        "UI uses a consistent palette, typography, and component styling across all screens.",
+        "Primary UI colors are not predominantly blue/purple.",
+        "Menus include at minimum: Title screen, New/Continue, Settings (audio), and Credits/About."
+      ]
+    },
+    {
+      "id": "REQ-15",
+      "text": "Add basic game state management: new game/continue, autosave on key events (dialogue choice, activity completion, customization placement), and a way to reset progress.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-2"
+        ]
+      },
+      "acceptanceCriteria": [
+        "A player can start a new game, continue from last save, and reset progress from a menu.",
+        "Game autosaves after at least: completing an activity, finishing a mini-game, changing customization, and finishing an ending.",
+        "State includes Trust/Friendship, unlocked moments, placed items, letters, and story progression."
+      ]
+    }
+  ],
+  "constraints": [
+    "Backend must remain a single Motoko actor (all logic in backend/main.mo); create backend/migration.mo only if an upgrade requires state migration.",
+    "Do not edit any frontend files under the immutable paths listed in SYSTEM_CONTEXT (compose existing hooks/components instead).",
+    "Use English for any user-facing text."
+  ],
+  "nonGoals": [
+    "Add any chase/escape gameplay loops (the game is entirely in the library and focused on slice-of-life routines).",
+    "Implement transfurring-as-hazard gameplay during normal interactions (contact must remain safe/benign).",
+    "Multiplayer, real-time chat, or WebSocket-based features.",
+    "Third-party auth providers other than Internet Identity."
+  ],
+  "imageRequirements": {
+    "required": [
+      "Cozy dim library interior background illustration for title/menu (menu-library-bg.dim_1920x1080.png)",
+      "Retro-styled game logo text mark with warm cozy colors (game-logo.dim_1024x512.png)",
+      "On-screen mobile control icons set (joystick-base-and-stick.dim_512x512.png)",
+      "Pixelated wood-and-paper texture tile (wood-paper-texture-tile.dim_512x512.png)",
+      "Bonsai tree fruit icon (bonsai-fruit-icon.dim_256x256.png)"
+    ],
+    "edits": []
+  }
+}

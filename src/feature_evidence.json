@@ -1,0 +1,310 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-create-a-single-location-3d-game-scene-set-entirely-in-a-dim-cozy-dusty-library-with-bookshelves-vents-and-a-central-fruit-bearing-bonsai-tree-that-the-player-can-explore",
+      "featureTitle": "Create a single-location 3D game scene set entirely in a dim, cozy, dusty library with bookshelves, vents, and a central fruit-bearing bonsai tree that the player can explore.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/game/GameView.tsx",
+        "frontend/src/game/scene/LibraryScene.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-implement-mobile-friendly-controls-for-the-3d-gameplay-including-touch-movement-and-camera-control-with-a-desktop-fallback-keyboard-mouse-for-testing",
+      "featureTitle": "Implement mobile-friendly controls for the 3D gameplay, including touch movement and camera control, with a desktop fallback (keyboard/mouse) for testing.",
+      "files": [
+        "frontend/src/game/GameView.tsx",
+        "frontend/src/game/controls/MobileControlsOverlay.tsx",
+        "frontend/src/game/controls/usePlayerControls.ts"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-a-relationship-system-with-a-visible-trust-friendship-meter-that-changes-based-on-player-choices-and-activities-and-use-it-to-gate-or-alter-dialogue-openness-and-story-outcomes",
+      "featureTitle": "Add a Relationship system with a visible Trust/Friendship meter that changes based on player choices and activities, and use it to gate or alter dialogue openness and story outcomes.",
+      "files": [
+        "frontend/src/game/GameView.tsx",
+        "frontend/src/game/state/useGameStore.ts",
+        "frontend/src/game/ui/TrustMeter.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-implement-an-interactive-dialogue-tree-system-for-conversations-with-puro-including-choices-that-can-increase-or-decrease-trust-friendship-and-questions-about-the-lab-the-pale-virus-puro-s-nature-and-his-interest-in-humans",
+      "featureTitle": "Implement an interactive dialogue tree system for conversations with Puro, including choices that can increase or decrease Trust/Friendship and questions about the lab, the Pale virus, Puro’s nature, and his interest in humans.",
+      "files": [
+        "frontend/src/game/GameView.tsx",
+        "frontend/src/game/dialogue/dialogueData.ts",
+        "frontend/src/game/ui/DialoguePanel.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-4"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-create-a-hangout-daily-routine-loop-inside-the-library-with-at-least-these-activities-reading-together-listening-to-puro-s-stories-and-feeding-oranges-from-the-bonsai-tree",
+      "featureTitle": "Create a Hangout/Daily routine loop inside the library with at least these activities: reading together, listening to Puro’s stories, and feeding oranges from the bonsai tree.",
+      "files": [
+        "frontend/src/game/GameView.tsx",
+        "frontend/src/game/activities/activities.ts",
+        "frontend/src/game/scene/LibraryScene.tsx",
+        "frontend/src/game/ui/ActivityMenu.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-5"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-cozy-mini-games-accessible-from-the-library-1-book-sorting-2-drawing-lessons-viewing-drawings-3-hide-and-seek-among-the-bookshelves",
+      "featureTitle": "Add cozy mini-games accessible from the library: (1) Book Sorting, (2) Drawing Lessons/Viewing Drawings, (3) Hide-and-Seek among the bookshelves.",
+      "files": [
+        "frontend/src/game/GameView.tsx",
+        "frontend/src/game/minigames/BookSortingMiniGame.tsx",
+        "frontend/src/game/minigames/DrawingMiniGame.tsx",
+        "frontend/src/game/minigames/HideAndSeekMiniGame.tsx",
+        "frontend/src/game/minigames/MiniGameLauncher.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-6"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-implement-library-customization-allow-the-player-to-find-items-in-vents-and-place-them-in-the-library-to-make-it-more-comfortable",
+      "featureTitle": "Implement library customization: allow the player to find items in vents and place them in the library to make it more comfortable.",
+      "files": [
+        "frontend/src/game/GameView.tsx",
+        "frontend/src/game/customization/customizationData.ts",
+        "frontend/src/game/scene/LibraryScene.tsx",
+        "frontend/src/game/ui/CustomizationPanel.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-7"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-ensure-the-game-contains-no-transfurring-mechanic-any-accidental-contact-with-puro-is-treated-as-a-benign-interaction-hug-playful-shove-and-cannot-harm-or-transform-the-player",
+      "featureTitle": "Ensure the game contains no transfurring mechanic: any accidental contact with Puro is treated as a benign interaction (hug/playful shove) and cannot harm or transform the player.",
+      "files": [
+        "frontend/src/game/characters/Puro.tsx",
+        "frontend/src/game/scene/LibraryScene.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-8"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-implement-story-progression-with-multiple-endings-based-on-trust-friendship-a-good-ending-at-high-friendship-and-a-betrayal-ending-at-low-friendship-with-special-edition-variants-complete-assimilation-at-very-low-friendship-purlin-shared-mind-fusion-at-slightly-higher-but-still-low-friendship",
+      "featureTitle": "Implement story progression with multiple endings based on Trust/Friendship: a Good Ending at high friendship, and a Betrayal Ending at low friendship with Special Edition variants (complete assimilation at very low friendship; 'Purlin' shared-mind fusion at slightly higher but still low friendship).",
+      "files": [
+        "frontend/src/game/GameView.tsx",
+        "frontend/src/game/state/useGameStore.ts",
+        "frontend/src/game/story/EndingScene.tsx",
+        "frontend/src/game/story/endings.ts"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-9"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-a-memorable-moments-feature-that-lets-players-revisit-unlocked-heartwarming-scenes-e-g-sitting-with-puro-on-his-mat-watching-him-eat-a-snack",
+      "featureTitle": "Add a 'Memorable Moments' feature that lets players revisit unlocked heartwarming scenes (e.g., sitting with Puro on his mat; watching him eat a snack).",
+      "files": [
+        "frontend/src/game/GameView.tsx",
+        "frontend/src/game/moments/MomentPlayer.tsx",
+        "frontend/src/game/moments/momentsData.ts",
+        "frontend/src/game/ui/MomentsMenu.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-10"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-a-letter-writing-system-players-can-write-short-letters-and-place-them-in-vents-letters-are-saved-and-can-later-receive-an-in-game-response-non-hostile-friendly-tone",
+      "featureTitle": "Add a Letter Writing system: players can write short letters and place them in vents; letters are saved and can later receive an in-game response (non-hostile, friendly tone).",
+      "files": [
+        "frontend/src/game/letters/letterTemplates.ts",
+        "frontend/src/game/scene/LibraryScene.tsx",
+        "frontend/src/game/state/useGameStore.ts",
+        "frontend/src/game/ui/LettersPanel.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-11"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-set-the-game-s-tone-and-presentation-to-calm-cozy-and-slightly-melancholic-with-english-on-screen-text-include-lofi-retro-style-piano-background-music-and-basic-sound-toggles",
+      "featureTitle": "Set the game’s tone and presentation to calm, cozy, and slightly melancholic with English on-screen text; include lofi retro-style piano background music and basic sound toggles.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/game/audio/useAudio.ts",
+        "frontend/src/game/ui/SettingsScreen.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-12"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-resolve-the-art-style-direction-by-implementing-a-coherent-3d-visual-style-that-still-nods-to-pixel-art-aesthetics-e-g-low-poly-geometry-with-pixelated-retro-textures-and-apply-it-consistently-across-the-library-ui-and-mini-games",
+      "featureTitle": "Resolve the art-style direction by implementing a coherent 3D visual style that still nods to pixel-art aesthetics (e.g., low-poly geometry with pixelated/retro textures), and apply it consistently across the library, UI, and mini-games.",
+      "files": [
+        "frontend/src/game/minigames/BookSortingMiniGame.tsx",
+        "frontend/src/game/scene/LibraryScene.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-13"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-create-a-coherent-distinct-visual-theme-for-the-ui-colors-typography-layout-that-matches-the-cozy-library-mood-avoid-a-blue-purple-dominant-palette-and-apply-the-theme-consistently-across-menus-dialogue-ui-and-hud",
+      "featureTitle": "Create a coherent, distinct visual theme for the UI (colors, typography, layout) that matches the cozy library mood; avoid a blue/purple-dominant palette and apply the theme consistently across menus, dialogue UI, and HUD.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/index.css",
+        "frontend/src/ui/CreditsScreen.tsx",
+        "frontend/src/ui/TitleScreen.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-14"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-basic-game-state-management-new-game-continue-autosave-on-key-events-dialogue-choice-activity-completion-customization-placement-and-a-way-to-reset-progress",
+      "featureTitle": "Add basic game state management: new game/continue, autosave on key events (dialogue choice, activity completion, customization placement), and a way to reset progress.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/game/GameView.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-15"
+      ],
+      "confidence": "high"
+    }
+  ]
+}
