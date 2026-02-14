@@ -1,89 +1,73 @@
 {
   "kind": "build_request",
-  "title": "Fix app not starting when clicking Start/New Game (startup + game launch reliability)",
+  "title": "Handle IC0508 'canister is stopped' errors during New Game/Continue with retries and user-friendly messaging",
   "priority": "high",
   "requirements": [
     {
-      "id": "REQ-18",
-      "text": "Ensure the game reliably transitions from the Title screen to gameplay when the user clicks the start action (\"New Game\" and \"Continue\"), and prevent silent failures that leave the app appearing to not start.",
+      "id": "REQ-22",
+      "text": "Detect Internet Computer replica rejection errors where the reject_message contains \"is stopped\" (e.g., IC0508 / reject_code 5) for backend calls used to start gameplay (startNewGame, continueGame), and convert them into a user-friendly, English error summary that clearly indicates the game server is temporarily offline/stopped and the user should try again later.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-5"
+          "msg-6"
         ],
         "quotes": [
-          "It is not starting when I click the startup"
+          "Error: ... reject_message\": \"Canister pmng3-byaaa-aaaag-awtia-cai is stopped\" ... Method name: startNewGame ... error_code\": \"IC0508\", \"reject_code\": 5"
         ]
       },
       "acceptanceCriteria": [
-        "Clicking \"New Game\" on the title screen always navigates to the gameplay view (3D canvas visible) or shows a clear, user-facing error screen if gameplay initialization fails.",
-        "Clicking \"Continue\" navigates to gameplay using existing saved state (or shows a clear message if continuing is not possible due to missing/corrupt saved data).",
-        "If gameplay fails to mount for any reason, the user is presented with an on-screen error state (not a blank screen) that includes a \"Back to Title\" action."
+        "When startNewGame fails with an IC0508/reject_code 5 \"Canister ... is stopped\" rejection, the launch error screen shows a clear English summary such as \"The game server is temporarily offline (canister is stopped). Please try again in a moment.\" (wording may vary but must be clear and non-technical).",
+        "The technical details view still preserves the underlying error string (including reject code/message and canister id) so the full context can be copied if needed.",
+        "The same handling applies to continueGame failures with the same stopped-canister signature."
       ]
     },
     {
-      "id": "REQ-19",
-      "text": "Add a top-level runtime error boundary around the gameplay rendering path (including the React Three Fiber Canvas / scene) so that runtime exceptions (e.g., texture loading failures, WebGL issues) are caught and surfaced to the user with English error text and a recovery option.",
+      "id": "REQ-23",
+      "text": "Add a retry path on the launch error screen that allows the user to retry the last failed launch action (New Game or Continue) without requiring a full page refresh, and ensure the UI reflects retry-in-progress state and prevents double-submission.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-5"
+          "msg-6"
         ],
         "quotes": [
-          "It is not starting when I click the startup"
+          "Action: New Game",
+          "Stage: failed",
+          "Game Mounted: No"
         ]
       },
       "acceptanceCriteria": [
-        "A runtime error occurring during GameView/Canvas/scene rendering does not crash the entire app or result in a blank screen.",
-        "When an error is caught, a fallback UI is shown with: (1) a short plain-English message, (2) an optional expandable technical detail section, and (3) a \"Back to Title\" button that returns to the title screen.",
-        "The fallback UI is styled consistently with the existing Tailwind theme and remains readable on mobile."
+        "On the \"Unable to Start Game\" screen, a primary action \"Retry\" is available when lastLaunchAction is present.",
+        "Clicking \"Retry\" re-attempts the same action (startNewGame or continueGame) and shows a loading/disabled state until completion.",
+        "If the retry succeeds, the app transitions to gameplay as normal and diagnostics reflect a successful launch (launchStage complete, gameMounted true).",
+        "If the retry fails again, the user remains on the error screen with the updated user-friendly summary and updated technical details."
       ]
     },
     {
-      "id": "REQ-20",
-      "text": "Harden the asset startup and in-game asset loading flow so missing static assets do not prevent the game from starting (e.g., generated textures or audio files). Where assets are required for rendering, provide safe fallbacks instead of throwing.",
+      "id": "REQ-24",
+      "text": "Implement a small, centralized frontend error-normalization utility for backend actor call failures used during launch so that App diagnostics and GameLaunchErrorScreen can present consistent summaries (e.g., distinguish \"no saved game\" vs \"canister stopped\" vs generic connectivity errors), without losing the original raw error message for technical details.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-5"
+          "msg-6"
         ],
         "quotes": [
-          "It is not starting when I click the startup"
+          "The replica returned a rejection error: ... reject_code: 5 ... \"Canister pmng3-byaaa-aaaag-awtia-cai is stopped\""
         ]
       },
       "acceptanceCriteria": [
-        "Startup preloading failures never block the app from becoming interactive (title screen still renders, and navigation still works).",
-        "If a required 3D texture fails to load at runtime, the scene renders with a fallback material (e.g., a solid color) instead of throwing and blocking gameplay.",
-        "If background music fails to play/load (including autoplay restrictions), gameplay still starts and the app remains responsive; the app does not show a blocking error modal for audio issues."
-      ]
-    },
-    {
-      "id": "REQ-21",
-      "text": "Add lightweight startup + navigation diagnostics in the UI to help identify why startup/game launch failed (without requiring devtools), including a clear indicator of whether startup initialization completed and whether the game view mounted successfully.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-5"
-        ],
-        "quotes": [
-          "It is not starting when I click the startup"
-        ]
-      },
-      "acceptanceCriteria": [
-        "When startup fails or gameplay fails to mount, the user can see a concise English message describing the stage that failed (e.g., \"Startup initialization failed\" vs \"Game view failed to load\").",
-        "Diagnostics messaging does not appear during a normal successful flow (or is only visible in the error/fallback UI).",
-        "No sensitive information (keys, identities, principals) is shown in user-facing diagnostics."
+        "Launch failures produce consistent, human-readable summaries in English across both New Game and Continue.",
+        "The raw error message is still stored and displayed in the technical details section exactly (or functionally) as today.",
+        "Existing \"No saved game found\" messaging remains intact for the continue flow when applicable and is not replaced by the generic messaging."
       ]
     }
   ],
   "constraints": [
-    "Do not edit files under frontend/src/components/ui (Shadcn UI components are read-only and must be composed).",
-    "Do not edit immutable hook entrypoints listed in SYSTEM_CONTEXT (e.g., frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx)."
+    "Do not edit files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or any files under frontend/src/components/ui (compose them instead).",
+    "Keep all user-facing text in English."
   ],
   "nonGoals": [
-    "Adding new gameplay features, scenes, activities, or dialogue content.",
-    "Changing the authentication flow (Internet Identity).",
-    "Backend canister schema changes or migrations."
+    "Preventing a canister from being stopped at the IC/relica level (operational/deployment concern) is out of scope for code changes here.",
+    "Adding new authentication providers or external monitoring/alerting integrations."
   ],
   "imageRequirements": {
     "required": [],

@@ -1,15 +1,17 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 7,
+  "projectStateVersion": 9,
   "summary": "3D mobile-friendly slice-of-life adventure/visual-novel hybrid set entirely in Puro’s library, focused on building friendship/trust through dialogue and cozy activities, featuring multiple endings including a low-friendship Betrayal ending with Special Edition variants.",
   "architectural_notes": [
     "Core gameplay loop centered on a hub-based, single-location library environment with repeatable daily activities and relationship progression.",
     "Ending selection logic driven primarily by Trust/Friendship thresholds (including Special Edition sub-variants for very low vs slightly low friendship).",
-    "Project should include a clear startup/entrypoint file (e.g., main executable scene/script) used by build/deployment to launch the game."
+    "Project should include a clear startup/entrypoint file (e.g., main executable scene/script) used by build/deployment to launch the game.",
+    "Startup/New Game depends on an Internet Computer canister method call (startNewGame); app should handle canister availability (stopped) with preflight/health checks and user-facing recovery messaging."
   ],
   "known_issues": [
     "Art/style scope conflict: user requests a 3D game, but gameplay style mentions 2D pixel art aesthetics—needs final decision on visual style.",
-    "App/game fails to start when clicking the startup/entrypoint (startup launch issue reported by user)."
+    "App/game fails to start when clicking the startup/entrypoint (startup launch issue reported by user).",
+    "New Game fails with IC0508 non_replicated_rejection: canister pmng3-byaaa-aaaag-awtia-cai is stopped (reject_code 5), resulting in Game Mounted: No."
   ],
   "isFixRequest": true,
   "existing_features": [
@@ -178,6 +180,30 @@
       "title": "Add lightweight startup + navigation diagnostics in the UI to help identify why startup/game launch failed (without requiring devtools), including a clear indicator of whether startup initialization completed and whether the game view mounted successfully.",
       "reqIds": [
         "REQ-21"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-detect-internet-computer-replica-rejection-errors-where-the-reject-message-contains-is-stopped-e-g-ic0508-reject-code-5-for-backend-calls-used-to-start-gameplay-startnewgame-continuegame-and-convert-them-into-a-user-friendly-english-error-summary-that-clearly-indicates-the-game-server-is-temporarily-offline-stopped-and-the-user-should-try-again-later",
+      "title": "Detect Internet Computer replica rejection errors where the reject_message contains \"is stopped\" (e.g., IC0508 / reject_code 5) for backend calls used to start gameplay (startNewGame, continueGame), and convert them into a user-friendly, English error summary that clearly indicates the game server is temporarily offline/stopped and the user should try again later.",
+      "reqIds": [
+        "REQ-22"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-retry-path-on-the-launch-error-screen-that-allows-the-user-to-retry-the-last-failed-launch-action-new-game-or-continue-without-requiring-a-full-page-refresh-and-ensure-the-ui-reflects-retry-in-progress-state-and-prevents-double-submission",
+      "title": "Add a retry path on the launch error screen that allows the user to retry the last failed launch action (New Game or Continue) without requiring a full page refresh, and ensure the UI reflects retry-in-progress state and prevents double-submission.",
+      "reqIds": [
+        "REQ-23"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-a-small-centralized-frontend-error-normalization-utility-for-backend-actor-call-failures-used-during-launch-so-that-app-diagnostics-and-gamelauncherrorscreen-can-present-consistent-summaries-e-g-distinguish-no-saved-game-vs-canister-stopped-vs-generic-connectivity-errors-without-losing-the-original-raw-error-message-for-technical-details",
+      "title": "Implement a small, centralized frontend error-normalization utility for backend actor call failures used during launch so that App diagnostics and GameLaunchErrorScreen can present consistent summaries (e.g., distinguish \"no saved game\" vs \"canister stopped\" vs generic connectivity errors), without losing the original raw error message for technical details.",
+      "reqIds": [
+        "REQ-24"
       ],
       "version": 1
     }

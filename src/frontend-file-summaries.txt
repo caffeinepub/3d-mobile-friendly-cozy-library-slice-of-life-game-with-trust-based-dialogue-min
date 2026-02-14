@@ -1,5 +1,5 @@
 {
-  "frontend/src/App.tsx": "Main application component managing screen navigation with integrated startup sequence, asynchronous game launch handling via backend mutations, comprehensive error recovery, and diagnostics tracking for all launch stages.",
+  "frontend/src/App.tsx": "Main application component managing screen navigation with integrated startup sequence, asynchronous game launch handling via backend mutations with normalized error handling, retry functionality for failed launches, and comprehensive diagnostics tracking for all launch stages.",
   "frontend/src/ui/TitleScreen.tsx": "Title screen component with game logo, new game/continue buttons with loading states, and navigation to settings and credits with proper disabled states during launch.",
   "frontend/src/ui/CreditsScreen.tsx": "Credits screen displaying game information, features list, and attribution footer with caffeine.ai link.",
   "frontend/src/game/GameView.tsx": "Main in-game view component hosting the 3D canvas with mount success/error signaling, HUD overlays, dialogue panels, activity menus, and all game UI systems.",
@@ -34,6 +34,7 @@
   "frontend/src/hooks/useQueries.ts": "React Query hooks for all backend operations including game state, choices, activities, customization, moments, letters, and progress management.",
   "frontend/src/startup.ts": "Dedicated startup module handling one-time initialization with non-blocking asset preloading that captures success/failure results without throwing.",
   "frontend/STARTUP.md": "Developer documentation describing the startup system architecture, file locations, invocation flow, and extension guidelines.",
-  "frontend/src/ui/GameLaunchErrorScreen.tsx": "Dedicated error screen for game launch failures with plain-English error summaries, expandable technical diagnostics with explicit string array typing, and back-to-title recovery action.",
-  "frontend/src/ui/GameRuntimeErrorBoundary.tsx": "React error boundary wrapping gameplay rendering to catch runtime exceptions and display a styled fallback UI with optional technical details and recovery action."
+  "frontend/src/ui/GameLaunchErrorScreen.tsx": "Dedicated error screen for game launch failures with plain-English error summaries from normalized errors, retry action with loading state when lastLaunchAction is present, expandable technical diagnostics, and back-to-title recovery action.",
+  "frontend/src/ui/GameRuntimeErrorBoundary.tsx": "React error boundary wrapping gameplay rendering to catch runtime exceptions and display a styled fallback UI with optional technical details and recovery action.",
+  "frontend/src/utils/launchErrorNormalization.ts": "Centralized launch error normalization utility that inspects raw actor-call errors (including stopped canister IC0508 rejections) and returns user-friendly English summaries while preserving raw error text for technical details."
 }

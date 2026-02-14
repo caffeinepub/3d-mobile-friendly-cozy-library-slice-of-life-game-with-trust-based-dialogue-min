@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { AlertCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import { AlertCircle, ChevronDown, ChevronUp, RefreshCw } from 'lucide-react';
 import { useState } from 'react';
 
 interface DiagnosticsState {
@@ -9,17 +9,31 @@ interface DiagnosticsState {
   launchStage: 'idle' | 'calling-backend' | 'mounting-game' | 'complete' | 'failed';
   gameMounted: boolean;
   errorMessage: string | null;
+  userFriendlySummary: string | null;
 }
 
 interface GameLaunchErrorScreenProps {
   diagnostics: DiagnosticsState;
   onBackToTitle: () => void;
+  onRetry: () => void;
+  isRetrying: boolean;
 }
 
-export default function GameLaunchErrorScreen({ diagnostics, onBackToTitle }: GameLaunchErrorScreenProps) {
+export default function GameLaunchErrorScreen({
+  diagnostics,
+  onBackToTitle,
+  onRetry,
+  isRetrying,
+}: GameLaunchErrorScreenProps) {
   const [showDetails, setShowDetails] = useState(false);
 
   const getErrorSummary = () => {
+    // Use normalized user-friendly summary if available
+    if (diagnostics.userFriendlySummary) {
+      return diagnostics.userFriendlySummary;
+    }
+
+    // Fallback to legacy logic
     if (!diagnostics.startupComplete) {
       return 'Startup initialization failed';
     }
@@ -49,6 +63,8 @@ export default function GameLaunchErrorScreen({ diagnostics, onBackToTitle }: Ga
     return details;
   };
 
+  const canRetry = diagnostics.lastLaunchAction !== null;
+
   return (
     <div className="w-full h-full flex items-center justify-center bg-background p-4">
       <Card className="max-w-md w-full border-destructive/50">
@@ -63,7 +79,8 @@ export default function GameLaunchErrorScreen({ diagnostics, onBackToTitle }: Ga
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            {diagnostics.lastLaunchAction === 'continue'
+            {diagnostics.lastLaunchAction === 'continue' &&
+            diagnostics.userFriendlySummary?.includes('No saved game')
               ? 'It looks like there is no saved game to continue. Try starting a new game instead.'
               : 'The game encountered an issue while starting. Please try again or return to the title screen.'}
           </p>
@@ -84,8 +101,34 @@ export default function GameLaunchErrorScreen({ diagnostics, onBackToTitle }: Ga
             </div>
           )}
         </CardContent>
-        <CardFooter>
-          <Button onClick={onBackToTitle} className="w-full" size="lg">
+        <CardFooter className="flex gap-2">
+          {canRetry && (
+            <Button
+              onClick={onRetry}
+              disabled={isRetrying}
+              className="flex-1"
+              size="lg"
+              variant="default"
+            >
+              {isRetrying ? (
+                <>
+                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                  Retrying...
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Retry
+                </>
+              )}
+            </Button>
+          )}
+          <Button
+            onClick={onBackToTitle}
+            className={canRetry ? 'flex-1' : 'w-full'}
+            size="lg"
+            variant={canRetry ? 'outline' : 'default'}
+          >
             Back to Title
           </Button>
         </CardFooter>

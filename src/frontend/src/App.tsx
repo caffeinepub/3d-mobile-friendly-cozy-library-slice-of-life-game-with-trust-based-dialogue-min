@@ -9,6 +9,7 @@ import { ThemeProvider } from 'next-themes';
 import { Toaster } from 'sonner';
 import { runStartup } from './startup';
 import { useStartNewGame, useContinueGame } from './hooks/useQueries';
+import { normalizeLaunchError } from './utils/launchErrorNormalization';
 
 type Screen = 'title' | 'game' | 'settings' | 'credits' | 'launch-error';
 
@@ -18,6 +19,7 @@ interface DiagnosticsState {
   launchStage: 'idle' | 'calling-backend' | 'mounting-game' | 'complete' | 'failed';
   gameMounted: boolean;
   errorMessage: string | null;
+  userFriendlySummary: string | null;
 }
 
 export default function App() {
@@ -25,12 +27,14 @@ export default function App() {
   const [isNewGame, setIsNewGame] = useState(false);
   const [isReady, setIsReady] = useState(false);
   const [startupError, setStartupError] = useState<string | null>(null);
+  const [isRetrying, setIsRetrying] = useState(false);
   const [diagnostics, setDiagnostics] = useState<DiagnosticsState>({
     startupComplete: false,
     lastLaunchAction: null,
     launchStage: 'idle',
     gameMounted: false,
     errorMessage: null,
+    userFriendlySummary: null,
   });
 
   const startNewGameMutation = useStartNewGame();
@@ -50,6 +54,7 @@ export default function App() {
             ...prev,
             startupComplete: false,
             errorMessage: result.error || 'Startup initialization failed',
+            userFriendlySummary: 'Startup initialization failed',
           }));
         }
       })
@@ -61,6 +66,7 @@ export default function App() {
           ...prev,
           startupComplete: false,
           errorMessage: 'Unexpected error during startup',
+          userFriendlySummary: 'Unexpected error during startup',
         }));
       });
   }, []);
@@ -72,6 +78,7 @@ export default function App() {
       launchStage: 'calling-backend',
       gameMounted: false,
       errorMessage: null,
+      userFriendlySummary: null,
     });
 
     try {
@@ -81,10 +88,12 @@ export default function App() {
       setCurrentScreen('game');
     } catch (error) {
       console.error('Failed to start new game:', error);
+      const normalized = normalizeLaunchError(error, 'new-game');
       setDiagnostics((prev) => ({
         ...prev,
         launchStage: 'failed',
-        errorMessage: error instanceof Error ? error.message : 'Failed to start new game',
+        errorMessage: normalized.rawError,
+        userFriendlySummary: normalized.userSummary,
       }));
       setCurrentScreen('launch-error');
     }
@@ -97,6 +106,7 @@ export default function App() {
       launchStage: 'calling-backend',
       gameMounted: false,
       errorMessage: null,
+      userFriendlySummary: null,
     });
 
     try {
@@ -106,12 +116,32 @@ export default function App() {
       setCurrentScreen('game');
     } catch (error) {
       console.error('Failed to continue game:', error);
+      const normalized = normalizeLaunchError(error, 'continue');
       setDiagnostics((prev) => ({
         ...prev,
         launchStage: 'failed',
-        errorMessage: error instanceof Error ? error.message : 'Failed to continue game. No saved game found.',
+        errorMessage: normalized.rawError,
+        userFriendlySummary: normalized.userSummary,
       }));
       setCurrentScreen('launch-error');
+    }
+  };
+
+  const handleRetry = async () => {
+    if (!diagnostics.lastLaunchAction || isRetrying) {
+      return;
+    }
+
+    setIsRetrying(true);
+
+    try {
+      if (diagnostics.lastLaunchAction === 'new-game') {
+        await handleNewGame();
+      } else {
+        await handleContinue();
+      }
+    } finally {
+      setIsRetrying(false);
     }
   };
 
@@ -122,7 +152,9 @@ export default function App() {
       launchStage: 'idle',
       gameMounted: false,
       errorMessage: null,
+      userFriendlySummary: null,
     });
+    setIsRetrying(false);
     setCurrentScreen('title');
   };
 
@@ -140,6 +172,7 @@ export default function App() {
       launchStage: 'failed',
       gameMounted: false,
       errorMessage: error,
+      userFriendlySummary: 'Game view failed to load',
     }));
     setCurrentScreen('launch-error');
   };
@@ -162,7 +195,8 @@ export default function App() {
   const isLaunching =
     startNewGameMutation.isPending ||
     continueGameMutation.isPending ||
-    diagnostics.launchStage === 'mounting-game';
+    diagnostics.launchStage === 'mounting-game' ||
+    isRetrying;
 
   return (
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
@@ -202,6 +236,8 @@ export default function App() {
           <GameLaunchErrorScreen
             diagnostics={diagnostics}
             onBackToTitle={handleBackToTitle}
+            onRetry={handleRetry}
+            isRetrying={isRetrying}
           />
         )}
         <Toaster position="top-center" />

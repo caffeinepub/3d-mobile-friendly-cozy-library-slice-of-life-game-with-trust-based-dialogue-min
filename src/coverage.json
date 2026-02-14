@@ -1,75 +1,56 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-14T23:37:51.833Z",
+  "generatedAt": "2026-02-14T23:45:03.709Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 4,
-    "implemented": 4,
+    "total": 3,
+    "implemented": 3,
     "items": [
       {
-        "id": "REQ-18",
-        "summary": "Ensure the game reliably transitions from the Title screen to gameplay when the user clicks the start action (\"New Game\" and \"Continue\"), and prevent silent failures that leave the app appearing to not start.",
+        "id": "REQ-22",
+        "summary": "Detect Internet Computer replica rejection errors where the reject_message contains \"is stopped\" (e.g., IC0508 / reject_code 5) for backend calls used to start gameplay (startNewGame, continueGame), and convert them into a user-friendly, English error summary that clearly indicates the game server is temporarily offline/stopped and the user should try again later.",
         "status": "implemented",
         "plannedFiles": [
+          "frontend/src/utils/launchErrorNormalization.ts",
           "frontend/src/App.tsx",
-          "frontend/src/ui/TitleScreen.tsx",
-          "frontend/src/game/GameView.tsx",
           "frontend/src/ui/GameLaunchErrorScreen.tsx"
         ],
         "matchedFiles": [
+          "frontend/src/utils/launchErrorNormalization.ts",
           "frontend/src/App.tsx",
-          "frontend/src/ui/TitleScreen.tsx",
-          "frontend/src/game/GameView.tsx",
           "frontend/src/ui/GameLaunchErrorScreen.tsx"
         ]
       },
       {
-        "id": "REQ-19",
-        "summary": "Add a top-level runtime error boundary around the gameplay rendering path (including the React Three Fiber Canvas / scene) so that runtime exceptions (e.g., texture loading failures, WebGL issues) are caught and surfaced to the user with English error text and a recovery option.",
+        "id": "REQ-23",
+        "summary": "Add a retry path on the launch error screen that allows the user to retry the last failed launch action (New Game or Continue) without requiring a full page refresh, and ensure the UI reflects retry-in-progress state and prevents double-submission.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/ui/GameRuntimeErrorBoundary.tsx",
           "frontend/src/App.tsx",
-          "frontend/src/game/GameView.tsx"
+          "frontend/src/ui/GameLaunchErrorScreen.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/ui/GameRuntimeErrorBoundary.tsx",
           "frontend/src/App.tsx",
-          "frontend/src/game/GameView.tsx"
+          "frontend/src/ui/GameLaunchErrorScreen.tsx"
         ]
       },
       {
-        "id": "REQ-20",
-        "summary": "Harden the asset startup and in-game asset loading flow so missing static assets do not prevent the game from starting (e.g., generated textures or audio files). Where assets are required for rendering, provide safe fallbacks instead of throwing.",
+        "id": "REQ-24",
+        "summary": "Implement a small, centralized frontend error-normalization utility for backend actor call failures used during launch so that App diagnostics and GameLaunchErrorScreen can present consistent summaries (e.g., distinguish \"no saved game\" vs \"canister stopped\" vs generic connectivity errors), without losing the original raw error message for technical details.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/startup.ts",
-          "frontend/src/game/scene/LibraryScene.tsx",
-          "frontend/src/game/audio/useAudio.ts"
+          "frontend/src/utils/launchErrorNormalization.ts",
+          "frontend/src/App.tsx",
+          "frontend/src/ui/GameLaunchErrorScreen.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/startup.ts",
-          "frontend/src/game/scene/LibraryScene.tsx",
-          "frontend/src/game/audio/useAudio.ts"
-        ]
-      },
-      {
-        "id": "REQ-21",
-        "summary": "Add lightweight startup + navigation diagnostics in the UI to help identify why startup/game launch failed (without requiring devtools), including a clear indicator of whether startup initialization completed and whether the game view mounted successfully.",
-        "status": "implemented",
-        "plannedFiles": [
+          "frontend/src/utils/launchErrorNormalization.ts",
           "frontend/src/App.tsx",
-          "frontend/src/ui/GameLaunchErrorScreen.tsx",
-          "frontend/src/ui/GameRuntimeErrorBoundary.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/App.tsx",
-          "frontend/src/ui/GameLaunchErrorScreen.tsx",
-          "frontend/src/ui/GameRuntimeErrorBoundary.tsx"
+          "frontend/src/ui/GameLaunchErrorScreen.tsx"
         ]
       }
     ]
@@ -80,13 +61,8 @@
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
     "frontend/src/App.tsx",
-    "frontend/src/game/GameView.tsx",
-    "frontend/src/game/audio/useAudio.ts",
-    "frontend/src/game/scene/LibraryScene.tsx",
-    "frontend/src/startup.ts",
     "frontend/src/ui/GameLaunchErrorScreen.tsx",
-    "frontend/src/ui/GameRuntimeErrorBoundary.tsx",
-    "frontend/src/ui/TitleScreen.tsx",
+    "frontend/src/utils/launchErrorNormalization.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",
