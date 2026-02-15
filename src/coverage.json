@@ -1,24 +1,64 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-15T01:12:52.051Z",
+  "generatedAt": "2026-02-15T01:57:38.195Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 1,
-    "implemented": 1,
+    "total": 3,
+    "implemented": 3,
     "items": [
       {
-        "id": "REQ-52",
-        "summary": "Update the admin-only server status/availability UI so that the status text currently shown as \"Local Offline\" is replaced with \"Online\" (English text), ensuring this change is reflected anywhere that specific status label is rendered in the admin-mode server controls.",
+        "id": "REQ-59",
+        "summary": "Remove the local-only Online/Offline (server access) toggle and any related 'Offline (Local)' UI/state so the app always attempts backend availability checks and backend calls (New Game / Continue / terminal status) without a locally disabled mode.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/ui/ServerStatusIndicator.tsx"
+          "frontend/src/App.tsx",
+          "frontend/src/ui/TitleScreen.tsx",
+          "frontend/src/ui/ServerStatusIndicator.tsx",
+          "frontend/src/ui/DiagnosticTerminalOverlay.tsx",
+          "frontend/src/ui/terminal/commands.ts",
+          "frontend/src/state/useServerAccessStore.ts"
         ],
         "matchedFiles": [
-          "frontend/src/ui/ServerStatusIndicator.tsx"
+          "frontend/src/App.tsx",
+          "frontend/src/ui/TitleScreen.tsx",
+          "frontend/src/ui/ServerStatusIndicator.tsx",
+          "frontend/src/ui/DiagnosticTerminalOverlay.tsx",
+          "frontend/src/ui/terminal/commands.ts",
+          "frontend/src/state/useServerAccessStore.ts"
+        ]
+      },
+      {
+        "id": "REQ-60",
+        "summary": "Update user-facing error/help text to reflect the always-online behavior while staying accurate about Internet Computer limitations (the app cannot programmatically start/restart a stopped canister).",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/ui/TitleScreen.tsx",
+          "frontend/src/App.tsx",
+          "frontend/src/utils/launchErrorNormalization.ts",
+          "frontend/src/ui/terminal/commands.ts",
+          "frontend/src/ui/GameLaunchErrorScreen.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/ui/TitleScreen.tsx",
+          "frontend/src/App.tsx",
+          "frontend/src/utils/launchErrorNormalization.ts",
+          "frontend/src/ui/terminal/commands.ts",
+          "frontend/src/ui/GameLaunchErrorScreen.tsx"
+        ]
+      },
+      {
+        "id": "REQ-61",
+        "summary": "Update the operations documentation to emphasize the required operational steps to keep the backend canister online (running + funded with cycles), and cross-link to existing deployment troubleshooting guidance.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/OPS_CANISTER_AVAILABILITY.md"
+        ],
+        "matchedFiles": [
+          "frontend/OPS_CANISTER_AVAILABILITY.md"
         ]
       }
     ]
@@ -28,7 +68,15 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
+    "frontend/OPS_CANISTER_AVAILABILITY.md",
+    "frontend/src/App.tsx",
+    "frontend/src/state/useServerAccessStore.ts",
+    "frontend/src/ui/DiagnosticTerminalOverlay.tsx",
+    "frontend/src/ui/GameLaunchErrorScreen.tsx",
     "frontend/src/ui/ServerStatusIndicator.tsx",
+    "frontend/src/ui/TitleScreen.tsx",
+    "frontend/src/ui/terminal/commands.ts",
+    "frontend/src/utils/launchErrorNormalization.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

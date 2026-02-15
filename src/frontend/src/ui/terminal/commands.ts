@@ -1,127 +1,118 @@
-import { useTerminalStore } from './useTerminalStore';
-import { formatDiagnostics } from './useTerminalDiagnostics';
-import { useServerAccessStore } from '../../state/useServerAccessStore';
-
-interface DiagnosticsData {
-  currentScreen: string;
-  startupComplete: boolean;
-  lastLaunchAction: string | null;
-  launchStage: string;
-  gameMounted: boolean;
-  errorMessage: string | null;
-  userFriendlySummary: string | null;
-}
-
 interface CommandContext {
-  diagnostics: DiagnosticsData | null;
+  diagnostics: any;
   checkServerStatus: () => Promise<{ healthy: boolean; error?: string }>;
 }
 
-const HELP_TEXT = `
-=== Diagnostic Terminal ===
-This terminal is for in-app diagnostics only.
-
-Available commands:
-  help              Show this help message
-  clear             Clear the terminal output
-  server status     Check game server availability
-  server on         Enable server access (local toggle)
-  server off        Disable server access (local toggle)
-  diagnostics       Show application diagnostics
-
-Note: Server on/off commands control local app behavior only.
-They do not start or stop the backend canister.
-`.trim();
-
 export async function executeCommand(
-  command: string,
+  input: string,
   context: CommandContext
-): Promise<void> {
-  const { appendOutput } = useTerminalStore.getState();
-  const trimmedCommand = command.trim().toLowerCase();
+): Promise<Array<{ text: string; type: 'output' | 'error' }>> {
+  const parts = input.trim().toLowerCase().split(/\s+/);
+  const command = parts[0];
 
-  if (!trimmedCommand) {
-    return;
+  // Allowlist of safe commands
+  const allowedCommands = ['help', 'clear', 'status', 'server'];
+
+  if (!allowedCommands.includes(command)) {
+    return [
+      {
+        text: `Unknown command: ${command}. Type 'help' for available commands.`,
+        type: 'error',
+      },
+    ];
   }
 
-  if (trimmedCommand === 'help') {
-    appendOutput(HELP_TEXT, 'output');
-    return;
-  }
+  switch (command) {
+    case 'help':
+      return [
+        { text: 'Available commands:', type: 'output' },
+        { text: '  help           - Show this help message', type: 'output' },
+        { text: '  clear          - Clear terminal output', type: 'output' },
+        { text: '  status         - Show application diagnostics', type: 'output' },
+        { text: '  server status  - Check backend server availability', type: 'output' },
+      ];
 
-  if (trimmedCommand === 'clear') {
-    useTerminalStore.getState().clear();
-    return;
-  }
+    case 'clear':
+      return [{ text: 'Terminal cleared', type: 'output' }];
 
-  if (trimmedCommand === 'server on') {
-    const { enableServerAccess, serverAccessEnabled } = useServerAccessStore.getState();
-    if (serverAccessEnabled) {
-      appendOutput('Server access is already enabled.', 'output');
-    } else {
-      enableServerAccess();
-      appendOutput('Server access enabled.', 'success');
-      appendOutput('Note: This is a local app toggle. It does not start the backend canister.', 'output');
-    }
-    return;
-  }
+    case 'status':
+      return formatDiagnostics(context.diagnostics);
 
-  if (trimmedCommand === 'server off') {
-    const { disableServerAccess, serverAccessEnabled } = useServerAccessStore.getState();
-    if (!serverAccessEnabled) {
-      appendOutput('Server access is already disabled.', 'output');
-    } else {
-      disableServerAccess();
-      appendOutput('Server access disabled.', 'success');
-      appendOutput('Note: This is a local app toggle. It does not stop the backend canister.', 'output');
-    }
-    return;
-  }
-
-  if (trimmedCommand === 'server status' || trimmedCommand === 'status') {
-    const { serverAccessEnabled } = useServerAccessStore.getState();
-    
-    if (!serverAccessEnabled) {
-      appendOutput('Server Status: Checks Disabled', 'output');
-      appendOutput('Server access is disabled in this app. Availability checks are not performed.', 'output');
-      appendOutput('Use "server on" to enable server access.', 'output');
-      return;
-    }
-
-    appendOutput('Checking server status...', 'output');
-    try {
-      const result = await context.checkServerStatus();
-      if (result.healthy) {
-        appendOutput('Server Status: Healthy', 'success');
-        appendOutput('The game server is online and responding.', 'output');
-      } else {
-        appendOutput('Server Status: Unhealthy', 'error');
-        if (result.error) {
-          appendOutput(`Error: ${result.error}`, 'error');
-        }
+    case 'server':
+      if (parts[1] === 'status') {
+        return await checkServerStatus(context.checkServerStatus);
       }
-    } catch (error) {
-      appendOutput('Server Status: Error', 'error');
-      appendOutput(
-        `Failed to check server status: ${error instanceof Error ? error.message : String(error)}`,
-        'error'
-      );
-    }
-    return;
+      return [
+        {
+          text: `Unknown server subcommand: ${parts[1] || '(none)'}. Try 'server status'.`,
+          type: 'error',
+        },
+      ];
+
+    default:
+      return [
+        {
+          text: `Command not implemented: ${command}`,
+          type: 'error',
+        },
+      ];
+  }
+}
+
+function formatDiagnostics(diagnostics: any): Array<{ text: string; type: 'output' }> {
+  const lines: Array<{ text: string; type: 'output' }> = [];
+
+  lines.push({ text: '=== Application Diagnostics ===', type: 'output' });
+  lines.push({ text: `Current Screen: ${diagnostics.currentScreen}`, type: 'output' });
+  lines.push({ text: `Startup Complete: ${diagnostics.startupComplete ? 'Yes' : 'No'}`, type: 'output' });
+
+  if (diagnostics.lastLaunchAction) {
+    lines.push({ text: `Last Launch Action: ${diagnostics.lastLaunchAction}`, type: 'output' });
+    lines.push({ text: `Launch Stage: ${diagnostics.launchStage}`, type: 'output' });
+    lines.push({ text: `Game Mounted: ${diagnostics.gameMounted ? 'Yes' : 'No'}`, type: 'output' });
   }
 
-  if (trimmedCommand === 'diagnostics' || trimmedCommand === 'diag') {
-    if (!context.diagnostics) {
-      appendOutput('Diagnostics not available', 'error');
-      return;
-    }
-
-    const lines = formatDiagnostics(context.diagnostics);
-    lines.forEach((line) => appendOutput(line, 'output'));
-    return;
+  if (diagnostics.errorMessage) {
+    lines.push({ text: `Error: ${diagnostics.errorMessage}`, type: 'output' });
   }
 
-  // Unknown command
-  appendOutput(`Unknown command: ${command}`, 'error');
-  appendOutput('Type "help" for a list of available commands.', 'output');
+  if (diagnostics.userFriendlySummary) {
+    lines.push({ text: `Summary: ${diagnostics.userFriendlySummary}`, type: 'output' });
+  }
+
+  return lines;
+}
+
+async function checkServerStatus(
+  checkFn: () => Promise<{ healthy: boolean; error?: string }>
+): Promise<Array<{ text: string; type: 'output' | 'error' }>> {
+  const lines: Array<{ text: string; type: 'output' | 'error' }> = [];
+
+  lines.push({ text: 'Checking backend server status...', type: 'output' });
+
+  try {
+    const result = await checkFn();
+
+    if (result.healthy) {
+      lines.push({ text: 'Server Status: Online', type: 'output' });
+      lines.push({ text: 'Backend canister is responding normally.', type: 'output' });
+    } else {
+      lines.push({ text: 'Server Status: Offline', type: 'output' });
+      if (result.error) {
+        lines.push({ text: `Error: ${result.error}`, type: 'error' });
+      }
+      lines.push({
+        text: 'The backend canister may be stopped, out of cycles, or experiencing network issues.',
+        type: 'output',
+      });
+    }
+  } catch (error) {
+    lines.push({ text: 'Server Status: Error', type: 'output' });
+    lines.push({
+      text: `Failed to check server status: ${error instanceof Error ? error.message : String(error)}`,
+      type: 'error',
+    });
+  }
+
+  return lines;
 }

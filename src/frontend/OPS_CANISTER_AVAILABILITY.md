@@ -8,13 +8,13 @@ This document provides operational guidance for keeping the game canister online
 
 ## Important Limitation
 
-**The application cannot guarantee 100% uptime purely through frontend or backend code.** When a canister is stopped by its controller or runs out of cycles, it cannot programmatically restart itself. Starting and stopping canisters is an operational responsibility that requires controller access.
+**The application cannot guarantee 100% uptime or programmatically start/stop/restart the Internet Computer canister.** When a canister is stopped by its controller or runs out of cycles, it cannot restart itself. Starting and stopping canisters is an operational responsibility that requires controller access via the `dfx` command-line tool or the Internet Computer dashboard.
 
 ## Keeping the Canister Online
 
-To ensure the game remains available to users:
+To ensure the game remains available to users, follow these operational steps:
 
-### 1. Ensure the Canister is Started
+### 1. Ensure the Canister is Running
 
 The canister must be in a "running" state. Check the status with:
 

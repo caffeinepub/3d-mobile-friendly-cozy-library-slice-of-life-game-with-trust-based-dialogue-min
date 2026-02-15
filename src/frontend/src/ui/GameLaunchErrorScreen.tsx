@@ -82,7 +82,7 @@ export default function GameLaunchErrorScreen({
             {diagnostics.lastLaunchAction === 'continue' &&
             diagnostics.userFriendlySummary?.includes('No saved game')
               ? 'It looks like there is no saved game to continue. Try starting a new game instead.'
-              : 'The game encountered an issue while starting. Please try again or return to the title screen.'}
+              : 'The game encountered an issue while starting. The backend canister may be stopped, out of cycles, or experiencing network issues. Please try again later or return to the title screen.'}
           </p>
 
           <button

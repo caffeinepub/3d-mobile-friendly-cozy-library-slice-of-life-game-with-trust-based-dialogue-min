@@ -2,10 +2,15 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-the-admin-only-server-status-availability-ui-so-that-the-status-text-currently-shown-as-local-offline-is-replaced-with-online-english-text-ensuring-this-change-is-reflected-anywhere-that-specific-status-label-is-rendered-in-the-admin-mode-server-controls",
-      "featureTitle": "Update the admin-only server status/availability UI so that the status text currently shown as \"Local Offline\" is replaced with \"Online\" (English text), ensuring this change is reflected anywhere that specific status label is rendered in the admin-mode server controls.",
+      "featureId": "feature-remove-the-local-only-online-offline-server-access-toggle-and-any-related-offline-local-ui-state-so-the-app-always-attempts-backend-availability-checks-and-backend-calls-new-game-continue-terminal-status-without-a-locally-disabled-mode",
+      "featureTitle": "Remove the local-only Online/Offline (server access) toggle and any related 'Offline (Local)' UI/state so the app always attempts backend availability checks and backend calls (New Game / Continue / terminal status) without a locally disabled mode.",
       "files": [
-        "frontend/src/ui/ServerStatusIndicator.tsx"
+        "frontend/src/App.tsx",
+        "frontend/src/state/useServerAccessStore.ts",
+        "frontend/src/ui/DiagnosticTerminalOverlay.tsx",
+        "frontend/src/ui/ServerStatusIndicator.tsx",
+        "frontend/src/ui/TitleScreen.tsx",
+        "frontend/src/ui/terminal/commands.ts"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -15,7 +20,47 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-52"
+        "REQ-59"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-update-user-facing-error-help-text-to-reflect-the-always-online-behavior-while-staying-accurate-about-internet-computer-limitations-the-app-cannot-programmatically-start-restart-a-stopped-canister",
+      "featureTitle": "Update user-facing error/help text to reflect the always-online behavior while staying accurate about Internet Computer limitations (the app cannot programmatically start/restart a stopped canister).",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/ui/GameLaunchErrorScreen.tsx",
+        "frontend/src/ui/TitleScreen.tsx",
+        "frontend/src/ui/terminal/commands.ts",
+        "frontend/src/utils/launchErrorNormalization.ts"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-60"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-update-the-operations-documentation-to-emphasize-the-required-operational-steps-to-keep-the-backend-canister-online-running-funded-with-cycles-and-cross-link-to-existing-deployment-troubleshooting-guidance",
+      "featureTitle": "Update the operations documentation to emphasize the required operational steps to keep the backend canister online (running + funded with cycles), and cross-link to existing deployment troubleshooting guidance.",
+      "files": [
+        "frontend/OPS_CANISTER_AVAILABILITY.md"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-61"
       ],
       "confidence": "high"
     }

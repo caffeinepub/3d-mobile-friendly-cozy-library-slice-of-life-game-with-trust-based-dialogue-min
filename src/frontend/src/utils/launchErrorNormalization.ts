@@ -21,7 +21,7 @@ export function normalizeLaunchError(error: unknown, action: 'new-game' | 'conti
     rawError.includes('Canister') && rawError.includes('stopped')
   ) {
     return {
-      userSummary: 'The game server is temporarily offline. Please try again in a moment.',
+      userSummary: 'The game server is currently unavailable. The canister may be stopped or out of cycles. Please try again later.',
       rawError,
       category: 'CANISTER_STOPPED',
     };
@@ -47,7 +47,7 @@ export function normalizeLaunchError(error: unknown, action: 'new-game' | 'conti
     rawError.includes('connection')
   ) {
     return {
-      userSummary: 'Unable to connect to the game server. Please check your connection and try again.',
+      userSummary: 'Unable to connect to the game server. Please check your connection and try again later.',
       rawError,
       category: 'CONNECTIVITY',
     };
@@ -56,8 +56,8 @@ export function normalizeLaunchError(error: unknown, action: 'new-game' | 'conti
   // Generic fallback
   return {
     userSummary: action === 'new-game'
-      ? 'Failed to start a new game. Please try again.'
-      : 'Failed to continue game. Please try again or start a new game.',
+      ? 'Failed to start a new game. The server may be unavailable. Please try again later.'
+      : 'Failed to continue game. The server may be unavailable. Please try again later or start a new game.',
     rawError,
     category: 'UNKNOWN',
   };

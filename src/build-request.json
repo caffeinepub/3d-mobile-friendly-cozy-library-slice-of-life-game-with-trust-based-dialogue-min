@@ -1,35 +1,73 @@
 {
   "kind": "build_request",
-  "title": "Change admin-only server status text from “Local Offline” to “Online”",
+  "title": "Remove local Offline mode and enforce always-online backend access behavior in the app",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-52",
-      "text": "Update the admin-only server status/availability UI so that the status text currently shown as \"Local Offline\" is replaced with \"Online\" (English text), ensuring this change is reflected anywhere that specific status label is rendered in the admin-mode server controls.",
+      "id": "REQ-59",
+      "text": "Remove the local-only Online/Offline (server access) toggle and any related 'Offline (Local)' UI/state so the app always attempts backend availability checks and backend calls (New Game / Continue / terminal status) without a locally disabled mode.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "recent-9"
+          "msg-6"
         ],
         "quotes": [
-          "Replace local offline with online in the admin mode switch"
+          "Make its server always online"
         ]
       },
       "acceptanceCriteria": [
-        "When server access is disabled (admin-only toggle off) and the server status indicator is visible, the UI does not display the text \"Local Offline\" anywhere.",
-        "The UI displays \"Online\" instead of \"Local Offline\" in the relevant admin-mode server status/indicator location(s).",
-        "No other server status labels (e.g., \"Checking…\", \"Offline\") are unintentionally changed."
+        "The Title Screen no longer renders an Online/Offline switch or any text/alerts referring to 'Offline (Local)' or 'Local backend access only'.",
+        "`frontend/src/state/useServerAccessStore.ts` is no longer used to gate backend calls or backend availability polling; backend availability polling on the Title Screen runs whenever the Title Screen is shown.",
+        "Clicking New Game / Continue is no longer blocked by a local server-access-disabled condition; actions only depend on backend-derived availability/health (Checking/Online/Offline).",
+        "The server status indicator no longer receives or uses an `isLocalOffline` state; it displays only backend-derived states: Checking, Online, Offline (all English).",
+        "The Diagnostic Terminal `status` / `server status` commands no longer check or report a local offline mode; they attempt `actor.isAvailable()` and report Online/Offline results accordingly (all English)."
+      ]
+    },
+    {
+      "id": "REQ-60",
+      "text": "Update user-facing error/help text to reflect the always-online behavior while staying accurate about Internet Computer limitations (the app cannot programmatically start/restart a stopped canister).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-6"
+        ],
+        "quotes": [
+          "Make its server always online"
+        ]
+      },
+      "acceptanceCriteria": [
+        "No user-facing text claims the app can force the backend canister to be 'always online' or can start/stop/restart the canister automatically.",
+        "Any remaining server-offline messages continue to be in English and clearly indicate the backend can be offline due to canister stopped/out-of-cycles/network issues, and that the user may need to try again later."
+      ]
+    },
+    {
+      "id": "REQ-61",
+      "text": "Update the operations documentation to emphasize the required operational steps to keep the backend canister online (running + funded with cycles), and cross-link to existing deployment troubleshooting guidance.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-6"
+        ],
+        "quotes": [
+          "Make its server always online"
+        ]
+      },
+      "acceptanceCriteria": [
+        "`frontend/OPS_CANISTER_AVAILABILITY.md` clearly states (in English) that uptime cannot be guaranteed in-app, and provides concise, actionable steps to keep the canister running and funded with cycles.",
+        "The doc continues to reference `frontend/DEPLOYMENT_TROUBLESHOOTING.md` for deployment retry/failure diagnosis (English only)."
       ]
     }
   ],
   "constraints": [
-    "Use English for all user-facing text.",
-    "Do not edit files under frontend/src/components/ui (read-only UI components)."
+    "Do not modify any files under `frontend/src/components/ui` (read-only).",
+    "Do not edit any paths listed in `frontend.immutablePaths` in SYSTEM_CONTEXT.",
+    "Backend must remain a single Motoko actor in `backend/main.mo`; only add `backend/migration.mo` if a state migration is strictly required (not expected for this change).",
+    "All user-facing text must be in English."
   ],
   "nonGoals": [
-    "Changing backend behavior or adding new backend endpoints.",
-    "Changing the semantics of the server access toggle (it remains a local-only toggle that does not start/stop the backend canister).",
-    "Redesigning the Title Screen layout or admin gate flow beyond the requested text change."
+    "Do not attempt to programmatically start/stop/restart the Internet Computer canister from within the app or terminal.",
+    "Do not introduce external monitoring, cron jobs, WebSockets, or third-party uptime services.",
+    "Do not claim or imply 100% uptime can be achieved purely via frontend/backend code changes."
   ],
   "imageRequirements": {
     "required": [],

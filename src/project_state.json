@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 31,
+  "projectStateVersion": 37,
   "summary": "3D mobile-friendly slice-of-life adventure/visual-novel hybrid set entirely in Puro’s library, focused on building friendship/trust through dialogue and cozy activities, featuring multiple endings including a low-friendship Betrayal ending with Special Edition variants.",
   "architectural_notes": [
     "Core gameplay loop centered on a hub-based, single-location library environment with repeatable daily activities and relationship progression.",
@@ -11,7 +11,8 @@
     "Potential scope conflict: IC canisters generally cannot be started/stopped from within the app/canister itself; any server on/off control likely must be an ops/admin-only external action (or simulated locally) rather than a true canister lifecycle toggle.",
     "User reiterates requirement for an in-app switch to set the backend/server online/offline (true on/off control), which may conflict with IC canister lifecycle limitations.",
     "User requests admin-only switches be restricted by a specific username (not by Internet Identity principal), implying some form of username capture/storage and a trust model for admin gating.",
-    "Admin-mode gating username updated: unlock admin-only controls only when entered username exactly matches \"ADMIN\" (case-sensitive)."
+    "Admin-mode gating username updated: unlock admin-only controls only when entered username exactly matches \"ADMIN\" (case-sensitive).",
+    "User requires removing any \"Local Offline\" mode/state from admin/server controls UI; only \"Online\" and \"Offline\" should be presented."
   ],
   "known_issues": [
     "Art/style scope conflict: user requests a 3D game, but gameplay style mentions 2D pixel art aesthetics—needs final decision on visual style.",
@@ -20,9 +21,11 @@
     "React runtime error: \"Maximum update depth exceeded\" indicating an infinite render/update loop (likely repeated setState in componentDidUpdate/componentWillUpdate or an effect without stable dependencies).",
     "Request conflict risk: user asked for an in-app server on/off switch, but existing requirement states the terminal must not claim to start/stop/restart the backend canister; needs clarification/decision (admin-only external control vs simulated toggle).",
     "Admin gating approach conflict: earlier plan uses Internet Identity principal; user now requests username-based gating, which may be spoofable without strong authentication—needs a decision on security model.",
-    "Deployment to network failed (deployment error); user requested retry deployment."
+    "Deployment to network failed (deployment error); user requested retry deployment.",
+    "Server toggle/status UI still includes a \"Local Offline\" mode/state; user demands only Online/Offline (needs implementation/decision on local-only vs true backend control).",
+    "Admin switch/control appears to have been removed from the UI; user requests it be added back."
   ],
-  "isFixRequest": false,
+  "isFixRequest": true,
   "existing_features": [
     {
       "id": "feature-create-a-single-location-3d-game-scene-set-entirely-in-a-dim-cozy-dusty-library-with-bookshelves-vents-and-a-central-fruit-bearing-bonsai-tree-that-the-player-can-explore",
@@ -431,6 +434,78 @@
         "REQ-52"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-remove-the-local-only-server-access-local-offline-mode-from-the-app-so-the-ui-no-longer-supports-disabling-backend-calls-locally-and-the-app-always-uses-backend-availability-to-determine-whether-it-is-online-or-offline",
+      "title": "Remove the local-only “server access” (local offline) mode from the app so the UI no longer supports disabling backend calls locally, and the app always uses backend availability to determine whether it is Online or Offline.",
+      "reqIds": [
+        "REQ-53"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-title-screen-server-status-ui-to-present-only-backend-derived-states-checking-online-and-offline-ensure-all-labels-and-alerts-use-only-online-offline-wording-and-remain-in-english",
+      "title": "Update the Title Screen server status UI to present only backend-derived states: Checking, Online, and Offline; ensure all labels and alerts use only “Online” / “Offline” wording and remain in English.",
+      "reqIds": [
+        "REQ-54"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-app-launch-and-diagnostics-logic-to-stop-treating-server-access-disabled-as-a-possible-state-and-always-perform-backend-availability-checks-on-the-title-screen-before-new-game-continue",
+      "title": "Update app launch and diagnostics logic to stop treating “server access disabled” as a possible state, and always perform backend availability checks on the Title Screen before New Game / Continue.",
+      "reqIds": [
+        "REQ-55"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-remove-terminal-commands-that-manage-the-local-server-access-toggle-and-update-terminal-help-text-so-the-terminal-reflects-only-online-offline-server-availability-diagnostics-only",
+      "title": "Remove terminal commands that manage the local server-access toggle and update terminal help text so the terminal reflects only Online/Offline server availability (diagnostics only).",
+      "reqIds": [
+        "REQ-56"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-the-admin-only-online-offline-switch-back-to-the-title-screen-so-an-admin-can-locally-enable-disable-backend-canister-calls-local-only-and-persist-this-setting-across-page-reloads",
+      "title": "Add the admin-only Online/Offline switch back to the Title Screen so an admin can locally enable/disable backend canister calls (local-only), and persist this setting across page reloads.",
+      "reqIds": [
+        "REQ-57"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-wire-the-restored-admin-online-offline-switch-into-launch-and-availability-behavior-when-switched-to-offline-local-only-the-ui-must-not-attempt-backend-availability-checks-or-call-backend-methods-for-new-game-continue-and-must-present-a-clear-english-message-explaining-that-backend-calls-are-disabled-locally",
+      "title": "Wire the restored admin Online/Offline switch into launch and availability behavior: when switched to Offline (local-only), the UI must not attempt backend availability checks or call backend methods for New Game/Continue, and must present a clear English message explaining that backend calls are disabled locally.",
+      "reqIds": [
+        "REQ-58"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-remove-the-local-only-online-offline-server-access-toggle-and-any-related-offline-local-ui-state-so-the-app-always-attempts-backend-availability-checks-and-backend-calls-new-game-continue-terminal-status-without-a-locally-disabled-mode",
+      "title": "Remove the local-only Online/Offline (server access) toggle and any related 'Offline (Local)' UI/state so the app always attempts backend availability checks and backend calls (New Game / Continue / terminal status) without a locally disabled mode.",
+      "reqIds": [
+        "REQ-59"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-user-facing-error-help-text-to-reflect-the-always-online-behavior-while-staying-accurate-about-internet-computer-limitations-the-app-cannot-programmatically-start-restart-a-stopped-canister",
+      "title": "Update user-facing error/help text to reflect the always-online behavior while staying accurate about Internet Computer limitations (the app cannot programmatically start/restart a stopped canister).",
+      "reqIds": [
+        "REQ-60"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-operations-documentation-to-emphasize-the-required-operational-steps-to-keep-the-backend-canister-online-running-funded-with-cycles-and-cross-link-to-existing-deployment-troubleshooting-guidance",
+      "title": "Update the operations documentation to emphasize the required operational steps to keep the backend canister online (running + funded with cycles), and cross-link to existing deployment troubleshooting guidance.",
+      "reqIds": [
+        "REQ-61"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -565,6 +640,18 @@
     {
       "id": "AR-22",
       "summary": "Update admin-mode server access toggle wording: replace the label/text \"Local Offline\" with \"Online\" (i.e., adjust the Online/Offline switch copy)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-23",
+      "summary": "Remove the \"Local Offline\" mode/state from server controls; present only \"Online\" or \"Offline\" modes in the UI",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-24",
+      "summary": "Restore the admin-only switch/control in the UI (add the admin switch back where it was previously available)",
       "reqIds": [],
       "status": "pending"
     }

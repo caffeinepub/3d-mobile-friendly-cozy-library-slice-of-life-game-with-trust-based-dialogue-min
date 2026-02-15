@@ -1,24 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useTerminalStore } from './terminal/useTerminalStore';
-import { useAdminGateStore } from '../state/useAdminGateStore';
 import { executeCommand } from './terminal/commands';
-
-interface DiagnosticsData {
-  currentScreen: string;
-  startupComplete: boolean;
-  lastLaunchAction: string | null;
-  launchStage: string;
-  gameMounted: boolean;
-  errorMessage: string | null;
-  userFriendlySummary: string | null;
-}
+import { useAdminGateStore } from '../state/useAdminGateStore';
 
 interface DiagnosticTerminalOverlayProps {
-  diagnostics: DiagnosticsData;
+  diagnostics: any;
   checkServerStatus: () => Promise<{ healthy: boolean; error?: string }>;
 }
 
@@ -26,137 +16,137 @@ export default function DiagnosticTerminalOverlay({
   diagnostics,
   checkServerStatus,
 }: DiagnosticTerminalOverlayProps) {
-  const { isOpen, outputLines, appendInput, close } = useTerminalStore();
+  const { isOpen, outputLines, appendInput, appendOutput, clear, close } = useTerminalStore();
   const { isUnlocked: isAdminUnlocked } = useAdminGateStore();
-  const [inputValue, setInputValue] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Auto-focus input when terminal opens
+  // Keyboard shortcut to open terminal (Ctrl+` or Cmd+`) - only when admin unlocked
   useEffect(() => {
-    if (isOpen && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [isOpen]);
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === '`') {
+        e.preventDefault();
+        if (isAdminUnlocked && !isOpen) {
+          useTerminalStore.getState().open();
+        }
+      }
+    };
 
-  // Auto-scroll to bottom when new output is added
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, isAdminUnlocked]);
+
+  // Auto-scroll to bottom when output changes
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [outputLines]);
 
-  // Handle keyboard shortcuts - only allow opening when admin unlocked
+  // Focus input when terminal opens
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Ctrl+` or Cmd+` to toggle terminal - only when admin unlocked
-      if ((e.ctrlKey || e.metaKey) && e.key === '`') {
-        e.preventDefault();
-        if (isOpen) {
-          close();
-        } else if (isAdminUnlocked) {
-          useTerminalStore.getState().open();
-        }
-      }
-      // Escape to close terminal
-      if (e.key === 'Escape' && isOpen) {
-        e.preventDefault();
-        close();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, isAdminUnlocked, close]);
+    if (isOpen && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputValue.trim()) return;
+    const input = inputRef.current?.value.trim();
+    if (!input) return;
 
-    appendInput(inputValue);
-    setInputValue('');
+    appendInput(input);
 
-    await executeCommand(inputValue, {
+    const result = await executeCommand(input, {
       diagnostics,
       checkServerStatus,
     });
+
+    result.forEach((line) => appendOutput(line.text, line.type === 'error' ? 'error' : 'output'));
+
+    if (inputRef.current) {
+      inputRef.current.value = '';
+    }
   };
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    return null;
+  }
 
   return (
     <div
-      className="fixed inset-0 z-[9999] bg-black/90 flex flex-col"
+      className="fixed inset-0 z-[9999] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4"
       onClick={(e) => {
-        // Prevent clicks from propagating to game
-        e.stopPropagation();
+        if (e.target === e.currentTarget) {
+          close();
+        }
       }}
       onKeyDown={(e) => {
-        // Prevent keyboard events from propagating to game
+        // Prevent game controls from triggering
         e.stopPropagation();
       }}
     >
-      {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-border bg-background/50">
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-green-500" />
-          <span className="font-mono text-sm text-foreground">Diagnostic Terminal</span>
-          <span className="text-xs text-muted-foreground">
-            (Ctrl+` or Esc to close)
-          </span>
+      <div
+        className="w-full max-w-4xl h-[80vh] bg-background border-2 border-primary/30 rounded-lg flex flex-col shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b border-border">
+          <h2 className="text-lg font-mono font-semibold text-primary">Diagnostic Terminal</h2>
+          <Button variant="ghost" size="icon" onClick={close}>
+            <X className="h-5 w-5" />
+          </Button>
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={close}
-          className="h-8 w-8"
-        >
-          <X className="h-4 w-4" />
-        </Button>
-      </div>
 
-      {/* Output Area */}
-      <ScrollArea className="flex-1 p-4">
-        <div ref={scrollRef} className="font-mono text-sm space-y-1">
-          {outputLines.length === 0 && (
-            <div className="text-muted-foreground">
-              Type "help" for available commands.
-            </div>
-          )}
-          {outputLines.map((line) => (
-            <div
-              key={line.id}
-              className={
-                line.type === 'input'
-                  ? 'text-blue-400'
-                  : line.type === 'error'
-                    ? 'text-red-400'
-                    : line.type === 'success'
-                      ? 'text-green-400'
+        {/* Output Area */}
+        <ScrollArea className="flex-1 p-4">
+          <div ref={scrollRef} className="space-y-1 font-mono text-sm">
+            {outputLines.length === 0 && (
+              <div className="text-muted-foreground">
+                Type 'help' for available commands
+              </div>
+            )}
+            {outputLines.map((line) => (
+              <div
+                key={line.id}
+                className={
+                  line.type === 'input'
+                    ? 'text-primary font-semibold'
+                    : line.type === 'error'
+                      ? 'text-destructive'
                       : 'text-foreground'
-              }
-            >
-              {line.text}
-            </div>
-          ))}
-        </div>
-      </ScrollArea>
+                }
+              >
+                {line.text}
+              </div>
+            ))}
+          </div>
+        </ScrollArea>
 
-      {/* Input Area */}
-      <form onSubmit={handleSubmit} className="p-4 border-t border-border bg-background/50">
-        <div className="flex items-center gap-2">
-          <span className="text-green-400 font-mono">{'>'}</span>
-          <Input
-            ref={inputRef}
-            type="text"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            className="flex-1 font-mono bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0"
-            placeholder="Enter command..."
-            autoComplete="off"
-          />
-        </div>
-      </form>
+        {/* Input Area */}
+        <form onSubmit={handleSubmit} className="p-4 border-t border-border">
+          <div className="flex gap-2">
+            <span className="text-primary font-mono self-center">{'>'}</span>
+            <Input
+              ref={inputRef}
+              type="text"
+              placeholder="Enter command..."
+              className="flex-1 font-mono"
+              autoComplete="off"
+              onKeyDown={(e) => {
+                // Prevent event bubbling to game controls
+                e.stopPropagation();
+              }}
+            />
+            <Button type="submit" variant="outline">
+              Execute
+            </Button>
+            <Button type="button" variant="ghost" onClick={clear}>
+              Clear
+            </Button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

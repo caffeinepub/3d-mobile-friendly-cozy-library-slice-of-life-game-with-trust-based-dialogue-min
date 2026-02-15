@@ -13,7 +13,6 @@ import { useStartNewGame, useContinueGame } from './hooks/useQueries';
 import { useBackendAvailability } from './hooks/useBackendAvailability';
 import { normalizeLaunchError } from './utils/launchErrorNormalization';
 import { useActor } from './hooks/useActor';
-import { useServerAccessStore } from './state/useServerAccessStore';
 
 type Screen = 'title' | 'game' | 'settings' | 'credits' | 'launch-error';
 
@@ -44,12 +43,11 @@ export default function App() {
   const startNewGameMutation = useStartNewGame();
   const continueGameMutation = useContinueGame();
   const { actor } = useActor();
-  const { serverAccessEnabled } = useServerAccessStore();
 
-  // Backend availability check - only active on title screen AND when server access is enabled
+  // Backend availability check - always active on title screen
   const backendAvailability = useBackendAvailability({
-    enabled: currentScreen === 'title' && serverAccessEnabled,
-    refetchInterval: currentScreen === 'title' && serverAccessEnabled ? 30000 : undefined,
+    enabled: currentScreen === 'title',
+    refetchInterval: currentScreen === 'title' ? 30000 : undefined,
   });
 
   // Run startup sequence on mount
@@ -84,20 +82,6 @@ export default function App() {
   }, []);
 
   const handleNewGame = async () => {
-    // Check if server access is disabled
-    if (!serverAccessEnabled) {
-      setDiagnostics({
-        startupComplete: diagnostics.startupComplete,
-        lastLaunchAction: 'new-game',
-        launchStage: 'failed',
-        gameMounted: false,
-        errorMessage: 'Server access is disabled',
-        userFriendlySummary: 'Server access is disabled in this app. Enable it to start a new game.',
-      });
-      setCurrentScreen('launch-error');
-      return;
-    }
-
     // Preflight availability check
     if (!backendAvailability.isHealthy) {
       setDiagnostics({
@@ -106,7 +90,7 @@ export default function App() {
         launchStage: 'failed',
         gameMounted: false,
         errorMessage: backendAvailability.lastError || 'Game server is offline',
-        userFriendlySummary: 'The game server is currently offline. Please try again later.',
+        userFriendlySummary: 'The game server is currently unavailable. This may be due to the canister being stopped, out of cycles, or network issues. Please try again later.',
       });
       setCurrentScreen('launch-error');
       return;
@@ -140,20 +124,6 @@ export default function App() {
   };
 
   const handleContinue = async () => {
-    // Check if server access is disabled
-    if (!serverAccessEnabled) {
-      setDiagnostics({
-        startupComplete: diagnostics.startupComplete,
-        lastLaunchAction: 'continue',
-        launchStage: 'failed',
-        gameMounted: false,
-        errorMessage: 'Server access is disabled',
-        userFriendlySummary: 'Server access is disabled in this app. Enable it to continue your game.',
-      });
-      setCurrentScreen('launch-error');
-      return;
-    }
-
     // Preflight availability check
     if (!backendAvailability.isHealthy) {
       setDiagnostics({
@@ -162,7 +132,7 @@ export default function App() {
         launchStage: 'failed',
         gameMounted: false,
         errorMessage: backendAvailability.lastError || 'Game server is offline',
-        userFriendlySummary: 'The game server is currently offline. Please try again later.',
+        userFriendlySummary: 'The game server is currently unavailable. This may be due to the canister being stopped, out of cycles, or network issues. Please try again later.',
       });
       setCurrentScreen('launch-error');
       return;
@@ -247,14 +217,6 @@ export default function App() {
 
   // Terminal server status check function
   const checkServerStatus = async (): Promise<{ healthy: boolean; error?: string }> => {
-    // If server access is disabled, return a clear message
-    if (!serverAccessEnabled) {
-      return {
-        healthy: false,
-        error: 'Server access is disabled in this app',
-      };
-    }
-
     if (!actor) {
       return { healthy: false, error: 'Backend actor is not initialized yet' };
     }
@@ -314,7 +276,6 @@ export default function App() {
             isLaunching={isLaunching}
             continueDisabled={false}
             backendAvailability={backendAvailability}
-            serverAccessEnabled={serverAccessEnabled}
           />
         )}
         {currentScreen === 'game' && (
