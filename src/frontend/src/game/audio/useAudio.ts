@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 
 interface AudioStore {
   volume: number;
@@ -51,7 +51,7 @@ export function useAudioManager() {
     };
   }, [volume, isMuted]);
 
-  const playBackgroundMusic = () => {
+  const playBackgroundMusic = useCallback(() => {
     if (audioRef.current) {
       audioRef.current.play().catch((error) => {
         // Autoplay might be blocked, user interaction required
@@ -59,7 +59,7 @@ export function useAudioManager() {
         console.info('Background music autoplay blocked (expected):', error.message);
       });
     }
-  };
+  }, []);
 
   return {
     volume,

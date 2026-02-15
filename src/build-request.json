@@ -1,71 +1,72 @@
 {
   "kind": "build_request",
-  "title": "Improve backend canister availability so the game server stays online",
+  "title": "Fix React 'Maximum update depth exceeded' infinite update loop during gameplay mount",
   "priority": "high",
   "requirements": [
     {
-      "id": "REQ-25",
-      "text": "Add a lightweight backend availability endpoint that the frontend can call to confirm the game canister is running before attempting launch actions.",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-4"
-        ],
-        "quotes": [
-          "Make the game server always online"
-        ]
-      },
-      "acceptanceCriteria": [
-        "backend/main.mo exposes a non-throwing availability method (e.g., a query health/status call) that returns successfully when the canister is running",
-        "Calling the availability method does not require any existing saved game state and does not trap under normal conditions"
-      ]
-    },
-    {
-      "id": "REQ-26",
-      "text": "Add a frontend preflight check that verifies backend availability on the Title screen and immediately before invoking New Game / Continue, and present clear English UI when the server is offline/stopped.",
+      "id": "REQ-28",
+      "text": "Eliminate the React runtime error \"Maximum update depth exceeded\" that occurs during gameplay initialization by fixing any render/update loops triggered by state updates inside effects or lifecycle-equivalent logic (e.g., repeated store resets, unstable effect dependencies).",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-6"
         ],
         "quotes": [
-          "Make the game server always online"
+          "Error is... Maximum update depth exceeded. This can happen when a component repeatedly calls setState inside componentWillUpdate or componentDidUpdate. React limits the number of nested updates to prevent infinite loops."
         ]
       },
       "acceptanceCriteria": [
-        "When the user opens the app (Title screen), the frontend performs a backend availability check and records the result in state used by the launch UI",
-        "When backend availability check indicates failure (including canister stopped-like failures), the Title screen disables or warns on New Game / Continue with English text indicating the game server is offline and to try again later",
-        "When backend availability later becomes healthy, the Title screen reflects the healthy state without requiring a full page refresh (e.g., via retry / periodic recheck)"
+        "Starting a New Game transitions from the Title screen to gameplay without throwing \"Maximum update depth exceeded\" in the browser console.",
+        "Continuing a game transitions from the Title screen to gameplay without throwing \"Maximum update depth exceeded\" in the browser console.",
+        "Gameplay remains interactive (HUD renders, mobile controls overlay renders) after mount."
       ]
     },
     {
-      "id": "REQ-27",
-      "text": "Add a small, developer-facing operations document that explains how to keep the Internet Computer game canister online in production (e.g., ensure it is started and funded with cycles) and clarifies the platform limitation that a stopped canister cannot be programmatically restarted by the canister itself.",
-      "target": "unknown",
+      "id": "REQ-29",
+      "text": "Make gameplay initialization in `frontend/src/game/GameView.tsx` resilient to React re-renders and Strict Mode double-invocation by ensuring `initializeGame(isNewGame)` is not repeatedly invoked in a way that causes continuous state updates. Add a guard so initialization runs only when appropriate (e.g., once per mount and/or only when `isNewGame` changes meaningfully).",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-6"
         ],
         "quotes": [
-          "Make the game server always online"
+          "Maximum update depth exceeded. This can happen when a component repeatedly calls setState..."
         ]
       },
       "acceptanceCriteria": [
-        "A new documentation file is added that includes explicit English guidance for keeping the canister running (started, funded) and what to check when users see 'server offline/stopped' errors",
-        "The document explicitly states that the app cannot guarantee 100% uptime purely through frontend/backend code and that starting/stopping is an operational/controller responsibility"
+        "`initializeGame(true)` does not repeatedly reset the Zustand store in a way that causes a re-render loop.",
+        "Toggling unrelated UI state (e.g., opening/closing pause menu) does not cause game re-initialization.",
+        "No infinite loop occurs even if React Strict Mode causes effects to run more than once in development."
+      ]
+    },
+    {
+      "id": "REQ-30",
+      "text": "Stabilize effect dependencies involved in gameplay mount to prevent re-running initialization due to unstable function identities (e.g., `playBackgroundMusic` from `frontend/src/game/audio/useAudio.ts`). Ensure any functions used in `GameView` effects are memoized or invoked from effects that cannot repeatedly trigger store updates.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-6"
+        ],
+        "quotes": [
+          "Maximum update depth exceeded... repeatedly calls setState..."
+        ]
+      },
+      "acceptanceCriteria": [
+        "`GameView` does not re-run its initialization effect solely because a function dependency identity changes between renders.",
+        "Background music playback attempt still occurs on gameplay start, but does not contribute to any repeated state updates or render loops.",
+        "No new user-facing error text is introduced as part of this fix (keep user-facing text in English if any is added)."
       ]
     }
   ],
   "constraints": [
-    "Backend must remain a single Motoko actor in backend/main.mo (no additional backend services).",
-    "Only create backend/migration.mo if an upgrade requires state migration (conditional migration policy).",
-    "Do not modify frontend immutable paths: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui.",
-    "Use English for all user-facing text."
+    "Do not edit any files under `frontend/src/components/ui` (read-only UI component sources).",
+    "Do not edit immutable hook files: `frontend/src/hooks/useInternetIdentity.ts`, `frontend/src/hooks/useInternetIdentity.tsx`, `frontend/src/hooks/useActor.ts`, `frontend/src/main.tsx`.",
+    "Keep the existing single-page app navigation flow in `frontend/src/App.tsx` (Title → Game → error screens) intact while fixing the update loop."
   ],
   "nonGoals": [
-    "Guaranteeing absolute 'always online' uptime in all circumstances (e.g., controller-stopped canister, network-wide outages).",
-    "Implementing third-party uptime monitoring services, external cron jobs, or WebSocket-based real-time connectivity.",
-    "Adding new authentication providers beyond Internet Identity."
+    "Adding new gameplay features, content, or UI redesign unrelated to fixing the update-depth error.",
+    "Changing backend Motoko APIs or save schema for this issue.",
+    "Implementing new third-party monitoring/logging services."
   ],
   "imageRequirements": {
     "required": [],

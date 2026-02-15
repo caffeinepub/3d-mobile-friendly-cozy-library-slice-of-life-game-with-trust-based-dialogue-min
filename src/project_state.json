@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 11,
+  "projectStateVersion": 13,
   "summary": "3D mobile-friendly slice-of-life adventure/visual-novel hybrid set entirely in Puro’s library, focused on building friendship/trust through dialogue and cozy activities, featuring multiple endings including a low-friendship Betrayal ending with Special Edition variants.",
   "architectural_notes": [
     "Core gameplay loop centered on a hub-based, single-location library environment with repeatable daily activities and relationship progression.",
@@ -12,9 +12,10 @@
   "known_issues": [
     "Art/style scope conflict: user requests a 3D game, but gameplay style mentions 2D pixel art aesthetics—needs final decision on visual style.",
     "App/game fails to start when clicking the startup/entrypoint (startup launch issue reported by user).",
-    "New Game fails with IC0508 non_replicated_rejection: canister pmng3-byaaa-aaaag-awtia-cai is stopped (reject_code 5), resulting in Game Mounted: No."
+    "New Game fails with IC0508 non_replicated_rejection: canister pmng3-byaaa-aaaag-awtia-cai is stopped (reject_code 5), resulting in Game Mounted: No.",
+    "React runtime error: \"Maximum update depth exceeded\" indicating an infinite render/update loop (likely repeated setState in componentDidUpdate/componentWillUpdate or an effect without stable dependencies)."
   ],
-  "isFixRequest": false,
+  "isFixRequest": true,
   "existing_features": [
     {
       "id": "feature-create-a-single-location-3d-game-scene-set-entirely-in-a-dim-cozy-dusty-library-with-bookshelves-vents-and-a-central-fruit-bearing-bonsai-tree-that-the-player-can-explore",
@@ -221,6 +222,30 @@
       "title": "Add a small, developer-facing operations document that explains how to keep the Internet Computer game canister online in production (e.g., ensure it is started and funded with cycles) and clarifies the platform limitation that a stopped canister cannot be programmatically restarted by the canister itself.",
       "reqIds": [
         "REQ-27"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-eliminate-the-react-runtime-error-maximum-update-depth-exceeded-that-occurs-during-gameplay-initialization-by-fixing-any-render-update-loops-triggered-by-state-updates-inside-effects-or-lifecycle-equivalent-logic-e-g-repeated-store-resets-unstable-effect-dependencies",
+      "title": "Eliminate the React runtime error \"Maximum update depth exceeded\" that occurs during gameplay initialization by fixing any render/update loops triggered by state updates inside effects or lifecycle-equivalent logic (e.g., repeated store resets, unstable effect dependencies).",
+      "reqIds": [
+        "REQ-28"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-make-gameplay-initialization-in-frontend-src-game-gameview-tsx-resilient-to-react-re-renders-and-strict-mode-double-invocation-by-ensuring-initializegame-isnewgame-is-not-repeatedly-invoked-in-a-way-that-causes-continuous-state-updates-add-a-guard-so-initialization-runs-only-when-appropriate-e-g-once-per-mount-and-or-only-when-isnewgame-changes-meaningfully",
+      "title": "Make gameplay initialization in `frontend/src/game/GameView.tsx` resilient to React re-renders and Strict Mode double-invocation by ensuring `initializeGame(isNewGame)` is not repeatedly invoked in a way that causes continuous state updates. Add a guard so initialization runs only when appropriate (e.g., once per mount and/or only when `isNewGame` changes meaningfully).",
+      "reqIds": [
+        "REQ-29"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-stabilize-effect-dependencies-involved-in-gameplay-mount-to-prevent-re-running-initialization-due-to-unstable-function-identities-e-g-playbackgroundmusic-from-frontend-src-game-audio-useaudio-ts-ensure-any-functions-used-in-gameview-effects-are-memoized-or-invoked-from-effects-that-cannot-repeatedly-trigger-store-updates",
+      "title": "Stabilize effect dependencies involved in gameplay mount to prevent re-running initialization due to unstable function identities (e.g., `playBackgroundMusic` from `frontend/src/game/audio/useAudio.ts`). Ensure any functions used in `GameView` effects are memoized or invoked from effects that cannot repeatedly trigger store updates.",
+      "reqIds": [
+        "REQ-30"
       ],
       "version": 1
     }

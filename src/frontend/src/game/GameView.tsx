@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Canvas } from '@react-three/fiber';
 import LibraryScene from './scene/LibraryScene';
 import { useGameStore } from './state/useGameStore';
@@ -39,16 +39,32 @@ export default function GameView({ isNewGame, onBackToTitle, onMounted, onMountE
   const [showPauseMenu, setShowPauseMenu] = useState(false);
   const [canvasMounted, setCanvasMounted] = useState(false);
   const { playBackgroundMusic } = useAudioManager();
+  
+  // Guard to prevent repeated initialization
+  const hasInitialized = useRef(false);
+  const lastInitMode = useRef<boolean | null>(null);
 
+  // Initialization effect - runs once per mount or when isNewGame changes meaningfully
   useEffect(() => {
-    try {
-      initializeGame(isNewGame);
-      playBackgroundMusic();
-    } catch (error) {
-      console.error('Failed to initialize game:', error);
-      onMountError?.(error instanceof Error ? error.message : 'Failed to initialize game');
+    // Only initialize if we haven't initialized yet, or if the game mode changed
+    if (!hasInitialized.current || lastInitMode.current !== isNewGame) {
+      try {
+        initializeGame(isNewGame);
+        hasInitialized.current = true;
+        lastInitMode.current = isNewGame;
+      } catch (error) {
+        console.error('Failed to initialize game:', error);
+        onMountError?.(error instanceof Error ? error.message : 'Failed to initialize game');
+      }
     }
-  }, [isNewGame, initializeGame, playBackgroundMusic, onMountError]);
+  }, [isNewGame, initializeGame, onMountError]);
+
+  // Audio playback effect - separate from initialization to avoid cascading updates
+  useEffect(() => {
+    if (hasInitialized.current) {
+      playBackgroundMusic();
+    }
+  }, [playBackgroundMusic]);
 
   const handleCanvasCreated = () => {
     setCanvasMounted(true);

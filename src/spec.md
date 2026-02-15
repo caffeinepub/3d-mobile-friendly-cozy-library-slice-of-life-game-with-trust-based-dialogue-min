@@ -1,12 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Improve game canister availability handling by adding a backend health/availability check and frontend preflight UI so players get clear feedback when the server is offline/stopped.
+**Goal:** Fix the React “Maximum update depth exceeded” error by preventing infinite update loops during gameplay initialization/mount.
 
 **Planned changes:**
-- Add a lightweight, non-throwing backend availability query method in `backend/main.mo` that returns successfully when the canister is running and does not depend on saved game state.
-- Add a frontend preflight availability check on the Title screen and immediately before New Game / Continue; disable or warn with clear English text when the server is offline/stopped.
-- Add retry/periodic recheck behavior so the Title screen updates to “healthy” without requiring a full page refresh.
-- Add a small developer-facing operations document describing how to keep the canister online in production (started, funded with cycles) and clarifying that a stopped canister cannot be restarted programmatically by the canister itself.
+- Update `frontend/src/game/GameView.tsx` to guard gameplay initialization so `initializeGame(isNewGame)` runs only when appropriate (e.g., once per mount and/or only when `isNewGame` meaningfully changes), including resilience to React Strict Mode double-invocation.
+- Stabilize effect dependencies involved in gameplay mount to prevent re-running initialization due to unstable function identities (e.g., memoize or restructure usage of `playBackgroundMusic` from `frontend/src/game/audio/useAudio.ts`).
+- Ensure transitions from Title → Gameplay (New Game and Continue) no longer trigger repeated store resets or state updates that cause render/update loops.
 
-**User-visible outcome:** Players see an immediate server status check on the Title screen; if the game server is offline/stopped, New Game/Continue is disabled or shows an English warning, and the UI can recover automatically once the backend is available again.
+**User-visible outcome:** Starting a New Game or Continuing a game reliably enters gameplay without console errors, and gameplay remains interactive after mount (HUD and mobile controls render normally).

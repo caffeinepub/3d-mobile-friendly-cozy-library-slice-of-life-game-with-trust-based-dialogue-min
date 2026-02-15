@@ -1,46 +1,63 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Frontend preflight backend availability check + ops documentation",
+  "title": "Fix infinite React update loop on gameplay mount by guarding initialization and stabilizing effect dependencies",
   "requirements": [
     {
-      "id": "REQ-26",
-      "summary": "Add a Title screen backend availability preflight check (on load + before New Game/Continue) with clear offline UI and retry/polling.",
+      "id": "REQ-28",
+      "summary": "Eliminate the gameplay-mount \"Maximum update depth exceeded\" error by removing render/update loops caused by repeated initialization state updates.",
       "acceptanceCriteria": [
-        "When the user opens the app (Title screen), the frontend performs a backend availability check and records the result in state used by the launch UI",
-        "When backend availability check indicates failure (including canister stopped-like failures), the Title screen disables or warns on New Game / Continue with English text indicating the game server is offline and to try again later",
-        "When backend availability later becomes healthy, the Title screen reflects the healthy state without requiring a full page refresh (e.g., via retry / periodic recheck)"
+        "Starting a New Game transitions from the Title screen to gameplay without throwing \"Maximum update depth exceeded\" in the browser console.",
+        "Continuing a game transitions from the Title screen to gameplay without throwing \"Maximum update depth exceeded\" in the browser console.",
+        "Gameplay remains interactive (HUD renders, mobile controls overlay renders) after mount."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/hooks/useBackendAvailability.ts",
-          "operation": "create",
-          "description": "Create a small hook that calls the backend actor's availability method (e.g., isAvailable) and normalizes results into UI-friendly states (checking/healthy/unhealthy + lastChecked + lastError), supporting manual retry and optional periodic recheck while on the Title screen."
+          "path": "frontend/src/game/GameView.tsx",
+          "operation": "modify",
+          "description": "Refactor gameplay mount logic to avoid any effect-triggered re-render loop: ensure game initialization and audio start are not invoked in a way that continuously updates state, and reduce unnecessary re-renders from broad Zustand subscriptions."
         },
         {
-          "path": "frontend/src/App.tsx",
+          "path": "frontend/src/game/audio/useAudio.ts",
           "operation": "modify",
-          "description": "Integrate backend availability state into the Title screen flow: run an availability check when the Title screen is shown, recheck periodically or via explicit retry, and perform an immediate preflight availability check inside the New Game / Continue handlers before calling launch mutations; if unavailable, keep user on the Title screen and surface a clear English message instead of attempting launch."
-        },
-        {
-          "path": "frontend/src/ui/TitleScreen.tsx",
-          "operation": "modify",
-          "description": "Update the Title screen UI to reflect backend availability status: show an English 'server offline/stopped' warning when unhealthy, disable or guard New Game/Continue accordingly, and provide a Retry action that triggers a recheck; use shadcn-ui components (e.g., Button/Card) for consistent styling. Verify the component's usage instructions before implementing."
+          "description": "Stabilize the audio manager API (especially background music start) to prevent identity-driven effect re-runs that can cascade into repeated state updates."
         }
       ]
     },
     {
-      "id": "REQ-27",
-      "summary": "Add a developer-facing operations document explaining how to keep the IC game canister online and the limitation that stopped canisters cannot self-restart.",
+      "id": "REQ-29",
+      "summary": "Make `GameView` initialization resilient to re-renders and React Strict Mode by guarding `initializeGame(isNewGame)` so it only runs when appropriate.",
       "acceptanceCriteria": [
-        "A new documentation file is added that includes explicit English guidance for keeping the canister running (started, funded) and what to check when users see 'server offline/stopped' errors",
-        "The document explicitly states that the app cannot guarantee 100% uptime purely through frontend/backend code and that starting/stopping is an operational/controller responsibility"
+        "`initializeGame(true)` does not repeatedly reset the Zustand store in a way that causes a re-render loop.",
+        "Toggling unrelated UI state (e.g., opening/closing pause menu) does not cause game re-initialization.",
+        "No infinite loop occurs even if React Strict Mode causes effects to run more than once in development."
       ],
       "file_operations": [
         {
-          "path": "frontend/OPS_CANISTER_AVAILABILITY.md",
-          "operation": "create",
-          "description": "Add an operations guide describing how to keep the game canister online in production (ensure it is started and funded with cycles), common checks when users see 'server offline/stopped' messaging, and an explicit note that the app cannot guarantee 100% uptime because a stopped canister cannot be programmatically restarted by the canister/frontend; starting/stopping is an operational/controller responsibility."
+          "path": "frontend/src/game/GameView.tsx",
+          "operation": "modify",
+          "description": "Add an explicit initialization guard (e.g., ref-based \"has initialized\" / \"last initialized mode\") so `initializeGame(isNewGame)` only runs once per mount and/or only when `isNewGame` meaningfully changes; also ensure the initialization effect is not coupled to unrelated UI state changes."
+        }
+      ]
+    },
+    {
+      "id": "REQ-30",
+      "summary": "Stabilize gameplay-mount effect dependencies (e.g., audio functions) to prevent initialization re-running due to unstable function identities.",
+      "acceptanceCriteria": [
+        "`GameView` does not re-run its initialization effect solely because a function dependency identity changes between renders.",
+        "Background music playback attempt still occurs on gameplay start, but does not contribute to any repeated state updates or render loops.",
+        "No new user-facing error text is introduced as part of this fix (keep user-facing text in English if any is added)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/game/audio/useAudio.ts",
+          "operation": "modify",
+          "description": "Memoize `playBackgroundMusic` (and any other callable functions returned by `useAudioManager`) so their identity remains stable across renders unless behavior must change."
+        },
+        {
+          "path": "frontend/src/game/GameView.tsx",
+          "operation": "modify",
+          "description": "Adjust `GameView` effects so function dependencies (e.g., `playBackgroundMusic`) cannot cause repeated initialization; if needed, separate concerns into multiple effects (initialization vs. audio start) and/or use refs to call the latest callbacks without making them effect dependencies."
         }
       ]
     }

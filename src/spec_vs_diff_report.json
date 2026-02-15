@@ -1,50 +1,30 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-14T23:52:20.764Z",
-  "summary": "REQ-25 and most of REQ-26 appear implemented: backend exposes a non-throwing `isAvailable()` query, and the frontend performs availability checks on the Title screen with polling, UI warning, disabled launch buttons, and a retry action. REQ-27 is only partially evidenced due to doc truncation; explicit guidance for funding with cycles and troubleshooting steps are not clearly present in the shown diff.",
-  "missing_requirements": [
-    {
-      "id": "REQ-27",
-      "requirement": "Operations document includes explicit guidance for keeping the canister running (started, funded with cycles) and what to check when users see 'server offline/stopped' errors.",
-      "reason": "The added ops doc clearly states the uptime limitation and controller responsibility, and starts a section about ensuring the canister is started, but the provided diff is truncated before any concrete steps/commands and does not show guidance about cycles funding or a troubleshooting checklist.",
-      "evidence": [
-        "frontend/OPS_CANISTER_AVAILABILITY.md"
-      ]
-    },
-    {
-      "id": "REQ-26",
-      "requirement": "Preflight check immediately before invoking both New Game and Continue.",
-      "reason": "The diff shows a preflight check in `handleNewGame`, but the `handleContinue` implementation is not visible in the truncated `App.tsx` excerpt, so it cannot be confirmed from the provided evidence.",
-      "evidence": [
-        "frontend/src/App.tsx"
-      ]
-    }
-  ],
+  "generatedAt": "2026-02-14T23:59:37.442Z",
+  "summary": "The diff appears to address the reported infinite update loop by adding guarded, ref-based initialization in `GameView.tsx` and by stabilizing `playBackgroundMusic` with `useCallback` in `useAudio.ts`. No clearly required items from REQ-28/29/30 are obviously missing based on the provided diff summary, but the audio changes introduce additional state/persistence behavior not explicitly requested.",
+  "missing_requirements": [],
   "hallucinated_features": [
     {
-      "description": "Added extensive launch diagnostics tracking (startupComplete, launchStage, gameMounted, etc.) and related launch-error navigation beyond a simple availability preflight/UI warning.",
-      "reason": "REQ-26 requests a preflight availability check and clear offline UI on the Title screen; the additional diagnostics state machinery is not requested in the BuildRequest.",
+      "description": "Introduced a persisted Zustand audio settings store (volume/mute) as part of the audio hook, which goes beyond stabilizing function identity for playback.",
+      "reason": "REQ-30 asks to stabilize effect dependencies/function identities to avoid re-running initialization; it does not request adding/persisting audio settings state.",
       "evidence": [
-        "frontend/src/App.tsx"
+        "frontend/src/game/audio/useAudio.ts"
       ]
     },
     {
-      "description": "Introduced launch error normalization utility usage (`normalizeLaunchError`) not mentioned in requirements.",
-      "reason": "The BuildRequest does not ask for error normalization; it only requires English UI messaging when the server is offline/stopped.",
+      "description": "Added new console logging for audio autoplay-blocked and audio init/pause warnings.",
+      "reason": "Not requested by REQ-28/29/30; while not user-facing UI text, it is additional behavior beyond the specified fix.",
       "evidence": [
-        "frontend/src/App.tsx"
+        "frontend/src/game/audio/useAudio.ts"
       ]
     }
   ],
-  "confidence": 0.66,
+  "confidence": 0.74,
   "changed_files": [
-    "backend/main.mo",
     "frontend-file-summaries.txt",
-    "frontend/OPS_CANISTER_AVAILABILITY.md",
-    "frontend/src/App.tsx",
-    "frontend/src/hooks/useBackendAvailability.ts",
-    "frontend/src/ui/TitleScreen.tsx",
+    "frontend/src/game/GameView.tsx",
+    "frontend/src/game/audio/useAudio.ts",
     "project_state.json"
   ]
 }

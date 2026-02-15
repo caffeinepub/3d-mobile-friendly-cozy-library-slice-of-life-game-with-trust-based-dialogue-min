@@ -2,12 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-add-a-frontend-preflight-check-that-verifies-backend-availability-on-the-title-screen-and-immediately-before-invoking-new-game-continue-and-present-clear-english-ui-when-the-server-is-offline-stopped",
-      "featureTitle": "Add a frontend preflight check that verifies backend availability on the Title screen and immediately before invoking New Game / Continue, and present clear English UI when the server is offline/stopped.",
+      "featureId": "feature-eliminate-the-react-runtime-error-maximum-update-depth-exceeded-that-occurs-during-gameplay-initialization-by-fixing-any-render-update-loops-triggered-by-state-updates-inside-effects-or-lifecycle-equivalent-logic-e-g-repeated-store-resets-unstable-effect-dependencies",
+      "featureTitle": "Eliminate the React runtime error \"Maximum update depth exceeded\" that occurs during gameplay initialization by fixing any render/update loops triggered by state updates inside effects or lifecycle-equivalent logic (e.g., repeated store resets, unstable effect dependencies).",
       "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/hooks/useBackendAvailability.ts",
-        "frontend/src/ui/TitleScreen.tsx"
+        "frontend/src/game/GameView.tsx",
+        "frontend/src/game/audio/useAudio.ts"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -17,15 +16,15 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-26"
+        "REQ-28"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-add-a-small-developer-facing-operations-document-that-explains-how-to-keep-the-internet-computer-game-canister-online-in-production-e-g-ensure-it-is-started-and-funded-with-cycles-and-clarifies-the-platform-limitation-that-a-stopped-canister-cannot-be-programmatically-restarted-by-the-canister-itself",
-      "featureTitle": "Add a small, developer-facing operations document that explains how to keep the Internet Computer game canister online in production (e.g., ensure it is started and funded with cycles) and clarifies the platform limitation that a stopped canister cannot be programmatically restarted by the canister itself.",
+      "featureId": "feature-make-gameplay-initialization-in-frontend-src-game-gameview-tsx-resilient-to-react-re-renders-and-strict-mode-double-invocation-by-ensuring-initializegame-isnewgame-is-not-repeatedly-invoked-in-a-way-that-causes-continuous-state-updates-add-a-guard-so-initialization-runs-only-when-appropriate-e-g-once-per-mount-and-or-only-when-isnewgame-changes-meaningfully",
+      "featureTitle": "Make gameplay initialization in `frontend/src/game/GameView.tsx` resilient to React re-renders and Strict Mode double-invocation by ensuring `initializeGame(isNewGame)` is not repeatedly invoked in a way that causes continuous state updates. Add a guard so initialization runs only when appropriate (e.g., once per mount and/or only when `isNewGame` changes meaningfully).",
       "files": [
-        "frontend/OPS_CANISTER_AVAILABILITY.md"
+        "frontend/src/game/GameView.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -35,7 +34,26 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-27"
+        "REQ-29"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-stabilize-effect-dependencies-involved-in-gameplay-mount-to-prevent-re-running-initialization-due-to-unstable-function-identities-e-g-playbackgroundmusic-from-frontend-src-game-audio-useaudio-ts-ensure-any-functions-used-in-gameview-effects-are-memoized-or-invoked-from-effects-that-cannot-repeatedly-trigger-store-updates",
+      "featureTitle": "Stabilize effect dependencies involved in gameplay mount to prevent re-running initialization due to unstable function identities (e.g., `playBackgroundMusic` from `frontend/src/game/audio/useAudio.ts`). Ensure any functions used in `GameView` effects are memoized or invoked from effects that cannot repeatedly trigger store updates.",
+      "files": [
+        "frontend/src/game/GameView.tsx",
+        "frontend/src/game/audio/useAudio.ts"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-30"
       ],
       "confidence": "high"
     }
