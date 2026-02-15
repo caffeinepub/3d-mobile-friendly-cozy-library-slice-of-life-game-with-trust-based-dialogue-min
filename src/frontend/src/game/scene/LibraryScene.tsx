@@ -6,16 +6,24 @@ import Puro from '../characters/Puro';
 import { usePlayerControls } from '../controls/usePlayerControls';
 import { usePlayerControlsStore } from '../controls/usePlayerControlsStore';
 import { useGameStore } from '../state/useGameStore';
+import { useAdminGateStore } from '../../state/useAdminGateStore';
+import { toast } from 'sonner';
 
 export default function LibraryScene() {
   const playerRef = useRef<THREE.Group>(null);
+  const puroRef = useRef<THREE.Group>(null);
   const { movement, look } = usePlayerControls();
   const controlsStore = usePlayerControlsStore();
   const { libraryCustomizations, isPaused } = useGameStore();
+  const { attemptUnlock, isUnlocked } = useAdminGateStore();
   
   // Jump physics state
   const [verticalVelocity, setVerticalVelocity] = useState(0);
   const [isGrounded, setIsGrounded] = useState(true);
+
+  // Proximity trigger state
+  const wasInProximity = useRef(false);
+  const lastTriggerTime = useRef(0);
 
   // Load texture unconditionally (required by Rules of Hooks)
   // If it fails, drei will handle the error and we'll use fallback material
@@ -81,6 +89,43 @@ export default function LibraryScene() {
     state.camera.position.x = playerRef.current.position.x;
     state.camera.position.y = playerRef.current.position.y + 1.6; // Eye height
     state.camera.position.z = playerRef.current.position.z;
+
+    // Proximity detection with Puro
+    if (puroRef.current && !isUnlocked) {
+      const playerPos = new THREE.Vector3();
+      const puroPos = new THREE.Vector3();
+      
+      playerRef.current.getWorldPosition(playerPos);
+      puroRef.current.getWorldPosition(puroPos);
+      
+      const distance = playerPos.distanceTo(puroPos);
+      const proximityRadius = 1.5; // Collision radius
+      const hysteresisMargin = 0.3; // Prevent rapid re-triggering
+      
+      const isInProximity = distance < proximityRadius;
+      const isOutsideHysteresis = distance > (proximityRadius + hysteresisMargin);
+      
+      // Trigger on entering proximity (one-shot with cooldown)
+      if (isInProximity && !wasInProximity.current) {
+        const now = Date.now();
+        const cooldownMs = 2000; // 2 second cooldown
+        
+        if (now - lastTriggerTime.current > cooldownMs) {
+          // Trigger the secret: unlock admin mode
+          const success = attemptUnlock('ADMIN');
+          if (success) {
+            toast.success('Secret discovered! Admin mode unlocked.');
+          }
+          lastTriggerTime.current = now;
+        }
+        wasInProximity.current = true;
+      }
+      
+      // Reset proximity state when player moves away
+      if (isOutsideHysteresis) {
+        wasInProximity.current = false;
+      }
+    }
   });
 
   return (
@@ -139,7 +184,7 @@ export default function LibraryScene() {
       <Vent position={[8, 0.5, 5]} />
 
       {/* Puro character */}
-      <Puro position={[2, 0, -3]} />
+      <Puro position={[2, 0, -3]} ref={puroRef} />
 
       {/* Customization items */}
       {libraryCustomizations.map((item, index) => (

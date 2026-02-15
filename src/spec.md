@@ -1,14 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Allow the game to be launched and played in an explicit Offline Mode when the backend is unreachable, using only locally persisted state.
+**Goal:** Trigger the existing secret event when the player avatar touches/collides with Puro in the 3D library scene.
 
 **Planned changes:**
-- Update the title screen so gameplay entry is not blocked when the server is offline, while keeping the existing server status indicator/alert for admins.
-- Add clear English offline messaging on the title screen indicating the user can play and that progress is saved on the device.
-- Update App.tsx launch behavior so “New Game” and “Continue” fall back to starting gameplay locally (without routing to a launch-error screen) when backend preflight/availability checks fail.
-- Ensure the offline launch path makes no backend actor calls (e.g., startNewGame(), continueGame(), isAvailable()) and sets diagnostics to an English offline summary while preserving the user’s chosen action (new-game/continue).
-- Add a local-save-present flag in the persisted Zustand store to drive “Continue” availability in offline mode (disable/communicate when no local save exists; load local state when it does).
-- Verify core gameplay interactions remain functional without backend coupling or runtime errors while offline.
+- Add a proximity/collision-radius check between the player avatar and Puro in the 3D library scene to trigger the existing secret event without requiring a click.
+- Add a one-shot/cooldown guard so the touch-triggered secret event does not repeatedly fire every frame while the player remains in contact.
+- Ensure the touch-triggered behavior stays benign (no harm/transformation) and that any new touch-specific on-screen text is English-only, while preserving Puro’s existing click interaction.
 
-**User-visible outcome:** Users can start a new game or continue from the title screen even with no network/backend available, with progress stored locally on the device and clear English offline-mode messaging.
+**User-visible outcome:** Players can trigger the same existing secret sequence by walking/joysticking into Puro (desktop or mobile), and it won’t continuously re-trigger while staying in contact.

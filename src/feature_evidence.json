@@ -2,11 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-add-an-explicit-offline-mode-launch-path-so-the-game-can-be-started-and-continued-without-any-backend-canister-calls-when-the-backend-is-unavailable-or-when-the-user-has-no-network-connection",
-      "featureTitle": "Add an explicit \"Offline Mode\" launch path so the game can be started and continued without any backend canister calls when the backend is unavailable (or when the user has no network connection).",
+      "featureId": "feature-detect-when-the-player-character-avatar-touches-collides-with-puro-in-the-3d-library-scene-and-trigger-the-existing-secret-event-that-was-recently-added",
+      "featureTitle": "Detect when the player character avatar touches/collides with Puro in the 3D library scene and trigger the existing \"secret\" event that was recently added.",
       "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/ui/TitleScreen.tsx"
+        "frontend/src/game/characters/Puro.tsx",
+        "frontend/src/game/scene/LibraryScene.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -16,16 +16,16 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-62"
+        "REQ-67"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-update-the-title-screen-to-allow-play-while-offline-keep-the-existing-server-status-indicator-alert-for-admins-but-do-not-disable-gameplay-entry-when-the-server-is-offline-provide-clear-english-messaging-that-progress-will-be-stored-locally-while-offline",
-      "featureTitle": "Update the title screen to allow play while offline: keep the existing server status indicator/alert for admins, but do not disable gameplay entry when the server is Offline. Provide clear English messaging that progress will be stored locally while offline.",
+      "featureId": "feature-add-a-cooldown-one-shot-guard-so-the-touch-triggered-secret-event-does-not-repeatedly-fire-every-frame-while-the-player-remains-in-contact-with-puro",
+      "featureTitle": "Add a cooldown/one-shot guard so the touch-triggered secret event does not repeatedly fire every frame while the player remains in contact with Puro.",
       "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/ui/TitleScreen.tsx"
+        "frontend/src/game/characters/Puro.tsx",
+        "frontend/src/game/scene/LibraryScene.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -35,16 +35,15 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-63"
+        "REQ-68"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-implement-local-only-game-launching-behavior-in-app-tsx-when-backend-preflight-fails-for-new-game-or-continue-fall-back-to-launching-offline-gameplay-instead-of-routing-to-the-launch-error-screen",
-      "featureTitle": "Implement local-only game launching behavior in App.tsx: when backend preflight fails for New Game or Continue, fall back to launching offline gameplay instead of routing to the launch-error screen.",
+      "featureId": "feature-ensure-the-touch-interaction-remains-benign-and-consistent-with-the-existing-no-transfurring-rule-no-harm-or-transformation-on-contact-any-user-facing-text-used-by-the-secret-event-touch-feedback-must-be-in-english",
+      "featureTitle": "Ensure the touch interaction remains benign and consistent with the existing no-transfurring rule (no harm or transformation on contact). Any user-facing text used by the secret event/touch feedback must be in English.",
       "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/ui/GameLaunchErrorScreen.tsx"
+        "frontend/src/game/scene/LibraryScene.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -54,47 +53,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-64"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-add-a-local-save-presence-signal-to-drive-continue-behavior-in-offline-mode-using-the-existing-persisted-zustand-store-as-the-source-of-truth",
-      "featureTitle": "Add a local-save presence signal to drive \"Continue\" behavior in offline mode, using the existing persisted Zustand store as the source of truth.",
-      "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/game/state/useGameStore.ts",
-        "frontend/src/ui/TitleScreen.tsx"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-65"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-ensure-offline-mode-does-not-introduce-backend-coupling-elsewhere-gameplay-ui-interactions-must-remain-functional-without-backend-calls-dialogue-choices-activities-letters-customization-moments-endings-and-must-continue-using-the-local-zustand-store-as-they-do-today",
-      "featureTitle": "Ensure offline mode does not introduce backend coupling elsewhere: gameplay UI interactions must remain functional without backend calls (dialogue choices, activities, letters, customization, moments, endings) and must continue using the local Zustand store as they do today.",
-      "files": [
-        "frontend/src/game/GameView.tsx",
-        "frontend/src/hooks/useQueries.ts",
-        "frontend/src/ui/TitleScreen.tsx"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-66"
+        "REQ-69"
       ],
       "confidence": "high"
     }

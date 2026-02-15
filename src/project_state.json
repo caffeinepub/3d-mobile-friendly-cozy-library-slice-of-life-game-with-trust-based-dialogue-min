@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 39,
+  "projectStateVersion": 41,
   "summary": "3D mobile-friendly slice-of-life adventure/visual-novel hybrid set entirely in Puro’s library, focused on building friendship/trust through dialogue and cozy activities, featuring multiple endings including a low-friendship Betrayal ending with Special Edition variants.",
   "architectural_notes": [
     "Core gameplay loop centered on a hub-based, single-location library environment with repeatable daily activities and relationship progression.",
@@ -26,7 +26,7 @@
     "Admin switch/control appears to have been removed from the UI; user requests it be added back.",
     "Requirement conflict: user wants the game accessible even when offline, but current launch flow depends on Internet Computer canister calls (startNewGame/continueGame) and an 'always-online' backend assumption—needs clarified offline behavior (local saves/content vs backend sync)."
   ],
-  "isFixRequest": false,
+  "isFixRequest": true,
   "existing_features": [
     {
       "id": "feature-create-a-single-location-3d-game-scene-set-entirely-in-a-dim-cozy-dusty-library-with-bookshelves-vents-and-a-central-fruit-bearing-bonsai-tree-that-the-player-can-explore",
@@ -547,6 +547,30 @@
         "REQ-66"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-detect-when-the-player-character-avatar-touches-collides-with-puro-in-the-3d-library-scene-and-trigger-the-existing-secret-event-that-was-recently-added",
+      "title": "Detect when the player character avatar touches/collides with Puro in the 3D library scene and trigger the existing \"secret\" event that was recently added.",
+      "reqIds": [
+        "REQ-67"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-cooldown-one-shot-guard-so-the-touch-triggered-secret-event-does-not-repeatedly-fire-every-frame-while-the-player-remains-in-contact-with-puro",
+      "title": "Add a cooldown/one-shot guard so the touch-triggered secret event does not repeatedly fire every frame while the player remains in contact with Puro.",
+      "reqIds": [
+        "REQ-68"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-the-touch-interaction-remains-benign-and-consistent-with-the-existing-no-transfurring-rule-no-harm-or-transformation-on-contact-any-user-facing-text-used-by-the-secret-event-touch-feedback-must-be-in-english",
+      "title": "Ensure the touch interaction remains benign and consistent with the existing no-transfurring rule (no harm or transformation on contact). Any user-facing text used by the secret event/touch feedback must be in English.",
+      "reqIds": [
+        "REQ-69"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -699,6 +723,12 @@
     {
       "id": "AR-25",
       "summary": "Enable the game to remain accessible/usable even when offline (graceful offline mode that does not depend on backend availability)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-26",
+      "summary": "Trigger the newly-added secret event when the player character touches/collides with Puro",
       "reqIds": [],
       "status": "pending"
     }

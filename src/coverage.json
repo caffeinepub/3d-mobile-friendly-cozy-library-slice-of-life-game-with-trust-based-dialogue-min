@@ -1,82 +1,52 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-15T02:07:25.440Z",
+  "generatedAt": "2026-02-15T03:09:35.331Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 5,
-    "implemented": 5,
+    "total": 3,
+    "implemented": 3,
     "items": [
       {
-        "id": "REQ-62",
-        "summary": "Add an explicit \"Offline Mode\" launch path so the game can be started and continued without any backend canister calls when the backend is unavailable (or when the user has no network connection).",
+        "id": "REQ-67",
+        "summary": "Detect when the player character avatar touches/collides with Puro in the 3D library scene and trigger the existing \"secret\" event that was recently added.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/App.tsx",
-          "frontend/src/ui/TitleScreen.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/App.tsx",
-          "frontend/src/ui/TitleScreen.tsx"
-        ]
-      },
-      {
-        "id": "REQ-63",
-        "summary": "Update the title screen to allow play while offline: keep the existing server status indicator/alert for admins, but do not disable gameplay entry when the server is Offline. Provide clear English messaging that progress will be stored locally while offline.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/ui/TitleScreen.tsx",
-          "frontend/src/App.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/ui/TitleScreen.tsx",
-          "frontend/src/App.tsx"
-        ]
-      },
-      {
-        "id": "REQ-64",
-        "summary": "Implement local-only game launching behavior in App.tsx: when backend preflight fails for New Game or Continue, fall back to launching offline gameplay instead of routing to the launch-error screen.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/App.tsx",
-          "frontend/src/ui/GameLaunchErrorScreen.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/App.tsx",
-          "frontend/src/ui/GameLaunchErrorScreen.tsx"
-        ]
-      },
-      {
-        "id": "REQ-65",
-        "summary": "Add a local-save presence signal to drive \"Continue\" behavior in offline mode, using the existing persisted Zustand store as the source of truth.",
-        "status": "implemented",
-        "plannedFiles": [
+          "frontend/src/game/scene/LibraryScene.tsx",
           "frontend/src/game/state/useGameStore.ts",
-          "frontend/src/App.tsx",
-          "frontend/src/ui/TitleScreen.tsx"
+          "frontend/src/game/characters/Puro.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/game/state/useGameStore.ts",
-          "frontend/src/App.tsx",
-          "frontend/src/ui/TitleScreen.tsx"
+          "frontend/src/game/scene/LibraryScene.tsx",
+          "frontend/src/game/characters/Puro.tsx"
         ]
       },
       {
-        "id": "REQ-66",
-        "summary": "Ensure offline mode does not introduce backend coupling elsewhere: gameplay UI interactions must remain functional without backend calls (dialogue choices, activities, letters, customization, moments, endings) and must continue using the local Zustand store as they do today.",
+        "id": "REQ-68",
+        "summary": "Add a cooldown/one-shot guard so the touch-triggered secret event does not repeatedly fire every frame while the player remains in contact with Puro.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/game/GameView.tsx",
-          "frontend/src/ui/TitleScreen.tsx",
-          "frontend/src/hooks/useQueries.ts"
+          "frontend/src/game/scene/LibraryScene.tsx",
+          "frontend/src/game/characters/Puro.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/game/GameView.tsx",
-          "frontend/src/ui/TitleScreen.tsx",
-          "frontend/src/hooks/useQueries.ts"
+          "frontend/src/game/scene/LibraryScene.tsx",
+          "frontend/src/game/characters/Puro.tsx"
+        ]
+      },
+      {
+        "id": "REQ-69",
+        "summary": "Ensure the touch interaction remains benign and consistent with the existing no-transfurring rule (no harm or transformation on contact). Any user-facing text used by the secret event/touch feedback must be in English.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/game/scene/LibraryScene.tsx",
+          "frontend/src/game/state/useGameStore.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/game/scene/LibraryScene.tsx"
         ]
       }
     ]
@@ -86,12 +56,8 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/App.tsx",
-    "frontend/src/game/GameView.tsx",
-    "frontend/src/game/state/useGameStore.ts",
-    "frontend/src/hooks/useQueries.ts",
-    "frontend/src/ui/GameLaunchErrorScreen.tsx",
-    "frontend/src/ui/TitleScreen.tsx",
+    "frontend/src/game/characters/Puro.tsx",
+    "frontend/src/game/scene/LibraryScene.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

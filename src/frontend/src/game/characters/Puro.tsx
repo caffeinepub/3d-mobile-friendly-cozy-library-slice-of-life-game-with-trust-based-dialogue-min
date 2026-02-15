@@ -1,23 +1,21 @@
-import { useRef, useState } from 'react';
+import { forwardRef, useState, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useGameStore } from '../state/useGameStore';
-import { toast } from 'sonner';
 
 interface PuroProps {
   position: [number, number, number];
 }
 
-export default function Puro({ position }: PuroProps) {
-  const meshRef = useRef<THREE.Group>(null);
+const Puro = forwardRef<THREE.Group, PuroProps>(({ position }, ref) => {
   const [hovered, setHovered] = useState(false);
   const { setShowDialogue } = useGameStore();
   const lastInteraction = useRef(0);
 
   useFrame((state) => {
-    if (!meshRef.current) return;
+    if (!ref || typeof ref === 'function' || !ref.current) return;
     // Gentle idle animation
-    meshRef.current.position.y = position[1] + Math.sin(state.clock.elapsedTime * 0.5) * 0.05;
+    ref.current.position.y = position[1] + Math.sin(state.clock.elapsedTime * 0.5) * 0.05;
   });
 
   const handleClick = () => {
@@ -40,7 +38,7 @@ export default function Puro({ position }: PuroProps) {
 
   return (
     <group 
-      ref={meshRef} 
+      ref={ref} 
       position={position}
       onClick={handleClick}
       onPointerOver={handlePointerOver}
@@ -87,4 +85,8 @@ export default function Puro({ position }: PuroProps) {
       </mesh>
     </group>
   );
-}
+});
+
+Puro.displayName = 'Puro';
+
+export default Puro;

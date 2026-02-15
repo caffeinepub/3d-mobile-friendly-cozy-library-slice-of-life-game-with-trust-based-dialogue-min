@@ -1,108 +1,72 @@
 {
   "kind": "build_request",
-  "title": "Add offline-accessible gameplay mode (playable without backend availability)",
+  "title": "Trigger the existing secret event when the player touches Puro",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-62",
-      "text": "Add an explicit \"Offline Mode\" launch path so the game can be started and continued without any backend canister calls when the backend is unavailable (or when the user has no network connection).",
+      "id": "REQ-67",
+      "text": "Detect when the player character avatar touches/collides with Puro in the 3D library scene and trigger the existing \"secret\" event that was recently added.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-5"
+          "recent-messages-5",
+          "recent-messages-9"
         ],
         "quotes": [
-          "Make the game always accessable even if it is offline."
+          "Make if your character touches puro then the secret that you recently added happens",
+          "Yes"
         ]
       },
       "acceptanceCriteria": [
-        "When backend availability is unhealthy/unreachable, the user can still enter gameplay from the title screen without seeing the launch error screen.",
-        "Starting gameplay via the offline path does not call startNewGame(), continueGame(), isAvailable(), or any other backend actor methods.",
-        "All user-facing UI text related to offline mode is in English."
+        "When the player avatar moves into contact range with Puro (e.g., within a small collision radius), the same secret event/sequence currently used elsewhere is triggered.",
+        "The secret event triggers from touch/collision without requiring a click on Puro.",
+        "The touch trigger works on both desktop (keyboard movement) and mobile (joystick movement)."
       ]
     },
     {
-      "id": "REQ-63",
-      "text": "Update the title screen to allow play while offline: keep the existing server status indicator/alert for admins, but do not disable gameplay entry when the server is Offline. Provide clear English messaging that progress will be stored locally while offline.",
+      "id": "REQ-68",
+      "text": "Add a cooldown/one-shot guard so the touch-triggered secret event does not repeatedly fire every frame while the player remains in contact with Puro.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-5"
+          "recent-messages-5"
         ],
         "quotes": [
-          "Make the game always accessable even if it is offline."
+          "Make if your character touches puro then the secret that you recently added happens"
         ]
       },
       "acceptanceCriteria": [
-        "On the title screen, \"New Game\" and \"Continue\" are not disabled solely due to backendAvailability being offline/unhealthy.",
-        "If the server is Offline, the title screen shows an English notice such as \"Server Offline — you can still play in Offline Mode. Progress will be saved on this device.\"",
-        "If the user is an admin and the server is Offline, the existing server-unavailable alert can remain, but it must not block offline play."
+        "While the player remains overlapping/touching Puro, the secret event does not continuously re-trigger.",
+        "After the player separates and re-approaches (or after a short cooldown), the touch trigger can fire again in a controlled way.",
+        "The guard does not break Puro’s existing click-to-open-dialogue interaction."
       ]
     },
     {
-      "id": "REQ-64",
-      "text": "Implement local-only game launching behavior in App.tsx: when backend preflight fails for New Game or Continue, fall back to launching offline gameplay instead of routing to the launch-error screen.",
+      "id": "REQ-69",
+      "text": "Ensure the touch interaction remains benign and consistent with the existing no-transfurring rule (no harm or transformation on contact). Any user-facing text used by the secret event/touch feedback must be in English.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-5"
+          "recent-messages-5"
         ],
         "quotes": [
-          "Make the game always accessable even if it is offline."
+          "Make if your character touches puro then the secret that you recently added happens"
         ]
       },
       "acceptanceCriteria": [
-        "In frontend/src/App.tsx, handleNewGame() launches gameplay (currentScreen='game', isNewGame=true) even when backendAvailability.isHealthy is false.",
-        "In frontend/src/App.tsx, handleContinue() launches gameplay (currentScreen='game', isNewGame=false) even when backendAvailability.isHealthy is false.",
-        "When the offline fallback is used, diagnostics.lastLaunchAction still reflects the user action (new-game/continue), and diagnostics.userFriendlySummary reflects an English offline message rather than a server failure message."
-      ]
-    },
-    {
-      "id": "REQ-65",
-      "text": "Add a local-save presence signal to drive \"Continue\" behavior in offline mode, using the existing persisted Zustand store as the source of truth.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-5"
-        ],
-        "quotes": [
-          "Make the game always accessable even if it is offline."
-        ]
-      },
-      "acceptanceCriteria": [
-        "The game persists a boolean (or equivalent) indicating a local save exists (e.g., set after the first meaningful progress such as any state change or after first entering gameplay).",
-        "If no local save exists, \"Continue\" is disabled (or shows an English message explaining there is no local save to continue) regardless of backend availability.",
-        "If a local save exists, \"Continue\" works in offline mode and loads the locally persisted state."
-      ]
-    },
-    {
-      "id": "REQ-66",
-      "text": "Ensure offline mode does not introduce backend coupling elsewhere: gameplay UI interactions must remain functional without backend calls (dialogue choices, activities, letters, customization, moments, endings) and must continue using the local Zustand store as they do today.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-5"
-        ],
-        "quotes": [
-          "Make the game always accessable even if it is offline."
-        ]
-      },
-      "acceptanceCriteria": [
-        "With the network disconnected (or backend canister stopped), the user can still: open dialogue, make choices, complete activities, write letters and receive local responses, place customization items, and view unlocked moments/endings without errors.",
-        "No new runtime errors appear due to missing backend actor or failed React Query calls during offline gameplay.",
-        "No UI copy claims the app can start/stop/restart the backend canister."
+        "Touching Puro does not apply any harmful effects or transformation mechanics.",
+        "Any new on-screen/toast text added specifically for the touch trigger is English-only."
       ]
     }
   ],
   "constraints": [
-    "Frontend immutable paths must not be edited: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui.",
-    "Backend remains single-actor in backend/main.mo; do not introduce additional backend services.",
-    "All user-facing text introduced/changed for this request must be in English."
+    "Do not edit files under frontend/src/components/ui (read-only).",
+    "Do not edit frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, or frontend/src/main.tsx (immutable paths)."
   ],
   "nonGoals": [
-    "Implementing bidirectional sync between offline local progress and backend canister state.",
-    "Guaranteeing offline availability of Internet Identity authentication flows.",
-    "Adding service worker/PWA offline asset caching beyond what already exists."
+    "Do not add new endings, new dialogue branches, or new mini-games as part of this change.",
+    "Do not implement physics-engine-based collisions; a simple proximity/collision-radius check is sufficient unless already present.",
+    "Do not change backend Motoko logic unless the existing secret event is backend-driven and cannot be triggered from the frontend without it."
   ],
   "imageRequirements": {
     "required": [],
