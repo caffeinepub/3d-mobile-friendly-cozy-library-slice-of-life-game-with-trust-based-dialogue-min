@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 17,
+  "projectStateVersion": 21,
   "summary": "3D mobile-friendly slice-of-life adventure/visual-novel hybrid set entirely in Puro’s library, focused on building friendship/trust through dialogue and cozy activities, featuring multiple endings including a low-friendship Betrayal ending with Special Edition variants.",
   "architectural_notes": [
     "Core gameplay loop centered on a hub-based, single-location library environment with repeatable daily activities and relationship progression.",
@@ -8,14 +8,17 @@
     "Project should include a clear startup/entrypoint file (e.g., main executable scene/script) used by build/deployment to launch the game.",
     "Startup/New Game depends on an Internet Computer canister method call (startNewGame); app should handle canister availability (stopped) with preflight/health checks and user-facing recovery messaging.",
     "Backend availability requirement: keep the Internet Computer canister running/always-online (monitoring + auto-restart/ops process) to prevent launch flows (startNewGame/continueGame) from failing due to a stopped canister.",
-    "Potential scope conflict: IC canisters generally cannot be started/stopped from within the app/canister itself; any server on/off control likely must be an ops/admin-only external action (or simulated locally) rather than a true canister lifecycle toggle."
+    "Potential scope conflict: IC canisters generally cannot be started/stopped from within the app/canister itself; any server on/off control likely must be an ops/admin-only external action (or simulated locally) rather than a true canister lifecycle toggle.",
+    "User reiterates requirement for an in-app switch to set the backend/server online/offline (true on/off control), which may conflict with IC canister lifecycle limitations.",
+    "User requests admin-only switches be restricted by a specific username (not by Internet Identity principal), implying some form of username capture/storage and a trust model for admin gating."
   ],
   "known_issues": [
     "Art/style scope conflict: user requests a 3D game, but gameplay style mentions 2D pixel art aesthetics—needs final decision on visual style.",
     "App/game fails to start when clicking the startup/entrypoint (startup launch issue reported by user).",
     "New Game fails with IC0508 non_replicated_rejection: canister pmng3-byaaa-aaaag-awtia-cai is stopped (reject_code 5), resulting in Game Mounted: No.",
     "React runtime error: \"Maximum update depth exceeded\" indicating an infinite render/update loop (likely repeated setState in componentDidUpdate/componentWillUpdate or an effect without stable dependencies).",
-    "Request conflict risk: user asked for an in-app server on/off switch, but existing requirement states the terminal must not claim to start/stop/restart the backend canister; needs clarification/decision (admin-only external control vs simulated toggle)."
+    "Request conflict risk: user asked for an in-app server on/off switch, but existing requirement states the terminal must not claim to start/stop/restart the backend canister; needs clarification/decision (admin-only external control vs simulated toggle).",
+    "Admin gating approach conflict: earlier plan uses Internet Identity principal; user now requests username-based gating, which may be spoofable without strong authentication—needs a decision on security model."
   ],
   "isFixRequest": false,
   "existing_features": [
@@ -314,6 +317,54 @@
         "REQ-38"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-update-the-title-screen-server-toggle-ui-to-match-the-user-s-online-offline-wording-while-clearly-communicating-that-the-switch-only-controls-local-backend-access-it-does-not-start-stop-the-internet-computer-canister",
+      "title": "Update the Title Screen server toggle UI to match the user’s “online/offline” wording while clearly communicating that the switch only controls local backend access (it does not start/stop the Internet Computer canister).",
+      "reqIds": [
+        "REQ-39"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-compact-always-visible-server-status-indicator-on-the-title-screen-near-the-server-toggle-that-reflects-the-current-state-local-offline-checking-online-offline-unhealthy-using-the-existing-backend-availability-check-state",
+      "title": "Add a compact, always-visible server status indicator on the Title Screen near the server toggle that reflects the current state (Local Offline, Checking, Online, Offline/Unhealthy) using the existing backend availability check state.",
+      "reqIds": [
+        "REQ-40"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-username-based-admin-access-mechanism-local-only-that-unlocks-admin-only-ui-controls-when-the-entered-username-exactly-matches-a-single-configured-username",
+      "title": "Add a username-based admin access mechanism (local-only) that unlocks admin-only UI controls when the entered username exactly matches a single configured username.",
+      "reqIds": [
+        "REQ-41"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-hide-admin-only-controls-on-the-title-screen-unless-admin-mode-is-unlocked-including-the-online-offline-server-access-toggle-server-status-indicator-and-the-button-that-opens-the-diagnostic-terminal",
+      "title": "Hide admin-only controls on the Title Screen unless admin mode is unlocked, including the Online/Offline server access toggle, server status indicator, and the button that opens the Diagnostic Terminal.",
+      "reqIds": [
+        "REQ-42"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-hide-admin-only-controls-during-gameplay-unless-admin-mode-is-unlocked-including-access-to-the-diagnostic-terminal-from-the-pause-menu-and-prevent-the-keyboard-shortcut-from-opening-the-terminal-when-not-in-admin-mode",
+      "title": "Hide admin-only controls during gameplay unless admin mode is unlocked, including access to the Diagnostic Terminal from the Pause Menu, and prevent the keyboard shortcut from opening the terminal when not in admin mode.",
+      "reqIds": [
+        "REQ-43"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-provide-an-in-app-way-to-lock-logout-admin-mode-clear-the-stored-admin-state-from-the-same-place-where-the-username-is-entered-with-clear-english-feedback",
+      "title": "Provide an in-app way to lock/logout admin mode (clear the stored admin state) from the same place where the username is entered, with clear English feedback.",
+      "reqIds": [
+        "REQ-44"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -424,6 +475,12 @@
     {
       "id": "AR-18",
       "summary": "Add an in-app switch/control to turn the game server/backend (IC canister) on/off from the UI (e.g., via the terminal)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-19",
+      "summary": "Gate admin-only UI switches behind a specific in-app username (instead of Internet Identity principal)",
       "reqIds": [],
       "status": "pending"
     }

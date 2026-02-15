@@ -3,10 +3,13 @@ import { Card } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { BookOpen, Settings, Info, Loader2, AlertCircle, RefreshCw, Terminal, Power } from 'lucide-react';
+import { BookOpen, Settings, Info, Loader2, AlertCircle, RefreshCw, Terminal } from 'lucide-react';
 import type { BackendAvailabilityState } from '../hooks/useBackendAvailability';
 import { useTerminalStore } from './terminal/useTerminalStore';
 import { useServerAccessStore } from '../state/useServerAccessStore';
+import { useAdminGateStore } from '../state/useAdminGateStore';
+import ServerStatusIndicator from './ServerStatusIndicator';
+import AdminAccessPanel from './AdminAccessPanel';
 
 interface TitleScreenProps {
   onNewGame: () => void;
@@ -31,6 +34,7 @@ export default function TitleScreen({
 }: TitleScreenProps) {
   const { open: openTerminal } = useTerminalStore();
   const { toggleServerAccess } = useServerAccessStore();
+  const { isUnlocked: isAdminUnlocked } = useAdminGateStore();
   
   // Only show server offline if server access is enabled
   const isServerOffline = serverAccessEnabled && backendAvailability && !backendAvailability.isHealthy && !backendAvailability.isChecking;
@@ -55,40 +59,58 @@ export default function TitleScreen({
             className="w-full max-w-sm"
           />
 
-          {/* Server Access Toggle */}
-          <div className="w-full flex items-center justify-between p-3 rounded-lg border bg-muted/50">
-            <div className="flex items-center gap-2">
-              <Power className="h-4 w-4 text-muted-foreground" />
-              <Label htmlFor="server-access" className="cursor-pointer text-sm font-medium">
-                Server Access
-              </Label>
+          {/* Admin Access Panel */}
+          <AdminAccessPanel />
+
+          {/* Server Access Toggle with Status Indicator - Only visible when admin unlocked */}
+          {isAdminUnlocked && (
+            <div className="w-full space-y-2">
+              <div className="flex items-center justify-between p-3 rounded-lg border bg-muted/50">
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="server-access" className="cursor-pointer text-sm font-medium">
+                    {serverAccessEnabled ? 'Online' : 'Offline'}
+                  </Label>
+                </div>
+                <Switch
+                  id="server-access"
+                  checked={serverAccessEnabled}
+                  onCheckedChange={toggleServerAccess}
+                  disabled={isLaunching}
+                />
+              </div>
+              
+              {/* Always-visible status indicator */}
+              <div className="flex justify-center">
+                <ServerStatusIndicator
+                  serverAccessEnabled={serverAccessEnabled}
+                  backendAvailability={backendAvailability}
+                />
+              </div>
+              
+              <p className="text-xs text-muted-foreground text-center px-2">
+                This toggle enables or disables server calls from this app. It does not start or stop the backend canister.
+              </p>
             </div>
-            <Switch
-              id="server-access"
-              checked={serverAccessEnabled}
-              onCheckedChange={toggleServerAccess}
-              disabled={isLaunching}
-            />
-          </div>
+          )}
 
           {/* Server Access Disabled Alert */}
           {!serverAccessEnabled && (
             <Alert className="w-full">
               <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Server Access Disabled</AlertTitle>
+              <AlertTitle>Offline Mode</AlertTitle>
               <AlertDescription>
-                Backend server calls are disabled in this app. Enable server access above to start or continue a game.
+                Backend server calls are disabled locally. {isAdminUnlocked ? 'Switch to Online above to start or continue a game.' : 'Admin access required to enable server calls.'}
               </AlertDescription>
             </Alert>
           )}
 
-          {/* Server Offline Alert - only shown when server access is enabled */}
-          {isServerOffline && (
+          {/* Server Offline Alert - only shown when server access is enabled and admin unlocked */}
+          {isAdminUnlocked && isServerOffline && (
             <Alert variant="destructive" className="w-full">
               <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Server Offline</AlertTitle>
+              <AlertTitle>Server Unavailable</AlertTitle>
               <AlertDescription className="flex flex-col gap-2">
-                <span>The game server is currently offline or stopped. Please try again later.</span>
+                <span>The backend canister is currently unavailable. This may be due to the canister being stopped or network issues.</span>
                 <Button
                   variant="outline"
                   size="sm"
@@ -100,14 +122,6 @@ export default function TitleScreen({
                 </Button>
               </AlertDescription>
             </Alert>
-          )}
-
-          {/* Server Checking Status - only shown when server access is enabled */}
-          {isCheckingServer && (
-            <div className="w-full text-center text-sm text-muted-foreground flex items-center justify-center gap-2">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Checking server status...
-            </div>
           )}
 
           <div className="flex flex-col gap-3 w-full">
@@ -171,16 +185,19 @@ export default function TitleScreen({
               </Button>
             </div>
 
-            <Button
-              onClick={openTerminal}
-              variant="outline"
-              size="sm"
-              className="w-full mt-2"
-              disabled={isLaunching}
-            >
-              <Terminal className="mr-2 h-4 w-4" />
-              Diagnostic Terminal
-            </Button>
+            {/* Diagnostic Terminal - Only visible when admin unlocked */}
+            {isAdminUnlocked && (
+              <Button
+                onClick={openTerminal}
+                variant="outline"
+                size="sm"
+                className="w-full mt-2"
+                disabled={isLaunching}
+              >
+                <Terminal className="mr-2 h-4 w-4" />
+                Diagnostic Terminal
+              </Button>
+            )}
           </div>
         </div>
       </Card>

@@ -1,6 +1,6 @@
 {
   "frontend/src/App.tsx": "Main application component managing screen navigation, startup sequence, backend availability monitoring (disabled when server access is OFF), game launch handling with server access guards, diagnostics tracking, and terminal integration with server status check function that respects server access state.",
-  "frontend/src/ui/TitleScreen.tsx": "Title screen component with game logo, server access toggle switch, new game/continue buttons (disabled when server access is OFF), backend availability status display (only shown when server access is enabled), navigation to settings/credits, and diagnostic terminal access button.",
+  "frontend/src/ui/TitleScreen.tsx": "Title screen component with admin access panel, conditionally rendered server access toggle/status/terminal button (only visible when admin unlocked), and game launch buttons that respect server access state.",
   "frontend/src/ui/CreditsScreen.tsx": "Credits screen displaying game information, features list, and attribution footer with caffeine.ai link.",
   "frontend/src/game/GameView.tsx": "Main in-game view component hosting the 3D canvas with mount success/error signaling, HUD overlays, dialogue panels, activity menus, and all game UI systems with guarded initialization logic to prevent infinite update loops.",
   "frontend/src/game/scene/LibraryScene.tsx": "3D library scene with texture loading that calls useTexture hook unconditionally at the top level and falls back to solid color material when texture fails, preventing runtime exceptions from blocking scene rendering.",
@@ -24,7 +24,7 @@
   "frontend/src/game/moments/MomentPlayer.tsx": "Replay interface for viewing unlocked memorable moments.",
   "frontend/src/game/ui/LettersPanel.tsx": "Letter writing and inbox system with tabs for composing new letters and viewing sent letters with responses.",
   "frontend/src/game/letters/letterTemplates.ts": "Response generation logic for letters using contextual keyword matching and friendly templates.",
-  "frontend/src/game/ui/PauseMenu.tsx": "Pause menu with resume, quick access to game features, settings, diagnostic terminal access, reset progress, and return to title options.",
+  "frontend/src/game/ui/PauseMenu.tsx": "Pause menu with resume, quick access to game features, settings, conditionally rendered diagnostic terminal button (only visible when admin unlocked), reset progress, and return to title options.",
   "frontend/src/game/ui/SettingsScreen.tsx": "Settings interface for audio controls including mute toggle and volume slider.",
   "frontend/src/game/audio/useAudio.ts": "Audio management hook with persistent volume/mute settings, safe audio initialization with error handling, non-blocking background music playback, and memoized playBackgroundMusic function to prevent effect dependency loops.",
   "frontend/src/game/story/endings.ts": "Ending definitions with trust thresholds for good ending, Purlin fusion, and complete assimilation variants.",
@@ -42,6 +42,10 @@
   "frontend/src/ui/terminal/useTerminalStore.ts": "Zustand store managing terminal state including open/close status, output history with timestamps and types, and actions for appending input/output and clearing the log.",
   "frontend/src/ui/terminal/useTerminalDiagnostics.ts": "Utility function that formats application diagnostics data (screen context, startup status, launch stages, errors) into readable terminal output lines.",
   "frontend/src/ui/terminal/commands.ts": "Command parser and executor for diagnostic terminal commands (help, clear, server status, server on/off, diagnostics) with English output, server access state integration, and safe allowlist-based execution.",
-  "frontend/src/ui/DiagnosticTerminalOverlay.tsx": "Full-screen terminal overlay component with scrollable output log using outputLines from store, command input with Enter submission, keyboard shortcuts (Ctrl+` and Esc), auto-focus, and event isolation to prevent gameplay interference.",
-  "frontend/src/state/useServerAccessStore.ts": "Zustand persisted store managing local server access toggle state with enable/disable/toggle actions, persisted to local storage."
+  "frontend/src/ui/DiagnosticTerminalOverlay.tsx": "Full-screen terminal overlay component with admin-gated keyboard shortcut (Ctrl+` only opens when admin unlocked), scrollable output log, command input, and event isolation to prevent gameplay interference.",
+  "frontend/src/state/useServerAccessStore.ts": "Zustand persisted store managing local server access toggle state with enable/disable/toggle actions, persisted to local storage.",
+  "frontend/src/ui/ServerStatusIndicator.tsx": "Compact status indicator component displaying backend connection state (Local Offline, Checking…, Online, or Offline) with appropriate icons and colors based on server access toggle and availability check results.",
+  "frontend/src/config/adminGate.ts": "Configuration module exporting the admin username constant and localStorage key for the username-based admin gate system.",
+  "frontend/src/state/useAdminGateStore.ts": "Zustand persisted store managing admin mode state with actions to unlock via exact username match and lock/clear admin access.",
+  "frontend/src/ui/AdminAccessPanel.tsx": "Admin access UI panel allowing username entry to unlock admin mode with clear English feedback and explicit messaging that this is a local-only gate (not secure authentication)."
 }

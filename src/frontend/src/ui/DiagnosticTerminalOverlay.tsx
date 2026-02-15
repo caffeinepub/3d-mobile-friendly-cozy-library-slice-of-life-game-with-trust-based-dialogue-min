@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useTerminalStore } from './terminal/useTerminalStore';
+import { useAdminGateStore } from '../state/useAdminGateStore';
 import { executeCommand } from './terminal/commands';
 
 interface DiagnosticsData {
@@ -26,6 +27,7 @@ export default function DiagnosticTerminalOverlay({
   checkServerStatus,
 }: DiagnosticTerminalOverlayProps) {
   const { isOpen, outputLines, appendInput, close } = useTerminalStore();
+  const { isUnlocked: isAdminUnlocked } = useAdminGateStore();
   const [inputValue, setInputValue] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -44,15 +46,15 @@ export default function DiagnosticTerminalOverlay({
     }
   }, [outputLines]);
 
-  // Handle keyboard shortcuts
+  // Handle keyboard shortcuts - only allow opening when admin unlocked
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Ctrl+` or Cmd+` to toggle terminal
+      // Ctrl+` or Cmd+` to toggle terminal - only when admin unlocked
       if ((e.ctrlKey || e.metaKey) && e.key === '`') {
         e.preventDefault();
         if (isOpen) {
           close();
-        } else {
+        } else if (isAdminUnlocked) {
           useTerminalStore.getState().open();
         }
       }
@@ -65,7 +67,7 @@ export default function DiagnosticTerminalOverlay({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, close]);
+  }, [isOpen, isAdminUnlocked, close]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

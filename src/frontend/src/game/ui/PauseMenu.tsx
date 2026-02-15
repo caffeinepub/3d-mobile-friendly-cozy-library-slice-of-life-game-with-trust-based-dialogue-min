@@ -16,6 +16,7 @@ import { Play, RotateCcw, Settings, Home, Terminal } from 'lucide-react';
 import { useState } from 'react';
 import SettingsScreen from './SettingsScreen';
 import { useTerminalStore } from '../../ui/terminal/useTerminalStore';
+import { useAdminGateStore } from '../../state/useAdminGateStore';
 
 interface Props {
   onResume: () => void;
@@ -26,6 +27,7 @@ export default function PauseMenu({ onResume, onBackToTitle }: Props) {
   const { resetProgress, setShowActivities, setShowMiniGames, setShowCustomization, setShowMoments, setShowLetters } = useGameStore();
   const [showSettings, setShowSettings] = useState(false);
   const { open: openTerminal } = useTerminalStore();
+  const { isUnlocked: isAdminUnlocked } = useAdminGateStore();
 
   const handleReset = () => {
     resetProgress();
@@ -102,10 +104,13 @@ export default function PauseMenu({ onResume, onBackToTitle }: Props) {
               Settings
             </Button>
 
-            <Button onClick={handleOpenTerminal} variant="outline" className="w-full justify-start mt-1">
-              <Terminal className="mr-2 h-5 w-5" />
-              Diagnostic Terminal
-            </Button>
+            {/* Diagnostic Terminal - Only visible when admin unlocked */}
+            {isAdminUnlocked && (
+              <Button onClick={handleOpenTerminal} variant="outline" className="w-full justify-start mt-1">
+                <Terminal className="mr-2 h-5 w-5" />
+                Diagnostic Terminal
+              </Button>
+            )}
 
             <AlertDialog>
               <AlertDialogTrigger asChild>

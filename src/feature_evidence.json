@@ -2,29 +2,12 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-add-an-in-app-on-off-switch-that-toggles-whether-the-app-is-allowed-to-call-the-backend-canister-local-server-access-toggle-and-persist-this-preference-across-page-reloads",
-      "featureTitle": "Add an in-app on/off switch that toggles whether the app is allowed to call the backend canister (local “server access” toggle), and persist this preference across page reloads.",
+      "featureId": "feature-add-a-username-based-admin-access-mechanism-local-only-that-unlocks-admin-only-ui-controls-when-the-entered-username-exactly-matches-a-single-configured-username",
+      "featureTitle": "Add a username-based admin access mechanism (local-only) that unlocks admin-only UI controls when the entered username exactly matches a single configured username.",
       "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/state/useServerAccessStore.ts"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-36"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-integrate-the-server-access-toggle-into-the-title-screen-so-that-when-server-access-is-disabled-new-game-and-continue-are-disabled-and-the-user-is-shown-a-clear-english-explanation-that-backend-calls-are-disabled-locally",
-      "featureTitle": "Integrate the server access toggle into the Title Screen so that when server access is disabled, New Game and Continue are disabled and the user is shown a clear English explanation that backend calls are disabled locally.",
-      "files": [
-        "frontend/src/App.tsx",
+        "frontend/src/config/adminGate.ts",
+        "frontend/src/state/useAdminGateStore.ts",
+        "frontend/src/ui/AdminAccessPanel.tsx",
         "frontend/src/ui/TitleScreen.tsx"
       ],
       "components": [
@@ -35,17 +18,15 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-37"
+        "REQ-41"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-extend-the-diagnostic-terminal-command-set-to-support-toggling-the-local-server-access-switch-diagnostic-only-and-update-terminal-help-text-accordingly",
-      "featureTitle": "Extend the Diagnostic Terminal command set to support toggling the local server access switch (diagnostic-only), and update terminal help text accordingly.",
+      "featureId": "feature-hide-admin-only-controls-on-the-title-screen-unless-admin-mode-is-unlocked-including-the-online-offline-server-access-toggle-server-status-indicator-and-the-button-that-opens-the-diagnostic-terminal",
+      "featureTitle": "Hide admin-only controls on the Title Screen unless admin mode is unlocked, including the Online/Offline server access toggle, server status indicator, and the button that opens the Diagnostic Terminal.",
       "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/ui/DiagnosticTerminalOverlay.tsx",
-        "frontend/src/ui/terminal/commands.ts"
+        "frontend/src/ui/TitleScreen.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -55,7 +36,47 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-38"
+        "REQ-42"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-hide-admin-only-controls-during-gameplay-unless-admin-mode-is-unlocked-including-access-to-the-diagnostic-terminal-from-the-pause-menu-and-prevent-the-keyboard-shortcut-from-opening-the-terminal-when-not-in-admin-mode",
+      "featureTitle": "Hide admin-only controls during gameplay unless admin mode is unlocked, including access to the Diagnostic Terminal from the Pause Menu, and prevent the keyboard shortcut from opening the terminal when not in admin mode.",
+      "files": [
+        "frontend/src/game/ui/PauseMenu.tsx",
+        "frontend/src/ui/DiagnosticTerminalOverlay.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-43"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-provide-an-in-app-way-to-lock-logout-admin-mode-clear-the-stored-admin-state-from-the-same-place-where-the-username-is-entered-with-clear-english-feedback",
+      "featureTitle": "Provide an in-app way to lock/logout admin mode (clear the stored admin state) from the same place where the username is entered, with clear English feedback.",
+      "files": [
+        "frontend/src/game/ui/PauseMenu.tsx",
+        "frontend/src/state/useAdminGateStore.ts",
+        "frontend/src/ui/AdminAccessPanel.tsx",
+        "frontend/src/ui/TitleScreen.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-44"
       ],
       "confidence": "high"
     }
