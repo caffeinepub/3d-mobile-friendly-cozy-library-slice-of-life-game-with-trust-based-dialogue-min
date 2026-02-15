@@ -1,27 +1,46 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Deployment retry & troubleshooting documentation for failed network deploys",
+  "title": "Update local admin gate username to ADMIN and invalidate old unlock state",
   "requirements": [
     {
-      "id": "REQ-46",
-      "summary": "Add an English deployment troubleshooting guide covering retrying failed IC network deploys and diagnosing common failures, referencing the existing canister availability ops guide.",
+      "id": "REQ-47",
+      "summary": "Change the local-only admin username gate to unlock only on exact, case-sensitive match to \"ADMIN\".",
       "acceptanceCriteria": [
-        "A new markdown document exists in the repo that provides step-by-step instructions to retry deployment after a failure.",
-        "The guide includes a section listing common failure modes (build failure, identity/auth issues, canister stopped, out of cycles) and what to check next.",
-        "The guide references the existing canister availability operations guidance (frontend/OPS_CANISTER_AVAILABILITY.md) rather than duplicating it verbatim.",
-        "All user-facing/documentation text added is in English."
+        "Admin mode unlock succeeds when the user enters exactly \"ADMIN\".",
+        "Admin mode unlock fails for \"admin\", \"Admin\", \"ADMIN \" (trailing space), or any other non-exact value.",
+        "All existing admin-only UI remains gated by the updated admin unlock condition."
       ],
       "file_operations": [
         {
-          "path": "frontend/DEPLOYMENT_TROUBLESHOOTING.md",
-          "operation": "create",
-          "description": "Create a developer-facing English markdown guide describing how to retry a failed network deployment (including verifying canister status before redeploying) and how to diagnose common deployment failures (build failure, identity/auth issues, canister stopped, out-of-cycles). Include explicit references/links to frontend/OPS_CANISTER_AVAILABILITY.md for canister availability operations rather than duplicating that guidance."
+          "path": "frontend/src/config/adminGate.ts",
+          "operation": "modify",
+          "description": "Update the configured ADMIN_USERNAME constant to \"ADMIN\" (case-sensitive exact match)."
         },
         {
-          "path": "frontend/OPS_CANISTER_AVAILABILITY.md",
+          "path": "frontend/src/state/useAdminGateStore.ts",
           "operation": "modify",
-          "description": "Add a short English cross-reference pointing developers to frontend/DEPLOYMENT_TROUBLESHOOTING.md for deployment retry and broader failure-diagnosis steps, without duplicating troubleshooting content already covered in this ops guide."
+          "description": "Ensure the unlock check continues to compare the raw entered value exactly against the configured ADMIN_USERNAME (no trimming/case normalization), so only exact \"ADMIN\" unlocks."
+        }
+      ]
+    },
+    {
+      "id": "REQ-48",
+      "summary": "Invalidate any previously persisted admin-unlocked state when the configured admin username changes.",
+      "acceptanceCriteria": [
+        "After updating the admin username to \"ADMIN\", a user who was previously in an unlocked admin state is no longer unlocked on page reload until they enter \"ADMIN\" again.",
+        "Locking admin mode still clears the local persisted admin-unlocked state."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/config/adminGate.ts",
+          "operation": "modify",
+          "description": "Revise ADMIN_GATE_STORAGE_KEY to be derived from (or versioned with) the configured admin username so that changing the username results in a new persistence key and the old unlocked state is not reused."
+        },
+        {
+          "path": "frontend/src/state/useAdminGateStore.ts",
+          "operation": "modify",
+          "description": "Wire the updated ADMIN_GATE_STORAGE_KEY into Zustand persist configuration and confirm the lock action keeps persisting the locked state (so admin lock reliably clears the persisted unlocked flag for the active key)."
         }
       ]
     }

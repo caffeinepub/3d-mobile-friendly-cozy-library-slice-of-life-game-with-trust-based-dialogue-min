@@ -1,42 +1,39 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-15T00:43:10.015Z",
-  "summary": "REQ-46 is partially implemented: a new markdown troubleshooting guide file was added and OPS docs were updated to link to it, but the added guide content is truncated in the diff so key acceptance-criteria sections cannot be verified. Additionally, unrequested backend migration/upgrade scaffolding was added and backend/main.mo was modified to use it, which is outside the documentation-only request.",
+  "generatedAt": "2026-02-15T00:49:24.423Z",
+  "summary": "Core admin-gate changes appear implemented: the configured admin username is now exactly \"ADMIN\" with case-sensitive exact-match unlock, and the persisted unlock storage key is derived from the username to invalidate previously persisted unlocked state when the username changes. Some additional non-requested files were modified (summaries/state metadata).",
   "missing_requirements": [
     {
-      "id": "REQ-46",
-      "requirement": "Provide step-by-step instructions to retry deployment after a failure, and include a section of common failure modes (build failure, identity/auth issues, canister stopped, out of cycles) with next checks; the guide must reference frontend/OPS_CANISTER_AVAILABILITY.md rather than duplicating it.",
-      "reason": "Although frontend/DEPLOYMENT_TROUBLESHOOTING.md was added, the diff content for that file is truncated right after starting 'Verify Canister Status' and does not show the required retry steps, the common failure modes section, or any reference/link to frontend/OPS_CANISTER_AVAILABILITY.md from within the new guide.",
+      "id": "REQ-47",
+      "requirement": "All existing admin-only UI remains gated by the updated admin unlock condition.",
+      "reason": "The diff shows the store/config changes, but does not show any UI components or gating logic being verified/updated to use the new condition; only a file listing summary mentions TitleScreen has conditional admin UI. With the provided diff summary alone, it’s not possible to confirm the UI still gates correctly under the new unlock condition.",
       "evidence": [
-        "frontend/DEPLOYMENT_TROUBLESHOOTING.md (truncated content ends mid-section)"
+        "frontend-file-summaries.txt (mentions frontend/src/ui/TitleScreen.tsx but does not show code changes)"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "Added backend state migration module and wired backend actor to use it (upgrade hook/scaffolding).",
-      "reason": "BuildRequest only asked for a developer-facing deployment troubleshooting markdown guide (REQ-46). Adding backend/migration.mo and modifying backend/main.mo to import and use Migration is not requested, and the request explicitly limited backend changes to a single Motoko actor unless a state upgrade is required (not indicated in the request).",
+      "description": "Updated/modified repository-generated file summary listing many frontend files.",
+      "reason": "Not requested by REQ-47/REQ-48; appears to be ancillary metadata/documentation rather than the admin gate change itself.",
       "evidence": [
-        "backend/migration.mo",
-        "backend/main.mo"
+        "frontend-file-summaries.txt"
       ]
     },
     {
-      "description": "Updated operations doc to add cross-link to the new troubleshooting guide.",
-      "reason": "REQ-46 only required that the new troubleshooting guide reference the existing OPS canister availability guide; it did not request modifying the OPS guide to reference the new one (even though this may be reasonable).",
+      "description": "Updated project state metadata/version information.",
+      "reason": "Not requested by REQ-47/REQ-48; appears unrelated to changing the local admin username gate.",
       "evidence": [
-        "frontend/OPS_CANISTER_AVAILABILITY.md"
+        "project_state.json"
       ]
     }
   ],
-  "confidence": 0.66,
+  "confidence": 0.72,
   "changed_files": [
-    "backend/main.mo",
-    "backend/migration.mo",
     "frontend-file-summaries.txt",
-    "frontend/DEPLOYMENT_TROUBLESHOOTING.md",
-    "frontend/OPS_CANISTER_AVAILABILITY.md",
+    "frontend/src/config/adminGate.ts",
+    "frontend/src/state/useAdminGateStore.ts",
     "project_state.json"
   ]
 }

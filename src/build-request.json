@@ -1,49 +1,54 @@
 {
   "kind": "build_request",
-  "title": "Add deployment retry & troubleshooting guidance for failed network deploys",
+  "title": "Change local admin username gate to \"ADMIN\"",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-46",
-      "text": "Add a developer-facing deployment troubleshooting guide that explains how to retry a failed network deployment and how to diagnose common deployment failures for this Internet Computer app (including canister stopped / out-of-cycles scenarios and how to verify canister status before re-deploying). All documentation text must be in English.",
-      "target": "both",
+      "id": "REQ-47",
+      "text": "Update the local-only admin username gate so that admin mode unlocks only when the entered username exactly matches \"ADMIN\" (case-sensitive), replacing the current configured admin username.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-3"
+          "msg-5"
         ],
         "quotes": [
-          "Retry deployment"
+          "Make the admin username \"ADMIN\""
         ]
       },
       "acceptanceCriteria": [
-        "A new markdown document exists in the repo that provides step-by-step instructions to retry deployment after a failure.",
-        "The guide includes a section listing common failure modes (build failure, identity/auth issues, canister stopped, out of cycles) and what to check next.",
-        "The guide references the existing canister availability operations guidance (frontend/OPS_CANISTER_AVAILABILITY.md) rather than duplicating it verbatim.",
-        "All user-facing/documentation text added is in English."
+        "Admin mode unlock succeeds when the user enters exactly \"ADMIN\".",
+        "Admin mode unlock fails for \"admin\", \"Admin\", \"ADMIN \" (trailing space), or any other non-exact value.",
+        "All existing admin-only UI remains gated by the updated admin unlock condition."
+      ]
+    },
+    {
+      "id": "REQ-48",
+      "text": "Ensure that changing the configured admin username invalidates any previously persisted \"admin unlocked\" state so that users who were unlocked under the old username are not still unlocked after the change.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-5"
+        ],
+        "quotes": [
+          "Make the admin username \"ADMIN\""
+        ]
+      },
+      "acceptanceCriteria": [
+        "After updating the admin username to \"ADMIN\", a user who was previously in an unlocked admin state is no longer unlocked on page reload until they enter \"ADMIN\" again.",
+        "Locking admin mode still clears the local persisted admin-unlocked state."
       ]
     }
   ],
   "constraints": [
-    "Do not edit files under frontend/src/components/ui (read-only).",
-    "Do not edit frontend immutable hook/entry files: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx.",
-    "Backend must remain a single Motoko actor in backend/main.mo; only add backend/migration.mo if a state upgrade is required."
+    "Do not edit any files under frontend/src/components/ui (read-only UI components).",
+    "Keep the admin gate local-only (no Internet Identity changes required for this request)."
   ],
   "nonGoals": [
-    "Do not add any in-app UI that claims to redeploy, start/stop, or restart the backend canister from the frontend.",
-    "Do not introduce any third-party deployment services or external CI/CD providers."
+    "Do not add new admin features or expand the terminal command set.",
+    "Do not implement secure authentication/authorization beyond the existing local-only username gate."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
-  },
-  "userProfileUpdate": {
-    "goalsToAdd": [],
-    "goalsToRemove": [],
-    "preferencesToAdd": [],
-    "preferencesToRemove": [],
-    "miscToAdd": [],
-    "miscToRemove": [],
-    "fieldsToSet": {},
-    "fieldsToDelete": []
   }
 }

@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 25,
+  "projectStateVersion": 27,
   "summary": "3D mobile-friendly slice-of-life adventure/visual-novel hybrid set entirely in Puro’s library, focused on building friendship/trust through dialogue and cozy activities, featuring multiple endings including a low-friendship Betrayal ending with Special Edition variants.",
   "architectural_notes": [
     "Core gameplay loop centered on a hub-based, single-location library environment with repeatable daily activities and relationship progression.",
@@ -11,7 +11,7 @@
     "Potential scope conflict: IC canisters generally cannot be started/stopped from within the app/canister itself; any server on/off control likely must be an ops/admin-only external action (or simulated locally) rather than a true canister lifecycle toggle.",
     "User reiterates requirement for an in-app switch to set the backend/server online/offline (true on/off control), which may conflict with IC canister lifecycle limitations.",
     "User requests admin-only switches be restricted by a specific username (not by Internet Identity principal), implying some form of username capture/storage and a trust model for admin gating.",
-    "Admin-mode gating username updated: unlock admin-only controls only when entered username exactly matches \"hood\"."
+    "Admin-mode gating username updated: unlock admin-only controls only when entered username exactly matches \"ADMIN\" (case-sensitive)."
   ],
   "known_issues": [
     "Art/style scope conflict: user requests a 3D game, but gameplay style mentions 2D pixel art aesthetics—needs final decision on visual style.",
@@ -22,7 +22,7 @@
     "Admin gating approach conflict: earlier plan uses Internet Identity principal; user now requests username-based gating, which may be spoofable without strong authentication—needs a decision on security model.",
     "Deployment to network failed (deployment error); user requested retry deployment."
   ],
-  "isFixRequest": true,
+  "isFixRequest": false,
   "existing_features": [
     {
       "id": "feature-create-a-single-location-3d-game-scene-set-entirely-in-a-dim-cozy-dusty-library-with-bookshelves-vents-and-a-central-fruit-bearing-bonsai-tree-that-the-player-can-explore",
@@ -381,6 +381,22 @@
       "title": "Add a developer-facing deployment troubleshooting guide that explains how to retry a failed network deployment and how to diagnose common deployment failures for this Internet Computer app (including canister stopped / out-of-cycles scenarios and how to verify canister status before re-deploying). All documentation text must be in English.",
       "reqIds": [
         "REQ-46"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-local-only-admin-username-gate-so-that-admin-mode-unlocks-only-when-the-entered-username-exactly-matches-admin-case-sensitive-replacing-the-current-configured-admin-username",
+      "title": "Update the local-only admin username gate so that admin mode unlocks only when the entered username exactly matches \"ADMIN\" (case-sensitive), replacing the current configured admin username.",
+      "reqIds": [
+        "REQ-47"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-that-changing-the-configured-admin-username-invalidates-any-previously-persisted-admin-unlocked-state-so-that-users-who-were-unlocked-under-the-old-username-are-not-still-unlocked-after-the-change",
+      "title": "Ensure that changing the configured admin username invalidates any previously persisted \"admin unlocked\" state so that users who were unlocked under the old username are not still unlocked after the change.",
+      "reqIds": [
+        "REQ-48"
       ],
       "version": 1
     }

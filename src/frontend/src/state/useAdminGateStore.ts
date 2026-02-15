@@ -14,6 +14,7 @@ export const useAdminGateStore = create<AdminGateStore>()(
       isUnlocked: false,
 
       attemptUnlock: (username: string) => {
+        // Exact case-sensitive match required
         const success = username === ADMIN_USERNAME;
         if (success) {
           set({ isUnlocked: true });
@@ -28,3 +29,4 @@ export const useAdminGateStore = create<AdminGateStore>()(
     }
   )
 );
+

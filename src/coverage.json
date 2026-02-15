@@ -1,39 +1,50 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-15T00:43:10.020Z",
+  "generatedAt": "2026-02-15T00:49:24.426Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 1,
-    "implemented": 1,
+    "total": 2,
+    "implemented": 2,
     "items": [
       {
-        "id": "REQ-46",
-        "summary": "Add a developer-facing deployment troubleshooting guide that explains how to retry a failed network deployment and how to diagnose common deployment failures for this Internet Computer app (including canister stopped / out-of-cycles scenarios and how to verify canister status before re-deploying). All documentation text must be in English.",
+        "id": "REQ-47",
+        "summary": "Update the local-only admin username gate so that admin mode unlocks only when the entered username exactly matches \"ADMIN\" (case-sensitive), replacing the current configured admin username.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/DEPLOYMENT_TROUBLESHOOTING.md",
-          "frontend/OPS_CANISTER_AVAILABILITY.md"
+          "frontend/src/config/adminGate.ts",
+          "frontend/src/state/useAdminGateStore.ts"
         ],
         "matchedFiles": [
-          "frontend/DEPLOYMENT_TROUBLESHOOTING.md",
-          "frontend/OPS_CANISTER_AVAILABILITY.md"
+          "frontend/src/config/adminGate.ts",
+          "frontend/src/state/useAdminGateStore.ts"
+        ]
+      },
+      {
+        "id": "REQ-48",
+        "summary": "Ensure that changing the configured admin username invalidates any previously persisted \"admin unlocked\" state so that users who were unlocked under the old username are not still unlocked after the change.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/config/adminGate.ts",
+          "frontend/src/state/useAdminGateStore.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/config/adminGate.ts",
+          "frontend/src/state/useAdminGateStore.ts"
         ]
       }
     ]
   },
   "changedFiles": [
-    "backend/main.mo",
-    "backend/migration.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/DEPLOYMENT_TROUBLESHOOTING.md",
-    "frontend/OPS_CANISTER_AVAILABILITY.md",
+    "frontend/src/config/adminGate.ts",
+    "frontend/src/state/useAdminGateStore.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

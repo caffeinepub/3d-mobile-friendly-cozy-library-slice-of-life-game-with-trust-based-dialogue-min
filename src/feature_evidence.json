@@ -2,11 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-add-a-developer-facing-deployment-troubleshooting-guide-that-explains-how-to-retry-a-failed-network-deployment-and-how-to-diagnose-common-deployment-failures-for-this-internet-computer-app-including-canister-stopped-out-of-cycles-scenarios-and-how-to-verify-canister-status-before-re-deploying-all-documentation-text-must-be-in-english",
-      "featureTitle": "Add a developer-facing deployment troubleshooting guide that explains how to retry a failed network deployment and how to diagnose common deployment failures for this Internet Computer app (including canister stopped / out-of-cycles scenarios and how to verify canister status before re-deploying). All documentation text must be in English.",
+      "featureId": "feature-update-the-local-only-admin-username-gate-so-that-admin-mode-unlocks-only-when-the-entered-username-exactly-matches-admin-case-sensitive-replacing-the-current-configured-admin-username",
+      "featureTitle": "Update the local-only admin username gate so that admin mode unlocks only when the entered username exactly matches \"ADMIN\" (case-sensitive), replacing the current configured admin username.",
       "files": [
-        "frontend/DEPLOYMENT_TROUBLESHOOTING.md",
-        "frontend/OPS_CANISTER_AVAILABILITY.md"
+        "frontend/src/config/adminGate.ts",
+        "frontend/src/state/useAdminGateStore.ts"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -16,7 +16,26 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-46"
+        "REQ-47"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-ensure-that-changing-the-configured-admin-username-invalidates-any-previously-persisted-admin-unlocked-state-so-that-users-who-were-unlocked-under-the-old-username-are-not-still-unlocked-after-the-change",
+      "featureTitle": "Ensure that changing the configured admin username invalidates any previously persisted \"admin unlocked\" state so that users who were unlocked under the old username are not still unlocked after the change.",
+      "files": [
+        "frontend/src/config/adminGate.ts",
+        "frontend/src/state/useAdminGateStore.ts"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-48"
       ],
       "confidence": "high"
     }

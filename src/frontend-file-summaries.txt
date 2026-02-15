@@ -45,8 +45,8 @@
   "frontend/src/ui/DiagnosticTerminalOverlay.tsx": "Full-screen terminal overlay component with admin-gated keyboard shortcut (Ctrl+` only opens when admin unlocked), scrollable output log, command input, and event isolation to prevent gameplay interference.",
   "frontend/src/state/useServerAccessStore.ts": "Zustand persisted store managing local server access toggle state with enable/disable/toggle actions, persisted to local storage.",
   "frontend/src/ui/ServerStatusIndicator.tsx": "Compact status indicator component displaying backend connection state (Local Offline, Checking…, Online, or Offline) with appropriate icons and colors based on server access toggle and availability check results.",
-  "frontend/src/config/adminGate.ts": "Configuration module exporting the admin username constant and localStorage key for the username-based admin gate system.",
-  "frontend/src/state/useAdminGateStore.ts": "Zustand persisted store managing admin mode state with actions to unlock via exact username match and lock/clear admin access.",
+  "frontend/src/config/adminGate.ts": "Configuration module exporting the admin username constant \"ADMIN\" (case-sensitive) and a username-derived localStorage key that invalidates old persisted state when the username changes.",
+  "frontend/src/state/useAdminGateStore.ts": "Zustand persisted store managing admin mode state with exact case-sensitive username matching against \"ADMIN\" and username-versioned persistence key.",
   "frontend/src/ui/AdminAccessPanel.tsx": "Admin access UI panel allowing username entry to unlock admin mode with clear English feedback and explicit messaging that this is a local-only gate (not secure authentication).",
   "frontend/DEPLOYMENT_TROUBLESHOOTING.md": "New developer-facing guide providing step-by-step instructions for retrying failed network deployments, diagnosing common failure modes (build errors, identity issues, stopped canisters, out-of-cycles), and references to the canister availability operations guide."
 }
