@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 29,
+  "projectStateVersion": 31,
   "summary": "3D mobile-friendly slice-of-life adventure/visual-novel hybrid set entirely in Puro’s library, focused on building friendship/trust through dialogue and cozy activities, featuring multiple endings including a low-friendship Betrayal ending with Special Edition variants.",
   "architectural_notes": [
     "Core gameplay loop centered on a hub-based, single-location library environment with repeatable daily activities and relationship progression.",
@@ -423,6 +423,14 @@
         "REQ-51"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-update-the-admin-only-server-status-availability-ui-so-that-the-status-text-currently-shown-as-local-offline-is-replaced-with-online-english-text-ensuring-this-change-is-reflected-anywhere-that-specific-status-label-is-rendered-in-the-admin-mode-server-controls",
+      "title": "Update the admin-only server status/availability UI so that the status text currently shown as \"Local Offline\" is replaced with \"Online\" (English text), ensuring this change is reflected anywhere that specific status label is rendered in the admin-mode server controls.",
+      "reqIds": [
+        "REQ-52"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -551,6 +559,12 @@
     {
       "id": "AR-21",
       "summary": "Add a dedicated on-screen Jump button to allow the player character to jump",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-22",
+      "summary": "Update admin-mode server access toggle wording: replace the label/text \"Local Offline\" with \"Online\" (i.e., adjust the Online/Offline switch copy)",
       "reqIds": [],
       "status": "pending"
     }

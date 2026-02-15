@@ -1,89 +1,21 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "3D player avatar movement and mobile jump button",
+  "title": "Update admin server status label from “Local Offline” to “Online”",
   "requirements": [
     {
-      "id": "REQ-49",
-      "summary": "Render a visible 3D player avatar and move it with unified desktop (WASD/arrows) and mobile joystick input, respecting pause/terminal state and library bounds.",
+      "id": "REQ-52",
+      "summary": "Replace the admin-mode server status indicator label “Local Offline” with “Online” wherever that specific label is rendered.",
       "acceptanceCriteria": [
-        "When gameplay starts, a visible player avatar (e.g., a simple capsule/mesh) is present in the scene at the player position.",
-        "Using WASD/arrow keys moves the player avatar around the library on desktop.",
-        "Using the mobile joystick moves the player avatar around the library on touch devices.",
-        "Movement is disabled while the game is paused and while the diagnostic terminal is open (consistent with current input handling).",
-        "Player position remains constrained within the existing library bounds so the avatar cannot leave the playable area."
+        "When server access is disabled (admin-only toggle off) and the server status indicator is visible, the UI does not display the text \"Local Offline\" anywhere.",
+        "The UI displays \"Online\" instead of \"Local Offline\" in the relevant admin-mode server status/indicator location(s).",
+        "No other server status labels (e.g., \"Checking…\", \"Offline\") are unintentionally changed."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/game/controls/usePlayerControlsStore.ts",
-          "operation": "create",
-          "description": "Create a shared (singleton) controls store to hold joystick movement, look deltas, and transient action requests so the 3D scene and mobile overlay read/write the same control state."
-        },
-        {
-          "path": "frontend/src/game/controls/usePlayerControls.ts",
+          "path": "frontend/src/ui/ServerStatusIndicator.tsx",
           "operation": "modify",
-          "description": "Refactor the hook to use the shared controls store (so MobileControlsOverlay updates affect LibraryScene), compute unified movement from keyboard + joystick, and hard-disable movement/look outputs while paused or the diagnostic terminal is open."
-        },
-        {
-          "path": "frontend/src/game/controls/MobileControlsOverlay.tsx",
-          "operation": "modify",
-          "description": "Update mobile joystick/look wiring to write into the shared controls store via usePlayerControls so touch input reliably moves the player avatar; ensure touch controls remain pointer-events scoped to the overlay regions."
-        },
-        {
-          "path": "frontend/src/game/scene/LibraryScene.tsx",
-          "operation": "modify",
-          "description": "Render a visible player avatar mesh (e.g., capsule) attached to the player group and move the player group using usePlayerControls movement, keeping existing library bounds clamping and camera-follow behavior."
-        }
-      ]
-    },
-    {
-      "id": "REQ-50",
-      "summary": "Add jump action with basic gravity and ground collision, triggered by Space, with no double-jump, and disabled while paused/terminal open.",
-      "acceptanceCriteria": [
-        "Pressing the desktop jump key (Space) triggers a jump when the player is on the ground.",
-        "The player cannot initiate another jump while already in the air (no double-jump) unless explicitly reset by landing.",
-        "Jumping uses a consistent arc (upward impulse + gravity) and lands back at the floor height without sinking below it.",
-        "Jump input is ignored while paused or while the diagnostic terminal is open.",
-        "No runtime errors occur in the render loop while jumping repeatedly."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/game/controls/usePlayerControlsStore.ts",
-          "operation": "modify",
-          "description": "Extend the shared controls store to support a one-shot jump request (e.g., requestJump + consumeJump) that can be triggered by keyboard or UI and consumed safely by the render loop."
-        },
-        {
-          "path": "frontend/src/game/controls/usePlayerControls.ts",
-          "operation": "modify",
-          "description": "Add Space-key handling that triggers a one-shot jump request (avoid repeats from key-hold), and ensure jump requests are ignored/cleared when paused or the diagnostic terminal is open."
-        },
-        {
-          "path": "frontend/src/game/scene/LibraryScene.tsx",
-          "operation": "modify",
-          "description": "Implement simple vertical motion for the player group (upward impulse + gravity), ground collision at floor height (y=0), grounded state to prevent double-jumps, and safe consumption of jump requests inside the frame loop."
-        }
-      ]
-    },
-    {
-      "id": "REQ-51",
-      "summary": "Add an on-screen 'Jump' button to the mobile controls overlay that triggers the same jump action as Space without interfering with other touch controls.",
-      "acceptanceCriteria": [
-        "On touch devices, a clearly visible button labeled \"Jump\" appears in the gameplay HUD alongside the existing mobile controls.",
-        "Tapping the \"Jump\" button causes the player to jump (same behavior as Space).",
-        "The Jump button does not interfere with joystick movement or look controls (touch interactions remain usable).",
-        "The Jump button respects pause/terminal state (cannot jump while paused or terminal open).",
-        "All user-facing text on the button is English (\"Jump\")."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/game/controls/MobileControlsOverlay.tsx",
-          "operation": "modify",
-          "description": "Add a dedicated on-screen button labeled \"Jump\" that triggers the shared jump request; use the shadcn-ui Button component for consistent styling and ensure proper placement/sizing so it does not block the joystick/look areas. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/game/controls/usePlayerControls.ts",
-          "operation": "modify",
-          "description": "Expose a jump trigger function from the hook (backed by the shared controls store) so the mobile overlay can invoke the same jump action as the Space key while still respecting pause/terminal state."
+          "description": "Update the serverAccessEnabled=false branch to render the status text as \"Online\" instead of \"Local Offline\", without changing any other status labels or conditions."
         }
       ]
     }

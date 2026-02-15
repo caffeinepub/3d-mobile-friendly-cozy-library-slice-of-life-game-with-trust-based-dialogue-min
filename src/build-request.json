@@ -1,78 +1,35 @@
 {
   "kind": "build_request",
-  "title": "Add player character movement and on-screen jump button",
+  "title": "Change admin-only server status text from “Local Offline” to “Online”",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-49",
-      "text": "Render a visible player character avatar in the 3D library scene and make it move with the existing movement inputs (keyboard WASD/arrow keys on desktop and the on-screen joystick on touch devices).",
+      "id": "REQ-52",
+      "text": "Update the admin-only server status/availability UI so that the status text currently shown as \"Local Offline\" is replaced with \"Online\" (English text), ensuring this change is reflected anywhere that specific status label is rendered in the admin-mode server controls.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-6"
+          "recent-9"
         ],
         "quotes": [
-          "Make the character able to move. Add a jump button too..."
+          "Replace local offline with online in the admin mode switch"
         ]
       },
       "acceptanceCriteria": [
-        "When gameplay starts, a visible player avatar (e.g., a simple capsule/mesh) is present in the scene at the player position.",
-        "Using WASD/arrow keys moves the player avatar around the library on desktop.",
-        "Using the mobile joystick moves the player avatar around the library on touch devices.",
-        "Movement is disabled while the game is paused and while the diagnostic terminal is open (consistent with current input handling).",
-        "Player position remains constrained within the existing library bounds so the avatar cannot leave the playable area."
-      ]
-    },
-    {
-      "id": "REQ-50",
-      "text": "Implement a jump action for the player character, including basic gravity and ground collision so the player returns to the floor after jumping.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-6"
-        ],
-        "quotes": [
-          "Make the character able to move. Add a jump button too..."
-        ]
-      },
-      "acceptanceCriteria": [
-        "Pressing the desktop jump key (Space) triggers a jump when the player is on the ground.",
-        "The player cannot initiate another jump while already in the air (no double-jump) unless explicitly reset by landing.",
-        "Jumping uses a consistent arc (upward impulse + gravity) and lands back at the floor height without sinking below it.",
-        "Jump input is ignored while paused or while the diagnostic terminal is open.",
-        "No runtime errors occur in the render loop while jumping repeatedly."
-      ]
-    },
-    {
-      "id": "REQ-51",
-      "text": "Add a dedicated on-screen Jump button to the mobile controls overlay that triggers the same jump action as the desktop Space key, with English label text.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-6"
-        ],
-        "quotes": [
-          "Make the character able to move. Add a jump button too..."
-        ]
-      },
-      "acceptanceCriteria": [
-        "On touch devices, a clearly visible button labeled \"Jump\" appears in the gameplay HUD alongside the existing mobile controls.",
-        "Tapping the \"Jump\" button causes the player to jump (same behavior as Space).",
-        "The Jump button does not interfere with joystick movement or look controls (touch interactions remain usable).",
-        "The Jump button respects pause/terminal state (cannot jump while paused or terminal open).",
-        "All user-facing text on the button is English (\"Jump\")."
+        "When server access is disabled (admin-only toggle off) and the server status indicator is visible, the UI does not display the text \"Local Offline\" anywhere.",
+        "The UI displays \"Online\" instead of \"Local Offline\" in the relevant admin-mode server status/indicator location(s).",
+        "No other server status labels (e.g., \"Checking…\", \"Offline\") are unintentionally changed."
       ]
     }
   ],
   "constraints": [
-    "Frontend immutable paths must not be modified: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui.",
-    "Keep backend as single-actor Motoko; no backend changes are required for movement/jump.",
-    "All user-facing text must be in English."
+    "Use English for all user-facing text.",
+    "Do not edit files under frontend/src/components/ui (read-only UI components)."
   ],
   "nonGoals": [
-    "Adding combat, enemies, health, stamina, or advanced physics/collision beyond basic ground-and-gravity jumping.",
-    "Adding multiplayer or real-time synchronization.",
-    "Changing story/dialogue/trust systems as part of this movement/jump work."
+    "Changing backend behavior or adding new backend endpoints.",
+    "Changing the semantics of the server access toggle (it remains a local-only toggle that does not start/stop the backend canister).",
+    "Redesigning the Title Screen layout or admin gate flow beyond the requested text change."
   ],
   "imageRequirements": {
     "required": [],

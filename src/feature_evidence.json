@@ -2,13 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-render-a-visible-player-character-avatar-in-the-3d-library-scene-and-make-it-move-with-the-existing-movement-inputs-keyboard-wasd-arrow-keys-on-desktop-and-the-on-screen-joystick-on-touch-devices",
-      "featureTitle": "Render a visible player character avatar in the 3D library scene and make it move with the existing movement inputs (keyboard WASD/arrow keys on desktop and the on-screen joystick on touch devices).",
+      "featureId": "feature-update-the-admin-only-server-status-availability-ui-so-that-the-status-text-currently-shown-as-local-offline-is-replaced-with-online-english-text-ensuring-this-change-is-reflected-anywhere-that-specific-status-label-is-rendered-in-the-admin-mode-server-controls",
+      "featureTitle": "Update the admin-only server status/availability UI so that the status text currently shown as \"Local Offline\" is replaced with \"Online\" (English text), ensuring this change is reflected anywhere that specific status label is rendered in the admin-mode server controls.",
       "files": [
-        "frontend/src/game/controls/MobileControlsOverlay.tsx",
-        "frontend/src/game/controls/usePlayerControls.ts",
-        "frontend/src/game/controls/usePlayerControlsStore.ts",
-        "frontend/src/game/scene/LibraryScene.tsx"
+        "frontend/src/ui/ServerStatusIndicator.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -18,46 +15,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-49"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-implement-a-jump-action-for-the-player-character-including-basic-gravity-and-ground-collision-so-the-player-returns-to-the-floor-after-jumping",
-      "featureTitle": "Implement a jump action for the player character, including basic gravity and ground collision so the player returns to the floor after jumping.",
-      "files": [
-        "frontend/src/game/controls/usePlayerControls.ts",
-        "frontend/src/game/controls/usePlayerControlsStore.ts",
-        "frontend/src/game/scene/LibraryScene.tsx"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-50"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-add-a-dedicated-on-screen-jump-button-to-the-mobile-controls-overlay-that-triggers-the-same-jump-action-as-the-desktop-space-key-with-english-label-text",
-      "featureTitle": "Add a dedicated on-screen Jump button to the mobile controls overlay that triggers the same jump action as the desktop Space key, with English label text.",
-      "files": [
-        "frontend/src/game/controls/MobileControlsOverlay.tsx",
-        "frontend/src/game/controls/usePlayerControls.ts"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-51"
+        "REQ-52"
       ],
       "confidence": "high"
     }

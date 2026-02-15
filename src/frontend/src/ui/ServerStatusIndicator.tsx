@@ -16,7 +16,7 @@ export default function ServerStatusIndicator({
   let StatusIcon: React.ComponentType<{ className?: string }>;
 
   if (!serverAccessEnabled) {
-    statusText = 'Local Offline';
+    statusText = 'Online';
     statusColor = 'text-muted-foreground';
     StatusIcon = WifiOff;
   } else if (backendAvailability?.isChecking) {

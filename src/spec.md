@@ -1,14 +1,10 @@
 # Specification
 
 ## Summary
-**Goal:** Add a visible 3D player avatar that can move using existing desktop and mobile controls, and add a jump action with a dedicated on-screen Jump button.
+**Goal:** Update the admin-only server status label so it shows “Online” instead of “Local Offline” wherever that specific label appears in the admin-mode server controls.
 
 **Planned changes:**
-- Render a visible player character avatar (simple 3D mesh such as a capsule) at the player position in the 3D library scene.
-- Hook the avatar’s horizontal movement to existing inputs: keyboard WASD/arrow keys on desktop and the existing on-screen joystick on touch devices.
-- Ensure movement is disabled while the game is paused or while the diagnostic terminal is open, matching current input handling.
-- Constrain player movement to the existing library bounds so the avatar cannot leave the playable area.
-- Implement jump with Space on desktop and basic gravity + ground collision so the player lands back on the floor and cannot double-jump while airborne.
-- Add a clearly visible on-screen mobile HUD button labeled “Jump” that triggers the same jump behavior and does not interfere with joystick interactions.
+- Replace the displayed status text “Local Offline” with “Online” in the admin-mode server status/availability UI.
+- Ensure only this specific label is updated and other status labels (e.g., “Checking…”, “Offline”) remain unchanged.
 
-**User-visible outcome:** During gameplay, players see a character in the 3D library that moves with WASD/arrow keys or the mobile joystick, and can jump via Space or a labeled “Jump” button on touch devices (disabled while paused or when the diagnostic terminal is open).
+**User-visible outcome:** In admin mode server controls, the status indicator no longer shows “Local Offline” and instead displays “Online” when that label would have been shown.

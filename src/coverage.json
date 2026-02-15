@@ -1,58 +1,24 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-15T00:59:37.317Z",
+  "generatedAt": "2026-02-15T01:12:52.051Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 3,
-    "implemented": 3,
+    "total": 1,
+    "implemented": 1,
     "items": [
       {
-        "id": "REQ-49",
-        "summary": "Render a visible player character avatar in the 3D library scene and make it move with the existing movement inputs (keyboard WASD/arrow keys on desktop and the on-screen joystick on touch devices).",
+        "id": "REQ-52",
+        "summary": "Update the admin-only server status/availability UI so that the status text currently shown as \"Local Offline\" is replaced with \"Online\" (English text), ensuring this change is reflected anywhere that specific status label is rendered in the admin-mode server controls.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/game/controls/usePlayerControlsStore.ts",
-          "frontend/src/game/controls/usePlayerControls.ts",
-          "frontend/src/game/controls/MobileControlsOverlay.tsx",
-          "frontend/src/game/scene/LibraryScene.tsx"
+          "frontend/src/ui/ServerStatusIndicator.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/game/controls/usePlayerControlsStore.ts",
-          "frontend/src/game/controls/usePlayerControls.ts",
-          "frontend/src/game/controls/MobileControlsOverlay.tsx",
-          "frontend/src/game/scene/LibraryScene.tsx"
-        ]
-      },
-      {
-        "id": "REQ-50",
-        "summary": "Implement a jump action for the player character, including basic gravity and ground collision so the player returns to the floor after jumping.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/game/controls/usePlayerControlsStore.ts",
-          "frontend/src/game/controls/usePlayerControls.ts",
-          "frontend/src/game/scene/LibraryScene.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/game/controls/usePlayerControlsStore.ts",
-          "frontend/src/game/controls/usePlayerControls.ts",
-          "frontend/src/game/scene/LibraryScene.tsx"
-        ]
-      },
-      {
-        "id": "REQ-51",
-        "summary": "Add a dedicated on-screen Jump button to the mobile controls overlay that triggers the same jump action as the desktop Space key, with English label text.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/game/controls/MobileControlsOverlay.tsx",
-          "frontend/src/game/controls/usePlayerControls.ts"
-        ],
-        "matchedFiles": [
-          "frontend/src/game/controls/MobileControlsOverlay.tsx",
-          "frontend/src/game/controls/usePlayerControls.ts"
+          "frontend/src/ui/ServerStatusIndicator.tsx"
         ]
       }
     ]
@@ -62,10 +28,7 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/game/controls/MobileControlsOverlay.tsx",
-    "frontend/src/game/controls/usePlayerControls.ts",
-    "frontend/src/game/controls/usePlayerControlsStore.ts",
-    "frontend/src/game/scene/LibraryScene.tsx",
+    "frontend/src/ui/ServerStatusIndicator.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",
