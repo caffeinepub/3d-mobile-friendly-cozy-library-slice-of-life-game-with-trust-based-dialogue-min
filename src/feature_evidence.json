@@ -2,11 +2,13 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-the-local-only-admin-username-gate-so-that-admin-mode-unlocks-only-when-the-entered-username-exactly-matches-admin-case-sensitive-replacing-the-current-configured-admin-username",
-      "featureTitle": "Update the local-only admin username gate so that admin mode unlocks only when the entered username exactly matches \"ADMIN\" (case-sensitive), replacing the current configured admin username.",
+      "featureId": "feature-render-a-visible-player-character-avatar-in-the-3d-library-scene-and-make-it-move-with-the-existing-movement-inputs-keyboard-wasd-arrow-keys-on-desktop-and-the-on-screen-joystick-on-touch-devices",
+      "featureTitle": "Render a visible player character avatar in the 3D library scene and make it move with the existing movement inputs (keyboard WASD/arrow keys on desktop and the on-screen joystick on touch devices).",
       "files": [
-        "frontend/src/config/adminGate.ts",
-        "frontend/src/state/useAdminGateStore.ts"
+        "frontend/src/game/controls/MobileControlsOverlay.tsx",
+        "frontend/src/game/controls/usePlayerControls.ts",
+        "frontend/src/game/controls/usePlayerControlsStore.ts",
+        "frontend/src/game/scene/LibraryScene.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -16,16 +18,17 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-47"
+        "REQ-49"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-ensure-that-changing-the-configured-admin-username-invalidates-any-previously-persisted-admin-unlocked-state-so-that-users-who-were-unlocked-under-the-old-username-are-not-still-unlocked-after-the-change",
-      "featureTitle": "Ensure that changing the configured admin username invalidates any previously persisted \"admin unlocked\" state so that users who were unlocked under the old username are not still unlocked after the change.",
+      "featureId": "feature-implement-a-jump-action-for-the-player-character-including-basic-gravity-and-ground-collision-so-the-player-returns-to-the-floor-after-jumping",
+      "featureTitle": "Implement a jump action for the player character, including basic gravity and ground collision so the player returns to the floor after jumping.",
       "files": [
-        "frontend/src/config/adminGate.ts",
-        "frontend/src/state/useAdminGateStore.ts"
+        "frontend/src/game/controls/usePlayerControls.ts",
+        "frontend/src/game/controls/usePlayerControlsStore.ts",
+        "frontend/src/game/scene/LibraryScene.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -35,7 +38,26 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-48"
+        "REQ-50"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-a-dedicated-on-screen-jump-button-to-the-mobile-controls-overlay-that-triggers-the-same-jump-action-as-the-desktop-space-key-with-english-label-text",
+      "featureTitle": "Add a dedicated on-screen Jump button to the mobile controls overlay that triggers the same jump action as the desktop Space key, with English label text.",
+      "files": [
+        "frontend/src/game/controls/MobileControlsOverlay.tsx",
+        "frontend/src/game/controls/usePlayerControls.ts"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-51"
       ],
       "confidence": "high"
     }

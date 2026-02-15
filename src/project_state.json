@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 27,
+  "projectStateVersion": 29,
   "summary": "3D mobile-friendly slice-of-life adventure/visual-novel hybrid set entirely in Puro’s library, focused on building friendship/trust through dialogue and cozy activities, featuring multiple endings including a low-friendship Betrayal ending with Special Edition variants.",
   "architectural_notes": [
     "Core gameplay loop centered on a hub-based, single-location library environment with repeatable daily activities and relationship progression.",
@@ -399,6 +399,30 @@
         "REQ-48"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-render-a-visible-player-character-avatar-in-the-3d-library-scene-and-make-it-move-with-the-existing-movement-inputs-keyboard-wasd-arrow-keys-on-desktop-and-the-on-screen-joystick-on-touch-devices",
+      "title": "Render a visible player character avatar in the 3D library scene and make it move with the existing movement inputs (keyboard WASD/arrow keys on desktop and the on-screen joystick on touch devices).",
+      "reqIds": [
+        "REQ-49"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-a-jump-action-for-the-player-character-including-basic-gravity-and-ground-collision-so-the-player-returns-to-the-floor-after-jumping",
+      "title": "Implement a jump action for the player character, including basic gravity and ground collision so the player returns to the floor after jumping.",
+      "reqIds": [
+        "REQ-50"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-dedicated-on-screen-jump-button-to-the-mobile-controls-overlay-that-triggers-the-same-jump-action-as-the-desktop-space-key-with-english-label-text",
+      "title": "Add a dedicated on-screen Jump button to the mobile controls overlay that triggers the same jump action as the desktop Space key, with English label text.",
+      "reqIds": [
+        "REQ-51"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -515,6 +539,18 @@
     {
       "id": "AR-19",
       "summary": "Gate admin-only UI switches behind a specific in-app username (instead of Internet Identity principal)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-20",
+      "summary": "Implement basic player character movement controls (mobile-friendly and desktop fallback as appropriate)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-21",
+      "summary": "Add a dedicated on-screen Jump button to allow the player character to jump",
       "reqIds": [],
       "status": "pending"
     }

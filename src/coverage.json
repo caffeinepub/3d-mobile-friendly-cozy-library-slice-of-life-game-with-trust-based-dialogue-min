@@ -1,39 +1,58 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-15T00:49:24.426Z",
+  "generatedAt": "2026-02-15T00:59:37.317Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 2,
-    "implemented": 2,
+    "total": 3,
+    "implemented": 3,
     "items": [
       {
-        "id": "REQ-47",
-        "summary": "Update the local-only admin username gate so that admin mode unlocks only when the entered username exactly matches \"ADMIN\" (case-sensitive), replacing the current configured admin username.",
+        "id": "REQ-49",
+        "summary": "Render a visible player character avatar in the 3D library scene and make it move with the existing movement inputs (keyboard WASD/arrow keys on desktop and the on-screen joystick on touch devices).",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/config/adminGate.ts",
-          "frontend/src/state/useAdminGateStore.ts"
+          "frontend/src/game/controls/usePlayerControlsStore.ts",
+          "frontend/src/game/controls/usePlayerControls.ts",
+          "frontend/src/game/controls/MobileControlsOverlay.tsx",
+          "frontend/src/game/scene/LibraryScene.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/config/adminGate.ts",
-          "frontend/src/state/useAdminGateStore.ts"
+          "frontend/src/game/controls/usePlayerControlsStore.ts",
+          "frontend/src/game/controls/usePlayerControls.ts",
+          "frontend/src/game/controls/MobileControlsOverlay.tsx",
+          "frontend/src/game/scene/LibraryScene.tsx"
         ]
       },
       {
-        "id": "REQ-48",
-        "summary": "Ensure that changing the configured admin username invalidates any previously persisted \"admin unlocked\" state so that users who were unlocked under the old username are not still unlocked after the change.",
+        "id": "REQ-50",
+        "summary": "Implement a jump action for the player character, including basic gravity and ground collision so the player returns to the floor after jumping.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/config/adminGate.ts",
-          "frontend/src/state/useAdminGateStore.ts"
+          "frontend/src/game/controls/usePlayerControlsStore.ts",
+          "frontend/src/game/controls/usePlayerControls.ts",
+          "frontend/src/game/scene/LibraryScene.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/config/adminGate.ts",
-          "frontend/src/state/useAdminGateStore.ts"
+          "frontend/src/game/controls/usePlayerControlsStore.ts",
+          "frontend/src/game/controls/usePlayerControls.ts",
+          "frontend/src/game/scene/LibraryScene.tsx"
+        ]
+      },
+      {
+        "id": "REQ-51",
+        "summary": "Add a dedicated on-screen Jump button to the mobile controls overlay that triggers the same jump action as the desktop Space key, with English label text.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/game/controls/MobileControlsOverlay.tsx",
+          "frontend/src/game/controls/usePlayerControls.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/game/controls/MobileControlsOverlay.tsx",
+          "frontend/src/game/controls/usePlayerControls.ts"
         ]
       }
     ]
@@ -43,8 +62,10 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/config/adminGate.ts",
-    "frontend/src/state/useAdminGateStore.ts",
+    "frontend/src/game/controls/MobileControlsOverlay.tsx",
+    "frontend/src/game/controls/usePlayerControls.ts",
+    "frontend/src/game/controls/usePlayerControlsStore.ts",
+    "frontend/src/game/scene/LibraryScene.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

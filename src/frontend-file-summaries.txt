@@ -3,10 +3,10 @@
   "frontend/src/ui/TitleScreen.tsx": "Title screen component with admin access panel, conditionally rendered server access toggle/status/terminal button (only visible when admin unlocked), and game launch buttons that respect server access state.",
   "frontend/src/ui/CreditsScreen.tsx": "Credits screen displaying game information, features list, and attribution footer with caffeine.ai link.",
   "frontend/src/game/GameView.tsx": "Main in-game view component hosting the 3D canvas with mount success/error signaling, HUD overlays, dialogue panels, activity menus, and all game UI systems with guarded initialization logic to prevent infinite update loops.",
-  "frontend/src/game/scene/LibraryScene.tsx": "3D library scene with texture loading that calls useTexture hook unconditionally at the top level and falls back to solid color material when texture fails, preventing runtime exceptions from blocking scene rendering.",
+  "frontend/src/game/scene/LibraryScene.tsx": "3D library scene with visible player avatar (blue capsule), horizontal movement with library bounds clamping, jump physics with gravity and ground collision, camera follow at eye height, and all existing library elements.",
   "frontend/src/game/characters/Puro.tsx": "3D representation of Puro character with idle animation, hover effects, and click interaction to trigger dialogue.",
-  "frontend/src/game/controls/usePlayerControls.ts": "Custom hook managing player movement and camera controls for keyboard/mouse and touch inputs, with input gating when game is paused or terminal is open.",
-  "frontend/src/game/controls/MobileControlsOverlay.tsx": "On-screen mobile controls with virtual joystick for movement and touch area for camera look.",
+  "frontend/src/game/controls/usePlayerControls.ts": "Custom hook managing unified player movement from keyboard (WASD/arrows) and joystick, camera look controls, Space-key jump triggering, and hard-disabling all inputs when paused or terminal is open.",
+  "frontend/src/game/controls/MobileControlsOverlay.tsx": "On-screen mobile controls with virtual joystick for movement, touch area for camera look, and a centered Jump button that respects pause/terminal state.",
   "frontend/src/game/state/useGameStore.ts": "Zustand store managing all game state including trust level, activities, customizations, moments, letters, and UI visibility with local persistence.",
   "frontend/src/game/ui/TrustMeter.tsx": "HUD component displaying current trust/friendship level with color-coded status and progress bar.",
   "frontend/src/game/ui/DialoguePanel.tsx": "Interactive dialogue panel with branching choices, trust effects, and trust-gated options.",
@@ -48,5 +48,6 @@
   "frontend/src/config/adminGate.ts": "Configuration module exporting the admin username constant \"ADMIN\" (case-sensitive) and a username-derived localStorage key that invalidates old persisted state when the username changes.",
   "frontend/src/state/useAdminGateStore.ts": "Zustand persisted store managing admin mode state with exact case-sensitive username matching against \"ADMIN\" and username-versioned persistence key.",
   "frontend/src/ui/AdminAccessPanel.tsx": "Admin access UI panel allowing username entry to unlock admin mode with clear English feedback and explicit messaging that this is a local-only gate (not secure authentication).",
-  "frontend/DEPLOYMENT_TROUBLESHOOTING.md": "New developer-facing guide providing step-by-step instructions for retrying failed network deployments, diagnosing common failure modes (build errors, identity issues, stopped canisters, out-of-cycles), and references to the canister availability operations guide."
+  "frontend/DEPLOYMENT_TROUBLESHOOTING.md": "New developer-facing guide providing step-by-step instructions for retrying failed network deployments, diagnosing common failure modes (build errors, identity issues, stopped canisters, out-of-cycles), and references to the canister availability operations guide.",
+  "frontend/src/game/controls/usePlayerControlsStore.ts": "Zustand store managing shared player control state including joystick input, look deltas, and one-shot jump requests with safe consumption pattern for the render loop."
 }

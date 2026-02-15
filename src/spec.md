@@ -1,11 +1,14 @@
 # Specification
 
 ## Summary
-**Goal:** Update the local-only admin username gate so admin mode unlocks only when the username entered is exactly `ADMIN` (case-sensitive), and ensure any previously persisted unlocked state is invalidated.
+**Goal:** Add a visible 3D player avatar that can move using existing desktop and mobile controls, and add a jump action with a dedicated on-screen Jump button.
 
 **Planned changes:**
-- Change the admin unlock check to require an exact, case-sensitive match for the username `ADMIN` (no trimming; reject any non-exact input).
-- Invalidate any previously persisted “admin unlocked” state that was granted under the old configured admin username, requiring re-entry of `ADMIN` after reload.
-- Keep all existing admin-only UI gated by the updated admin unlock condition, and ensure “lock admin mode” still clears the persisted unlocked state.
+- Render a visible player character avatar (simple 3D mesh such as a capsule) at the player position in the 3D library scene.
+- Hook the avatar’s horizontal movement to existing inputs: keyboard WASD/arrow keys on desktop and the existing on-screen joystick on touch devices.
+- Ensure movement is disabled while the game is paused or while the diagnostic terminal is open, matching current input handling.
+- Constrain player movement to the existing library bounds so the avatar cannot leave the playable area.
+- Implement jump with Space on desktop and basic gravity + ground collision so the player lands back on the floor and cannot double-jump while airborne.
+- Add a clearly visible on-screen mobile HUD button labeled “Jump” that triggers the same jump behavior and does not interfere with joystick interactions.
 
-**User-visible outcome:** Admin mode only unlocks when the user enters exactly `ADMIN`, and anyone previously unlocked under the old username will be locked again after reloading until they enter `ADMIN`.
+**User-visible outcome:** During gameplay, players see a character in the 3D library that moves with WASD/arrow keys or the mobile joystick, and can jump via Space or a labeled “Jump” button on touch devices (disabled while paused or when the diagnostic terminal is open).

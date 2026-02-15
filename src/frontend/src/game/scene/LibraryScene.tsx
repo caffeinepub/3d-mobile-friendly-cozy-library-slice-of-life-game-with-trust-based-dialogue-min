@@ -1,15 +1,21 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { OrbitControls, Environment, useTexture } from '@react-three/drei';
+import { Environment, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 import Puro from '../characters/Puro';
 import { usePlayerControls } from '../controls/usePlayerControls';
+import { usePlayerControlsStore } from '../controls/usePlayerControlsStore';
 import { useGameStore } from '../state/useGameStore';
 
 export default function LibraryScene() {
   const playerRef = useRef<THREE.Group>(null);
   const { movement, look } = usePlayerControls();
-  const { libraryCustomizations } = useGameStore();
+  const controlsStore = usePlayerControlsStore();
+  const { libraryCustomizations, isPaused } = useGameStore();
+  
+  // Jump physics state
+  const [verticalVelocity, setVerticalVelocity] = useState(0);
+  const [isGrounded, setIsGrounded] = useState(true);
 
   // Load texture unconditionally (required by Rules of Hooks)
   // If it fails, drei will handle the error and we'll use fallback material
@@ -30,7 +36,7 @@ export default function LibraryScene() {
   useFrame((state, delta) => {
     if (!playerRef.current) return;
 
-    // Apply movement
+    // Apply horizontal movement
     const speed = 2;
     playerRef.current.position.x += movement.x * speed * delta;
     playerRef.current.position.z += movement.z * speed * delta;
@@ -39,6 +45,33 @@ export default function LibraryScene() {
     playerRef.current.position.x = THREE.MathUtils.clamp(playerRef.current.position.x, -8, 8);
     playerRef.current.position.z = THREE.MathUtils.clamp(playerRef.current.position.z, -8, 8);
 
+    // Jump physics
+    const gravity = -15;
+    const jumpForce = 6;
+    const floorHeight = 0;
+
+    // Check for jump request
+    if (controlsStore.consumeJump() && isGrounded) {
+      setVerticalVelocity(jumpForce);
+      setIsGrounded(false);
+    }
+
+    // Apply gravity and vertical velocity
+    setVerticalVelocity(prev => {
+      const newVelocity = prev + gravity * delta;
+      return newVelocity;
+    });
+
+    // Update vertical position
+    playerRef.current.position.y += verticalVelocity * delta;
+
+    // Ground collision
+    if (playerRef.current.position.y <= floorHeight) {
+      playerRef.current.position.y = floorHeight;
+      setVerticalVelocity(0);
+      setIsGrounded(true);
+    }
+
     // Apply camera look
     state.camera.rotation.y += look.x * delta;
     state.camera.rotation.x += look.y * delta;
@@ -46,6 +79,7 @@ export default function LibraryScene() {
 
     // Update camera position to follow player
     state.camera.position.x = playerRef.current.position.x;
+    state.camera.position.y = playerRef.current.position.y + 1.6; // Eye height
     state.camera.position.z = playerRef.current.position.z;
   });
 
@@ -57,8 +91,13 @@ export default function LibraryScene() {
       <pointLight position={[-5, 3, -5]} intensity={0.3} color="#fff5e6" />
       <pointLight position={[5, 3, 5]} intensity={0.3} color="#fff5e6" />
 
-      {/* Player reference */}
-      <group ref={playerRef} position={[0, 0, 0]} />
+      {/* Player avatar (visible capsule) */}
+      <group ref={playerRef} position={[0, 0, 0]}>
+        <mesh position={[0, 0.9, 0]} castShadow>
+          <capsuleGeometry args={[0.3, 1.2, 8, 16]} />
+          <meshStandardMaterial color="#4a90e2" metalness={0.3} roughness={0.7} />
+        </mesh>
+      </group>
 
       {/* Floor */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>

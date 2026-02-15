@@ -1,39 +1,36 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-15T00:49:24.423Z",
-  "summary": "Core admin-gate changes appear implemented: the configured admin username is now exactly \"ADMIN\" with case-sensitive exact-match unlock, and the persisted unlock storage key is derived from the username to invalidate previously persisted unlocked state when the username changes. Some additional non-requested files were modified (summaries/state metadata).",
+  "generatedAt": "2026-02-15T00:59:37.311Z",
+  "summary": "Diff implements a visible player avatar (capsule mesh) in LibraryScene, unified movement input from keyboard + mobile joystick, basic jump request handling (Space + mobile trigger) with gravity/ground collision, and adds a mobile controls store plus overlay changes that appear to include a Jump button. Some REQ-51 acceptance criteria (exact English label text and non-interference with other touch controls) cannot be fully verified from the truncated diff snippet.",
   "missing_requirements": [
     {
-      "id": "REQ-47",
-      "requirement": "All existing admin-only UI remains gated by the updated admin unlock condition.",
-      "reason": "The diff shows the store/config changes, but does not show any UI components or gating logic being verified/updated to use the new condition; only a file listing summary mentions TitleScreen has conditional admin UI. With the provided diff summary alone, it’s not possible to confirm the UI still gates correctly under the new unlock condition.",
+      "id": "REQ-51",
+      "requirement": "On touch devices, a clearly visible button labeled \"Jump\" appears in the gameplay HUD alongside the existing mobile controls, and it must not interfere with joystick/look touch interactions.",
+      "reason": "MobileControlsOverlay.tsx is truncated before the actual Jump button JSX/label and layout/positioning details. While the code references a handleJumpClick/triggerJump and imports Button, the diff excerpt does not show the rendered Button with the exact label text \"Jump\" nor enough layout/touch-handling context to confirm it won’t interfere with joystick or look controls.",
       "evidence": [
-        "frontend-file-summaries.txt (mentions frontend/src/ui/TitleScreen.tsx but does not show code changes)"
+        "frontend/src/game/controls/MobileControlsOverlay.tsx (truncated)"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "Updated/modified repository-generated file summary listing many frontend files.",
-      "reason": "Not requested by REQ-47/REQ-48; appears to be ancillary metadata/documentation rather than the admin gate change itself.",
+      "description": "Added a new Zustand store (usePlayerControlsStore) to hold joystick/look/jump state across controls and scene.",
+      "reason": "BuildRequest did not specify adding a dedicated controls store; it only required movement/jump behavior and a mobile Jump button. This is an implementation detail not requested explicitly.",
       "evidence": [
-        "frontend-file-summaries.txt"
-      ]
-    },
-    {
-      "description": "Updated project state metadata/version information.",
-      "reason": "Not requested by REQ-47/REQ-48; appears unrelated to changing the local admin username gate.",
-      "evidence": [
-        "project_state.json"
+        "frontend/src/game/controls/usePlayerControlsStore.ts",
+        "frontend/src/game/controls/usePlayerControls.ts",
+        "frontend/src/game/scene/LibraryScene.tsx"
       ]
     }
   ],
-  "confidence": 0.72,
+  "confidence": 0.66,
   "changed_files": [
     "frontend-file-summaries.txt",
-    "frontend/src/config/adminGate.ts",
-    "frontend/src/state/useAdminGateStore.ts",
+    "frontend/src/game/controls/MobileControlsOverlay.tsx",
+    "frontend/src/game/controls/usePlayerControls.ts",
+    "frontend/src/game/controls/usePlayerControlsStore.ts",
+    "frontend/src/game/scene/LibraryScene.tsx",
     "project_state.json"
   ]
 }

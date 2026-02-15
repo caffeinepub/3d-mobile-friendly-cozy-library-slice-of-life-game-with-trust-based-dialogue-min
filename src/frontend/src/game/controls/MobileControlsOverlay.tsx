@@ -1,9 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { usePlayerControls } from './usePlayerControls';
+import { Button } from '@/components/ui/button';
+import { useGameStore } from '../state/useGameStore';
+import { useTerminalStore } from '../../ui/terminal/useTerminalStore';
 
 export default function MobileControlsOverlay() {
   const [isTouchDevice, setIsTouchDevice] = useState(false);
-  const { updateJoystick, updateLook } = usePlayerControls();
+  const { updateJoystick, updateLook, triggerJump } = usePlayerControls();
+  const { isPaused } = useGameStore();
+  const { isOpen: isTerminalOpen } = useTerminalStore();
   const joystickRef = useRef<HTMLDivElement>(null);
   const lookRef = useRef<HTMLDivElement>(null);
   const [joystickActive, setJoystickActive] = useState(false);
@@ -90,7 +95,13 @@ export default function MobileControlsOverlay() {
     };
   }, [isTouchDevice, updateLook]);
 
+  const handleJumpClick = () => {
+    triggerJump();
+  };
+
   if (!isTouchDevice) return null;
+
+  const isDisabled = isPaused || isTerminalOpen;
 
   return (
     <>
@@ -98,7 +109,7 @@ export default function MobileControlsOverlay() {
       <div className="absolute bottom-8 left-8 pointer-events-auto">
         <div
           ref={joystickRef}
-          onTouchStart={() => setJoystickActive(true)}
+          onTouchStart={() => !isDisabled && setJoystickActive(true)}
           className="relative w-32 h-32 rounded-full bg-muted/40 backdrop-blur-sm border-2 border-muted-foreground/20"
         >
           <div
@@ -108,6 +119,18 @@ export default function MobileControlsOverlay() {
             }}
           />
         </div>
+      </div>
+
+      {/* Jump Button */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 pointer-events-auto">
+        <Button
+          size="lg"
+          onClick={handleJumpClick}
+          disabled={isDisabled}
+          className="px-8 py-6 text-lg font-semibold shadow-lg"
+        >
+          Jump
+        </Button>
       </div>
 
       {/* Look area */}
