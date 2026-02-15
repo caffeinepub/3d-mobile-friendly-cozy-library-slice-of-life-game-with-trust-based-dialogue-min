@@ -2,15 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-remove-the-local-only-online-offline-server-access-toggle-and-any-related-offline-local-ui-state-so-the-app-always-attempts-backend-availability-checks-and-backend-calls-new-game-continue-terminal-status-without-a-locally-disabled-mode",
-      "featureTitle": "Remove the local-only Online/Offline (server access) toggle and any related 'Offline (Local)' UI/state so the app always attempts backend availability checks and backend calls (New Game / Continue / terminal status) without a locally disabled mode.",
+      "featureId": "feature-add-an-explicit-offline-mode-launch-path-so-the-game-can-be-started-and-continued-without-any-backend-canister-calls-when-the-backend-is-unavailable-or-when-the-user-has-no-network-connection",
+      "featureTitle": "Add an explicit \"Offline Mode\" launch path so the game can be started and continued without any backend canister calls when the backend is unavailable (or when the user has no network connection).",
       "files": [
         "frontend/src/App.tsx",
-        "frontend/src/state/useServerAccessStore.ts",
-        "frontend/src/ui/DiagnosticTerminalOverlay.tsx",
-        "frontend/src/ui/ServerStatusIndicator.tsx",
-        "frontend/src/ui/TitleScreen.tsx",
-        "frontend/src/ui/terminal/commands.ts"
+        "frontend/src/ui/TitleScreen.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -20,19 +16,16 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-59"
+        "REQ-62"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-update-user-facing-error-help-text-to-reflect-the-always-online-behavior-while-staying-accurate-about-internet-computer-limitations-the-app-cannot-programmatically-start-restart-a-stopped-canister",
-      "featureTitle": "Update user-facing error/help text to reflect the always-online behavior while staying accurate about Internet Computer limitations (the app cannot programmatically start/restart a stopped canister).",
+      "featureId": "feature-update-the-title-screen-to-allow-play-while-offline-keep-the-existing-server-status-indicator-alert-for-admins-but-do-not-disable-gameplay-entry-when-the-server-is-offline-provide-clear-english-messaging-that-progress-will-be-stored-locally-while-offline",
+      "featureTitle": "Update the title screen to allow play while offline: keep the existing server status indicator/alert for admins, but do not disable gameplay entry when the server is Offline. Provide clear English messaging that progress will be stored locally while offline.",
       "files": [
         "frontend/src/App.tsx",
-        "frontend/src/ui/GameLaunchErrorScreen.tsx",
-        "frontend/src/ui/TitleScreen.tsx",
-        "frontend/src/ui/terminal/commands.ts",
-        "frontend/src/utils/launchErrorNormalization.ts"
+        "frontend/src/ui/TitleScreen.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -42,15 +35,16 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-60"
+        "REQ-63"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-update-the-operations-documentation-to-emphasize-the-required-operational-steps-to-keep-the-backend-canister-online-running-funded-with-cycles-and-cross-link-to-existing-deployment-troubleshooting-guidance",
-      "featureTitle": "Update the operations documentation to emphasize the required operational steps to keep the backend canister online (running + funded with cycles), and cross-link to existing deployment troubleshooting guidance.",
+      "featureId": "feature-implement-local-only-game-launching-behavior-in-app-tsx-when-backend-preflight-fails-for-new-game-or-continue-fall-back-to-launching-offline-gameplay-instead-of-routing-to-the-launch-error-screen",
+      "featureTitle": "Implement local-only game launching behavior in App.tsx: when backend preflight fails for New Game or Continue, fall back to launching offline gameplay instead of routing to the launch-error screen.",
       "files": [
-        "frontend/OPS_CANISTER_AVAILABILITY.md"
+        "frontend/src/App.tsx",
+        "frontend/src/ui/GameLaunchErrorScreen.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -60,7 +54,47 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-61"
+        "REQ-64"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-a-local-save-presence-signal-to-drive-continue-behavior-in-offline-mode-using-the-existing-persisted-zustand-store-as-the-source-of-truth",
+      "featureTitle": "Add a local-save presence signal to drive \"Continue\" behavior in offline mode, using the existing persisted Zustand store as the source of truth.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/game/state/useGameStore.ts",
+        "frontend/src/ui/TitleScreen.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-65"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-ensure-offline-mode-does-not-introduce-backend-coupling-elsewhere-gameplay-ui-interactions-must-remain-functional-without-backend-calls-dialogue-choices-activities-letters-customization-moments-endings-and-must-continue-using-the-local-zustand-store-as-they-do-today",
+      "featureTitle": "Ensure offline mode does not introduce backend coupling elsewhere: gameplay UI interactions must remain functional without backend calls (dialogue choices, activities, letters, customization, moments, endings) and must continue using the local Zustand store as they do today.",
+      "files": [
+        "frontend/src/game/GameView.tsx",
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/ui/TitleScreen.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-66"
       ],
       "confidence": "high"
     }

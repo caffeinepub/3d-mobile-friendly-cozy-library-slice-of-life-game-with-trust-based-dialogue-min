@@ -23,6 +23,7 @@ interface GameStore extends UIState {
   letters: Array<{ fromPlayer: boolean; content: string; timestamp: number; response?: string }>;
   endingsUnlocked: string[];
   discoveredItems: string[];
+  hasLocalSave: boolean;
 
   // Actions
   initializeGame: (isNew: boolean) => void;
@@ -58,6 +59,7 @@ const defaultState = {
   letters: [],
   endingsUnlocked: [],
   discoveredItems: [],
+  hasLocalSave: false,
   showDialogue: false,
   showActivities: false,
   showMiniGames: false,
@@ -75,7 +77,10 @@ export const useGameStore = create<GameStore>()(
 
       initializeGame: (isNew: boolean) => {
         if (isNew) {
-          set(defaultState);
+          set({ ...defaultState, hasLocalSave: true });
+        } else {
+          // Mark that we have a local save when continuing
+          set({ hasLocalSave: true });
         }
       },
 

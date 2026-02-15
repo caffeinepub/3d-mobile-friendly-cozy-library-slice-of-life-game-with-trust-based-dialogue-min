@@ -1,98 +1,120 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Remove local Offline mode and enforce always-online backend access behavior",
+  "title": "Offline Mode launch path with local-only continuation",
   "requirements": [
     {
-      "id": "REQ-59",
-      "summary": "Remove the local Online/Offline toggle and local-offline gating so the app always checks and calls the backend based only on backend-derived availability.",
+      "id": "REQ-62",
+      "summary": "Add an explicit Offline Mode launch path that enters gameplay without any backend calls.",
       "acceptanceCriteria": [
-        "The Title Screen no longer renders an Online/Offline switch or any text/alerts referring to 'Offline (Local)' or 'Local backend access only'.",
-        "`frontend/src/state/useServerAccessStore.ts` is no longer used to gate backend calls or backend availability polling; backend availability polling on the Title Screen runs whenever the Title Screen is shown.",
-        "Clicking New Game / Continue is no longer blocked by a local server-access-disabled condition; actions only depend on backend-derived availability/health (Checking/Online/Offline).",
-        "The server status indicator no longer receives or uses an `isLocalOffline` state; it displays only backend-derived states: Checking, Online, Offline (all English).",
-        "The Diagnostic Terminal `status` / `server status` commands no longer check or report a local offline mode; they attempt `actor.isAvailable()` and report Online/Offline results accordingly (all English)."
+        "When backend availability is unhealthy/unreachable, the user can still enter gameplay from the title screen without seeing the launch error screen.",
+        "Starting gameplay via the offline path does not call startNewGame(), continueGame(), isAvailable(), or any other backend actor methods.",
+        "All user-facing UI text related to offline mode is in English."
       ],
       "file_operations": [
         {
           "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Remove all references to `useServerAccessStore` and any local-offline gating in launch flows. Ensure `useBackendAvailability` is enabled whenever the Title Screen is shown (no local toggle), and New Game/Continue only depend on backend-derived availability/health states."
+          "description": "Add a dedicated offline-only launch handler (e.g., \"Offline Mode\") that routes directly to gameplay (currentScreen='game') using only local Zustand state and sets English diagnostics messaging, with no React Query mutations or other actor calls triggered by that user action."
         },
         {
           "path": "frontend/src/ui/TitleScreen.tsx",
           "operation": "modify",
-          "description": "Remove the Online/Offline switch UI, any 'Offline (Local)' / 'Local backend access only' text and alerts, and eliminate any `isLocalOffline` state/logic. Keep the server status indicator and offline alert behavior based purely on `backendAvailability`. Uses shadcn-ui components already imported (e.g., Button/Card/Alert); verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/ui/ServerStatusIndicator.tsx",
-          "operation": "modify",
-          "description": "Remove the `isLocalOffline` prop and local-offline display path. Render only backend-derived states (Checking, Online, Offline) in English based on `backendAvailability`."
-        },
-        {
-          "path": "frontend/src/ui/DiagnosticTerminalOverlay.tsx",
-          "operation": "modify",
-          "description": "Remove `useServerAccessStore` usage and stop passing any local server-access flag into terminal command execution. Keep the terminal admin gate behavior unchanged. Uses shadcn-ui components already imported (e.g., Button/Input/ScrollArea); verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/ui/terminal/commands.ts",
-          "operation": "modify",
-          "description": "Remove `serverAccessEnabled` from the terminal command context and delete the local-offline checks/messages for `status` and `server status`. Ensure these commands always attempt `checkServerStatus()` and report Online/Offline results in English."
-        },
-        {
-          "path": "frontend/src/state/useServerAccessStore.ts",
-          "operation": "delete",
-          "description": "Delete the persisted local server-access store to fully remove the local offline mode feature and prevent future gating via this store."
+          "description": "Add an explicit \"Offline Mode\" UI action on the title screen wired to the new App handler. Use existing shadcn-ui Button/Card/Alert patterns for consistent styling. Verify the component's usage instructions before implementing."
         }
       ]
     },
     {
-      "id": "REQ-60",
-      "summary": "Update user-facing server availability/error/help text to reflect always-online behavior without claiming the app can start/restart a stopped canister.",
+      "id": "REQ-63",
+      "summary": "Allow gameplay entry on the title screen while offline and show clear English local-progress messaging; keep admin server alert but do not block play.",
       "acceptanceCriteria": [
-        "No user-facing text claims the app can force the backend canister to be 'always online' or can start/stop/restart the canister automatically.",
-        "Any remaining server-offline messages continue to be in English and clearly indicate the backend can be offline due to canister stopped/out-of-cycles/network issues, and that the user may need to try again later."
+        "On the title screen, \"New Game\" and \"Continue\" are not disabled solely due to backendAvailability being offline/unhealthy.",
+        "If the server is Offline, the title screen shows an English notice such as \"Server Offline — you can still play in Offline Mode. Progress will be saved on this device.\"",
+        "If the user is an admin and the server is Offline, the existing server-unavailable alert can remain, but it must not block offline play."
       ],
       "file_operations": [
         {
           "path": "frontend/src/ui/TitleScreen.tsx",
           "operation": "modify",
-          "description": "Revise the Server Unavailable messaging (and any other remaining server-related copy on the Title Screen) so it stays accurate about IC limitations (no in-app start/restart), mentions common causes (stopped canister, out of cycles, network), and remains English-only. Uses shadcn-ui components already imported (e.g., Alert/Button); verify the component's usage instructions before implementing."
+          "description": "Update button disabled logic so server offline/checking does not disable New Game/Continue; keep the admin-only server unavailable Alert visible but non-blocking. Add an English offline notice for all users when server status is Offline/unhealthy that explains progress is saved locally on this device. Use shadcn-ui Alert for the notice and keep the existing admin alert unchanged except for removing any play-blocking implications. Verify the component's usage instructions before implementing."
         },
         {
           "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Update any user-friendly summaries produced during New Game / Continue preflight failures so they reflect always-online behavior and do not mention local offline mode or imply the app can control canister uptime."
-        },
+          "description": "Pass a computed continueDisabled value (based on local-save presence) into TitleScreen and ensure server status does not gate gameplay entry at the App level."
+        }
+      ]
+    },
+    {
+      "id": "REQ-64",
+      "summary": "Fallback to offline gameplay in App.tsx when backend preflight is unhealthy for New Game or Continue instead of routing to the launch-error screen.",
+      "acceptanceCriteria": [
+        "In frontend/src/App.tsx, handleNewGame() launches gameplay (currentScreen='game', isNewGame=true) even when backendAvailability.isHealthy is false.",
+        "In frontend/src/App.tsx, handleContinue() launches gameplay (currentScreen='game', isNewGame=false) even when backendAvailability.isHealthy is false.",
+        "When the offline fallback is used, diagnostics.lastLaunchAction still reflects the user action (new-game/continue), and diagnostics.userFriendlySummary reflects an English offline message rather than a server failure message."
+      ],
+      "file_operations": [
         {
-          "path": "frontend/src/utils/launchErrorNormalization.ts",
+          "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Adjust normalized English error summaries (e.g., CANISTER_STOPPED / CONNECTIVITY) to explicitly avoid implying the app can restart the canister, and to mention plausible causes like stopped canister, out-of-cycles, or network issues with a 'try again later' recommendation."
-        },
-        {
-          "path": "frontend/src/ui/terminal/commands.ts",
-          "operation": "modify",
-          "description": "Update terminal output strings for server checks to be English-only, always-online aligned, and accurate about limitations (no local offline mode references; no implication of canister start/restart)."
+          "description": "Change the preflight-unhealthy branches in handleNewGame() and handleContinue() to route into gameplay rather than 'launch-error'. Ensure the offline fallback path does not call startNewGame(), continueGame(), isAvailable(), or any other backend actor method, and set diagnostics.lastLaunchAction plus an English offline-mode summary (not a server failure explanation)."
         },
         {
           "path": "frontend/src/ui/GameLaunchErrorScreen.tsx",
           "operation": "modify",
-          "description": "Review and refine any user-visible fallback copy so it stays consistent with always-online behavior and does not claim or imply the app can start/stop/restart the canister (English only). Uses shadcn-ui components already imported (e.g., Card/Button); verify the component's usage instructions before implementing."
+          "description": "Adjust any copy/logic that assumes backend unavailability must result in the launch error screen, so offline fallback messaging does not conflict with the remaining error screen behavior (English-only text). Use existing shadcn-ui Card/Button patterns. Verify the component's usage instructions before implementing."
         }
       ]
     },
     {
-      "id": "REQ-61",
-      "summary": "Update operations documentation to emphasize operational steps required to keep the canister running and funded with cycles, linking to deployment troubleshooting guidance.",
+      "id": "REQ-65",
+      "summary": "Add a persistent local-save presence signal in the existing persisted Zustand store to drive Continue behavior in offline mode.",
       "acceptanceCriteria": [
-        "`frontend/OPS_CANISTER_AVAILABILITY.md` clearly states (in English) that uptime cannot be guaranteed in-app, and provides concise, actionable steps to keep the canister running and funded with cycles.",
-        "The doc continues to reference `frontend/DEPLOYMENT_TROUBLESHOOTING.md` for deployment retry/failure diagnosis (English only)."
+        "The game persists a boolean (or equivalent) indicating a local save exists (e.g., set after the first meaningful progress such as any state change or after first entering gameplay).",
+        "If no local save exists, \"Continue\" is disabled (or shows an English message explaining there is no local save to continue) regardless of backend availability.",
+        "If a local save exists, \"Continue\" works in offline mode and loads the locally persisted state."
       ],
       "file_operations": [
         {
-          "path": "frontend/OPS_CANISTER_AVAILABILITY.md",
+          "path": "frontend/src/game/state/useGameStore.ts",
           "operation": "modify",
-          "description": "Expand/complete the operations guide in English with clear, actionable steps to keep the canister available (ensure running state, monitor and top up cycles, what to check when offline), explicitly stating the app cannot guarantee uptime or start/restart a stopped canister. Ensure it references `frontend/DEPLOYMENT_TROUBLESHOOTING.md` for deployment retry/failure diagnosis."
+          "description": "Extend the persisted Zustand store with a persisted local-save presence flag (e.g., hasLocalSave) and update store actions (and/or initialization) to set it true after first entering gameplay and/or first meaningful state change, without introducing any backend coupling."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Read the local-save presence flag from the persisted Zustand store to determine whether Continue should be enabled, and ensure offline Continue launches gameplay using the locally persisted state."
+        },
+        {
+          "path": "frontend/src/ui/TitleScreen.tsx",
+          "operation": "modify",
+          "description": "Disable Continue when no local save is present and/or show an English explanation near the button (or on attempted click) that there is no local save on this device. Use existing shadcn-ui components (e.g., Alert/Muted text) for messaging. Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-66",
+      "summary": "Keep gameplay fully functional without backend coupling: ensure offline gameplay introduces no new actor/React Query call paths and no misleading UI copy.",
+      "acceptanceCriteria": [
+        "With the network disconnected (or backend canister stopped), the user can still: open dialogue, make choices, complete activities, write letters and receive local responses, place customization items, and view unlocked moments/endings without errors.",
+        "No new runtime errors appear due to missing backend actor or failed React Query calls during offline gameplay.",
+        "No UI copy claims the app can start/stop/restart the backend canister."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/game/GameView.tsx",
+          "operation": "modify",
+          "description": "Audit and (if needed) adjust GameView initialization so entering gameplay via offline paths relies only on local Zustand state initialization and does not trigger backend calls indirectly (e.g., avoid adding React Query hooks or actor-dependent logic to gameplay mount)."
+        },
+        {
+          "path": "frontend/src/ui/TitleScreen.tsx",
+          "operation": "modify",
+          "description": "Review and update any server-related title-screen copy so it does not claim the app can start/stop/restart the backend canister, while still allowing admins to see the existing server alert. Ensure any newly introduced/changed text remains English-only. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Add lightweight safeguards/comments (no new routes/pages) to prevent accidental use of React Query backend hooks in offline-only gameplay flows (e.g., ensure any future usage remains opt-in and not mounted by default during gameplay)."
         }
       ]
     }

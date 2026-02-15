@@ -13,12 +13,13 @@ import { useStartNewGame, useContinueGame } from './hooks/useQueries';
 import { useBackendAvailability } from './hooks/useBackendAvailability';
 import { normalizeLaunchError } from './utils/launchErrorNormalization';
 import { useActor } from './hooks/useActor';
+import { useGameStore } from './game/state/useGameStore';
 
 type Screen = 'title' | 'game' | 'settings' | 'credits' | 'launch-error';
 
 interface DiagnosticsState {
   startupComplete: boolean;
-  lastLaunchAction: 'new-game' | 'continue' | null;
+  lastLaunchAction: 'new-game' | 'continue' | 'offline-mode' | null;
   launchStage: 'idle' | 'calling-backend' | 'mounting-game' | 'complete' | 'failed';
   gameMounted: boolean;
   errorMessage: string | null;
@@ -43,6 +44,7 @@ export default function App() {
   const startNewGameMutation = useStartNewGame();
   const continueGameMutation = useContinueGame();
   const { actor } = useActor();
+  const { hasLocalSave } = useGameStore();
 
   // Backend availability check - always active on title screen
   const backendAvailability = useBackendAvailability({
@@ -82,17 +84,18 @@ export default function App() {
   }, []);
 
   const handleNewGame = async () => {
-    // Preflight availability check
+    // If backend is unhealthy, fallback to offline mode
     if (!backendAvailability.isHealthy) {
       setDiagnostics({
         startupComplete: diagnostics.startupComplete,
         lastLaunchAction: 'new-game',
-        launchStage: 'failed',
+        launchStage: 'mounting-game',
         gameMounted: false,
-        errorMessage: backendAvailability.lastError || 'Game server is offline',
-        userFriendlySummary: 'The game server is currently unavailable. This may be due to the canister being stopped, out of cycles, or network issues. Please try again later.',
+        errorMessage: null,
+        userFriendlySummary: 'Playing in Offline Mode. Progress will be saved on this device.',
       });
-      setCurrentScreen('launch-error');
+      setIsNewGame(true);
+      setCurrentScreen('game');
       return;
     }
 
@@ -124,17 +127,18 @@ export default function App() {
   };
 
   const handleContinue = async () => {
-    // Preflight availability check
+    // If backend is unhealthy, fallback to offline mode
     if (!backendAvailability.isHealthy) {
       setDiagnostics({
         startupComplete: diagnostics.startupComplete,
         lastLaunchAction: 'continue',
-        launchStage: 'failed',
+        launchStage: 'mounting-game',
         gameMounted: false,
-        errorMessage: backendAvailability.lastError || 'Game server is offline',
-        userFriendlySummary: 'The game server is currently unavailable. This may be due to the canister being stopped, out of cycles, or network issues. Please try again later.',
+        errorMessage: null,
+        userFriendlySummary: 'Playing in Offline Mode. Progress will be saved on this device.',
       });
-      setCurrentScreen('launch-error');
+      setIsNewGame(false);
+      setCurrentScreen('game');
       return;
     }
 
@@ -165,6 +169,19 @@ export default function App() {
     }
   };
 
+  const handleOfflineMode = () => {
+    setDiagnostics({
+      startupComplete: diagnostics.startupComplete,
+      lastLaunchAction: 'offline-mode',
+      launchStage: 'mounting-game',
+      gameMounted: false,
+      errorMessage: null,
+      userFriendlySummary: 'Playing in Offline Mode. Progress will be saved on this device.',
+    });
+    setIsNewGame(true);
+    setCurrentScreen('game');
+  };
+
   const handleRetry = async () => {
     if (!diagnostics.lastLaunchAction || isRetrying) {
       return;
@@ -175,7 +192,7 @@ export default function App() {
     try {
       if (diagnostics.lastLaunchAction === 'new-game') {
         await handleNewGame();
-      } else {
+      } else if (diagnostics.lastLaunchAction === 'continue') {
         await handleContinue();
       }
     } finally {
@@ -259,6 +276,9 @@ export default function App() {
     ...diagnostics,
   };
 
+  // Compute continue disabled based on local save presence
+  const continueDisabled = !hasLocalSave;
+
   return (
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
       <div className="w-full h-screen overflow-hidden">
@@ -271,10 +291,11 @@ export default function App() {
           <TitleScreen
             onNewGame={handleNewGame}
             onContinue={handleContinue}
+            onOfflineMode={handleOfflineMode}
             onSettings={() => setCurrentScreen('settings')}
             onCredits={() => setCurrentScreen('credits')}
             isLaunching={isLaunching}
-            continueDisabled={false}
+            continueDisabled={continueDisabled}
             backendAvailability={backendAvailability}
           />
         )}

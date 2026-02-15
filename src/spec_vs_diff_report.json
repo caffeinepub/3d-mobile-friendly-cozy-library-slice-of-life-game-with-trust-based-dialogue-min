@@ -1,33 +1,48 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-15T01:57:38.191Z",
-  "summary": "Diff largely aligns with always-online behavior: backend availability polling is enabled whenever the Title Screen is active, UI server status now appears derived from backend availability (Checking/Online/Offline), launch actions are gated by backend health instead of a local toggle, terminal commands include `server status` and do not reference a local offline mode, and OPS documentation adds clear uptime limitations and links to deployment troubleshooting. Some acceptance criteria cannot be fully verified due to truncation (notably: removal of the Title Screen toggle/text and whether `server status` specifically calls `actor.isAvailable()`).",
+  "generatedAt": "2026-02-15T02:07:25.436Z",
+  "summary": "Diff implements key offline-mode plumbing on the title screen and in App.tsx (offline fallback for New Game when backend is unhealthy), adds an offline notice in TitleScreen, and introduces a persisted `hasLocalSave` flag in the Zustand store. However, due to truncation, several acceptance-criteria behaviors (notably Continue fallback behavior and local-save gating wiring) cannot be confirmed from the provided diff summary.",
   "missing_requirements": [
     {
-      "id": "REQ-59",
-      "requirement": "Diagnostic Terminal `status` / `server status` commands no longer check/report local offline mode; they attempt `actor.isAvailable()` and report Online/Offline accordingly.",
-      "reason": "The diff shows terminal `server status` calling an injected `checkServerStatus()` function, but does not provide evidence that this function uses `actor.isAvailable()` specifically (it could be implemented differently).",
+      "id": "REQ-64",
+      "requirement": "In frontend/src/App.tsx, handleContinue() launches gameplay (currentScreen='game', isNewGame=false) even when backendAvailability.isHealthy is false, and diagnostics.userFriendlySummary reflects an English offline message.",
+      "reason": "The diff excerpt shows the offline fallback logic for handleNewGame(), but the handleContinue() implementation is not visible in the truncated App.tsx excerpt, so compliance with the Continue-specific acceptance criteria cannot be verified from the provided evidence.",
       "evidence": [
-        "frontend/src/ui/terminal/commands.ts",
-        "frontend/src/ui/DiagnosticTerminalOverlay.tsx",
-        "frontend/src/App.tsx"
+        "frontend/src/App.tsx (truncated)"
+      ]
+    },
+    {
+      "id": "REQ-62",
+      "requirement": "Add an explicit \"Offline Mode\" launch path so the game can be started and continued without any backend canister calls when the backend is unavailable (or when the user has no network connection).",
+      "reason": "TitleScreen now accepts an onOfflineMode prop and the file summary claims an explicit Offline Mode button, but the actual button wiring/behavior and corresponding App handler are not shown in the truncated excerpts. Therefore, it cannot be verified that the explicit offline launch path is fully implemented end-to-end and guaranteed to avoid backend actor calls when used.",
+      "evidence": [
+        "frontend/src/ui/TitleScreen.tsx (truncated)",
+        "frontend/src/App.tsx (truncated)",
+        "frontend-file-summaries.txt (truncated)"
+      ]
+    },
+    {
+      "id": "REQ-65",
+      "requirement": "If no local save exists, \"Continue\" is disabled (or shows an English message explaining there is no local save to continue) regardless of backend availability; if a local save exists, Continue works in offline mode and loads locally persisted state.",
+      "reason": "The store adds `hasLocalSave`, but the diff does not show (a) where gameplay progress updates set this beyond initialization, (b) that App passes `continueDisabled` based on `hasLocalSave`, or (c) that Continue actually loads the locally persisted state when offline. TitleScreen has a `continueDisabled` prop, but its usage is not visible in the truncated excerpt.",
+      "evidence": [
+        "frontend/src/game/state/useGameStore.ts (truncated)",
+        "frontend/src/ui/TitleScreen.tsx (truncated)",
+        "frontend/src/App.tsx (truncated)"
       ]
     }
   ],
   "hallucinated_features": [],
-  "confidence": 0.62,
+  "confidence": 0.55,
   "changed_files": [
     "frontend-file-summaries.txt",
-    "frontend/OPS_CANISTER_AVAILABILITY.md",
     "frontend/src/App.tsx",
-    "frontend/src/state/useServerAccessStore.ts",
-    "frontend/src/ui/DiagnosticTerminalOverlay.tsx",
+    "frontend/src/game/GameView.tsx",
+    "frontend/src/game/state/useGameStore.ts",
+    "frontend/src/hooks/useQueries.ts",
     "frontend/src/ui/GameLaunchErrorScreen.tsx",
-    "frontend/src/ui/ServerStatusIndicator.tsx",
     "frontend/src/ui/TitleScreen.tsx",
-    "frontend/src/ui/terminal/commands.ts",
-    "frontend/src/utils/launchErrorNormalization.ts",
     "project_state.json"
   ]
 }

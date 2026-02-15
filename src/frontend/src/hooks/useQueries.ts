@@ -2,6 +2,15 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
 import type { GameState } from '../backend';
 
+/**
+ * React Query hooks for backend operations.
+ * 
+ * IMPORTANT: These hooks are designed for online gameplay with backend sync.
+ * In offline mode, gameplay should rely solely on local Zustand state (useGameStore)
+ * and should NOT mount or call these hooks. The offline gameplay flow bypasses
+ * all backend actor calls to ensure the game remains functional without network.
+ */
+
 export function useGameState() {
   const { actor, isFetching } = useActor();
 

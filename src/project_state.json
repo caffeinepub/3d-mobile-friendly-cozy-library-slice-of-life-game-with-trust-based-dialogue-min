@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 37,
+  "projectStateVersion": 39,
   "summary": "3D mobile-friendly slice-of-life adventure/visual-novel hybrid set entirely in Puro’s library, focused on building friendship/trust through dialogue and cozy activities, featuring multiple endings including a low-friendship Betrayal ending with Special Edition variants.",
   "architectural_notes": [
     "Core gameplay loop centered on a hub-based, single-location library environment with repeatable daily activities and relationship progression.",
@@ -23,9 +23,10 @@
     "Admin gating approach conflict: earlier plan uses Internet Identity principal; user now requests username-based gating, which may be spoofable without strong authentication—needs a decision on security model.",
     "Deployment to network failed (deployment error); user requested retry deployment.",
     "Server toggle/status UI still includes a \"Local Offline\" mode/state; user demands only Online/Offline (needs implementation/decision on local-only vs true backend control).",
-    "Admin switch/control appears to have been removed from the UI; user requests it be added back."
+    "Admin switch/control appears to have been removed from the UI; user requests it be added back.",
+    "Requirement conflict: user wants the game accessible even when offline, but current launch flow depends on Internet Computer canister calls (startNewGame/continueGame) and an 'always-online' backend assumption—needs clarified offline behavior (local saves/content vs backend sync)."
   ],
-  "isFixRequest": true,
+  "isFixRequest": false,
   "existing_features": [
     {
       "id": "feature-create-a-single-location-3d-game-scene-set-entirely-in-a-dim-cozy-dusty-library-with-bookshelves-vents-and-a-central-fruit-bearing-bonsai-tree-that-the-player-can-explore",
@@ -506,6 +507,46 @@
         "REQ-61"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-add-an-explicit-offline-mode-launch-path-so-the-game-can-be-started-and-continued-without-any-backend-canister-calls-when-the-backend-is-unavailable-or-when-the-user-has-no-network-connection",
+      "title": "Add an explicit \"Offline Mode\" launch path so the game can be started and continued without any backend canister calls when the backend is unavailable (or when the user has no network connection).",
+      "reqIds": [
+        "REQ-62"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-title-screen-to-allow-play-while-offline-keep-the-existing-server-status-indicator-alert-for-admins-but-do-not-disable-gameplay-entry-when-the-server-is-offline-provide-clear-english-messaging-that-progress-will-be-stored-locally-while-offline",
+      "title": "Update the title screen to allow play while offline: keep the existing server status indicator/alert for admins, but do not disable gameplay entry when the server is Offline. Provide clear English messaging that progress will be stored locally while offline.",
+      "reqIds": [
+        "REQ-63"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-local-only-game-launching-behavior-in-app-tsx-when-backend-preflight-fails-for-new-game-or-continue-fall-back-to-launching-offline-gameplay-instead-of-routing-to-the-launch-error-screen",
+      "title": "Implement local-only game launching behavior in App.tsx: when backend preflight fails for New Game or Continue, fall back to launching offline gameplay instead of routing to the launch-error screen.",
+      "reqIds": [
+        "REQ-64"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-local-save-presence-signal-to-drive-continue-behavior-in-offline-mode-using-the-existing-persisted-zustand-store-as-the-source-of-truth",
+      "title": "Add a local-save presence signal to drive \"Continue\" behavior in offline mode, using the existing persisted Zustand store as the source of truth.",
+      "reqIds": [
+        "REQ-65"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-offline-mode-does-not-introduce-backend-coupling-elsewhere-gameplay-ui-interactions-must-remain-functional-without-backend-calls-dialogue-choices-activities-letters-customization-moments-endings-and-must-continue-using-the-local-zustand-store-as-they-do-today",
+      "title": "Ensure offline mode does not introduce backend coupling elsewhere: gameplay UI interactions must remain functional without backend calls (dialogue choices, activities, letters, customization, moments, endings) and must continue using the local Zustand store as they do today.",
+      "reqIds": [
+        "REQ-66"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -652,6 +693,12 @@
     {
       "id": "AR-24",
       "summary": "Restore the admin-only switch/control in the UI (add the admin switch back where it was previously available)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-25",
+      "summary": "Enable the game to remain accessible/usable even when offline (graceful offline mode that does not depend on backend availability)",
       "reqIds": [],
       "status": "pending"
     }

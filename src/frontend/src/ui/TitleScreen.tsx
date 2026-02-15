@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { BookOpen, Settings, Info, Loader2, AlertCircle, RefreshCw, Terminal } from 'lucide-react';
+import { BookOpen, Settings, Info, Loader2, AlertCircle, RefreshCw, Terminal, WifiOff } from 'lucide-react';
 import type { BackendAvailabilityState } from '../hooks/useBackendAvailability';
 import { useTerminalStore } from './terminal/useTerminalStore';
 import { useAdminGateStore } from '../state/useAdminGateStore';
@@ -11,6 +11,7 @@ import AdminAccessPanel from './AdminAccessPanel';
 interface TitleScreenProps {
   onNewGame: () => void;
   onContinue: () => void;
+  onOfflineMode: () => void;
   onSettings: () => void;
   onCredits: () => void;
   isLaunching?: boolean;
@@ -21,6 +22,7 @@ interface TitleScreenProps {
 export default function TitleScreen({
   onNewGame,
   onContinue,
+  onOfflineMode,
   onSettings,
   onCredits,
   isLaunching = false,
@@ -64,14 +66,25 @@ export default function TitleScreen({
             </div>
           )}
 
+          {/* Offline Notice - shown to all users when server is offline */}
+          {isServerOffline && (
+            <Alert className="w-full">
+              <WifiOff className="h-4 w-4" />
+              <AlertTitle>Server Offline</AlertTitle>
+              <AlertDescription>
+                You can still play in Offline Mode. Progress will be saved on this device.
+              </AlertDescription>
+            </Alert>
+          )}
+
           {/* Server Offline Alert - only shown when admin unlocked */}
           {isAdminUnlocked && isServerOffline && (
             <Alert variant="destructive" className="w-full">
               <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Server Unavailable</AlertTitle>
+              <AlertTitle>Server Unavailable (Admin)</AlertTitle>
               <AlertDescription className="flex flex-col gap-2">
                 <span>
-                  The backend canister is currently unavailable. This may be due to the canister being stopped, out of cycles, or network issues. Please try again later.
+                  The backend canister is currently unavailable. This may be due to the canister being stopped, out of cycles, or network issues.
                 </span>
                 <Button
                   variant="outline"
@@ -91,7 +104,7 @@ export default function TitleScreen({
               onClick={onNewGame}
               size="lg"
               className="w-full text-lg"
-              disabled={isLaunching || isServerOffline || isCheckingServer}
+              disabled={isLaunching}
             >
               {isLaunching ? (
                 <>
@@ -111,9 +124,27 @@ export default function TitleScreen({
               variant="outline"
               size="lg"
               className="w-full text-lg"
-              disabled={isLaunching || continueDisabled || isServerOffline || isCheckingServer}
+              disabled={isLaunching || continueDisabled}
+              title={continueDisabled ? 'No local save found on this device' : ''}
             >
               Continue
+            </Button>
+
+            {continueDisabled && (
+              <p className="text-xs text-muted-foreground text-center -mt-2">
+                No local save found on this device
+              </p>
+            )}
+
+            <Button
+              onClick={onOfflineMode}
+              variant="secondary"
+              size="lg"
+              className="w-full text-lg"
+              disabled={isLaunching}
+            >
+              <WifiOff className="mr-2 h-5 w-5" />
+              Offline Mode
             </Button>
 
             <div className="flex gap-2 w-full mt-2">

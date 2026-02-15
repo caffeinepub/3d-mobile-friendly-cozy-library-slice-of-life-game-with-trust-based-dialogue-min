@@ -1,14 +1,14 @@
 # Specification
 
 ## Summary
-**Goal:** Remove the app’s local “Offline (Local)” mode and make frontend behavior always attempt backend availability checks and backend calls, with updated messaging and ops guidance that remains accurate about Internet Computer limitations.
+**Goal:** Allow the game to be launched and played in an explicit Offline Mode when the backend is unreachable, using only locally persisted state.
 
 **Planned changes:**
-- Remove the Title Screen Online/Offline (server access) toggle and any UI/state/text referring to “Offline (Local)” or local-only backend access.
-- Update server availability polling and backend call gating so backend checks run whenever the Title Screen is shown, and New Game/Continue depend only on backend-derived availability (Checking/Online/Offline).
-- Simplify the server status indicator to use only backend-derived states (Checking, Online, Offline) and remove any `isLocalOffline` usage.
-- Update Diagnostic Terminal `status` / `server status` commands to always attempt `actor.isAvailable()` and report Online/Offline based on results (English only).
-- Revise user-facing help/error text to reflect always-online behavior without claiming the app can start/stop/restart or guarantee uptime for the backend canister.
-- Update `frontend/OPS_CANISTER_AVAILABILITY.md` to emphasize operational steps to keep the canister running and funded with cycles, and cross-link to `frontend/DEPLOYMENT_TROUBLESHOOTING.md`.
+- Update the title screen so gameplay entry is not blocked when the server is offline, while keeping the existing server status indicator/alert for admins.
+- Add clear English offline messaging on the title screen indicating the user can play and that progress is saved on the device.
+- Update App.tsx launch behavior so “New Game” and “Continue” fall back to starting gameplay locally (without routing to a launch-error screen) when backend preflight/availability checks fail.
+- Ensure the offline launch path makes no backend actor calls (e.g., startNewGame(), continueGame(), isAvailable()) and sets diagnostics to an English offline summary while preserving the user’s chosen action (new-game/continue).
+- Add a local-save-present flag in the persisted Zustand store to drive “Continue” availability in offline mode (disable/communicate when no local save exists; load local state when it does).
+- Verify core gameplay interactions remain functional without backend coupling or runtime errors while offline.
 
-**User-visible outcome:** The app no longer offers a local offline mode; it always checks the backend status and attempts backend actions, showing only Checking/Online/Offline states and providing accurate guidance when the backend is unavailable.
+**User-visible outcome:** Users can start a new game or continue from the title screen even with no network/backend available, with progress stored locally on the device and clear English offline-mode messaging.

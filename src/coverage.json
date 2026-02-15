@@ -1,64 +1,82 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-15T01:57:38.195Z",
+  "generatedAt": "2026-02-15T02:07:25.440Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 3,
-    "implemented": 3,
+    "total": 5,
+    "implemented": 5,
     "items": [
       {
-        "id": "REQ-59",
-        "summary": "Remove the local-only Online/Offline (server access) toggle and any related 'Offline (Local)' UI/state so the app always attempts backend availability checks and backend calls (New Game / Continue / terminal status) without a locally disabled mode.",
+        "id": "REQ-62",
+        "summary": "Add an explicit \"Offline Mode\" launch path so the game can be started and continued without any backend canister calls when the backend is unavailable (or when the user has no network connection).",
         "status": "implemented",
         "plannedFiles": [
           "frontend/src/App.tsx",
-          "frontend/src/ui/TitleScreen.tsx",
-          "frontend/src/ui/ServerStatusIndicator.tsx",
-          "frontend/src/ui/DiagnosticTerminalOverlay.tsx",
-          "frontend/src/ui/terminal/commands.ts",
-          "frontend/src/state/useServerAccessStore.ts"
+          "frontend/src/ui/TitleScreen.tsx"
         ],
         "matchedFiles": [
           "frontend/src/App.tsx",
-          "frontend/src/ui/TitleScreen.tsx",
-          "frontend/src/ui/ServerStatusIndicator.tsx",
-          "frontend/src/ui/DiagnosticTerminalOverlay.tsx",
-          "frontend/src/ui/terminal/commands.ts",
-          "frontend/src/state/useServerAccessStore.ts"
+          "frontend/src/ui/TitleScreen.tsx"
         ]
       },
       {
-        "id": "REQ-60",
-        "summary": "Update user-facing error/help text to reflect the always-online behavior while staying accurate about Internet Computer limitations (the app cannot programmatically start/restart a stopped canister).",
+        "id": "REQ-63",
+        "summary": "Update the title screen to allow play while offline: keep the existing server status indicator/alert for admins, but do not disable gameplay entry when the server is Offline. Provide clear English messaging that progress will be stored locally while offline.",
         "status": "implemented",
         "plannedFiles": [
           "frontend/src/ui/TitleScreen.tsx",
-          "frontend/src/App.tsx",
-          "frontend/src/utils/launchErrorNormalization.ts",
-          "frontend/src/ui/terminal/commands.ts",
-          "frontend/src/ui/GameLaunchErrorScreen.tsx"
+          "frontend/src/App.tsx"
         ],
         "matchedFiles": [
           "frontend/src/ui/TitleScreen.tsx",
+          "frontend/src/App.tsx"
+        ]
+      },
+      {
+        "id": "REQ-64",
+        "summary": "Implement local-only game launching behavior in App.tsx: when backend preflight fails for New Game or Continue, fall back to launching offline gameplay instead of routing to the launch-error screen.",
+        "status": "implemented",
+        "plannedFiles": [
           "frontend/src/App.tsx",
-          "frontend/src/utils/launchErrorNormalization.ts",
-          "frontend/src/ui/terminal/commands.ts",
+          "frontend/src/ui/GameLaunchErrorScreen.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/App.tsx",
           "frontend/src/ui/GameLaunchErrorScreen.tsx"
         ]
       },
       {
-        "id": "REQ-61",
-        "summary": "Update the operations documentation to emphasize the required operational steps to keep the backend canister online (running + funded with cycles), and cross-link to existing deployment troubleshooting guidance.",
+        "id": "REQ-65",
+        "summary": "Add a local-save presence signal to drive \"Continue\" behavior in offline mode, using the existing persisted Zustand store as the source of truth.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/OPS_CANISTER_AVAILABILITY.md"
+          "frontend/src/game/state/useGameStore.ts",
+          "frontend/src/App.tsx",
+          "frontend/src/ui/TitleScreen.tsx"
         ],
         "matchedFiles": [
-          "frontend/OPS_CANISTER_AVAILABILITY.md"
+          "frontend/src/game/state/useGameStore.ts",
+          "frontend/src/App.tsx",
+          "frontend/src/ui/TitleScreen.tsx"
+        ]
+      },
+      {
+        "id": "REQ-66",
+        "summary": "Ensure offline mode does not introduce backend coupling elsewhere: gameplay UI interactions must remain functional without backend calls (dialogue choices, activities, letters, customization, moments, endings) and must continue using the local Zustand store as they do today.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/game/GameView.tsx",
+          "frontend/src/ui/TitleScreen.tsx",
+          "frontend/src/hooks/useQueries.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/game/GameView.tsx",
+          "frontend/src/ui/TitleScreen.tsx",
+          "frontend/src/hooks/useQueries.ts"
         ]
       }
     ]
@@ -68,15 +86,12 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/OPS_CANISTER_AVAILABILITY.md",
     "frontend/src/App.tsx",
-    "frontend/src/state/useServerAccessStore.ts",
-    "frontend/src/ui/DiagnosticTerminalOverlay.tsx",
+    "frontend/src/game/GameView.tsx",
+    "frontend/src/game/state/useGameStore.ts",
+    "frontend/src/hooks/useQueries.ts",
     "frontend/src/ui/GameLaunchErrorScreen.tsx",
-    "frontend/src/ui/ServerStatusIndicator.tsx",
     "frontend/src/ui/TitleScreen.tsx",
-    "frontend/src/ui/terminal/commands.ts",
-    "frontend/src/utils/launchErrorNormalization.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

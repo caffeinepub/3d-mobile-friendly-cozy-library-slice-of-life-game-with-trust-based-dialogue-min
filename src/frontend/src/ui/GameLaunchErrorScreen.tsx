@@ -5,7 +5,7 @@ import { useState } from 'react';
 
 interface DiagnosticsState {
   startupComplete: boolean;
-  lastLaunchAction: 'new-game' | 'continue' | null;
+  lastLaunchAction: 'new-game' | 'continue' | 'offline-mode' | null;
   launchStage: 'idle' | 'calling-backend' | 'mounting-game' | 'complete' | 'failed';
   gameMounted: boolean;
   errorMessage: string | null;
@@ -53,7 +53,11 @@ export default function GameLaunchErrorScreen({
     const details: string[] = [];
     details.push(`Startup: ${diagnostics.startupComplete ? 'Complete' : 'Failed'}`);
     if (diagnostics.lastLaunchAction) {
-      details.push(`Action: ${diagnostics.lastLaunchAction === 'new-game' ? 'New Game' : 'Continue'}`);
+      const actionLabel = 
+        diagnostics.lastLaunchAction === 'new-game' ? 'New Game' :
+        diagnostics.lastLaunchAction === 'continue' ? 'Continue' :
+        'Offline Mode';
+      details.push(`Action: ${actionLabel}`);
     }
     details.push(`Stage: ${diagnostics.launchStage}`);
     details.push(`Game Mounted: ${diagnostics.gameMounted ? 'Yes' : 'No'}`);
@@ -63,7 +67,7 @@ export default function GameLaunchErrorScreen({
     return details;
   };
 
-  const canRetry = diagnostics.lastLaunchAction !== null;
+  const canRetry = diagnostics.lastLaunchAction !== null && diagnostics.lastLaunchAction !== 'offline-mode';
 
   return (
     <div className="w-full h-full flex items-center justify-center bg-background p-4">
@@ -82,7 +86,7 @@ export default function GameLaunchErrorScreen({
             {diagnostics.lastLaunchAction === 'continue' &&
             diagnostics.userFriendlySummary?.includes('No saved game')
               ? 'It looks like there is no saved game to continue. Try starting a new game instead.'
-              : 'The game encountered an issue while starting. The backend canister may be stopped, out of cycles, or experiencing network issues. Please try again later or return to the title screen.'}
+              : 'The game encountered an issue while starting. You can try playing in Offline Mode, where progress will be saved on this device.'}
           </p>
 
           <button

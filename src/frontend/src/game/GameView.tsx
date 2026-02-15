@@ -45,6 +45,7 @@ export default function GameView({ isNewGame, onBackToTitle, onMounted, onMountE
   const lastInitMode = useRef<boolean | null>(null);
 
   // Initialization effect - runs once per mount or when isNewGame changes meaningfully
+  // This relies solely on local Zustand state and does not trigger backend calls
   useEffect(() => {
     // Only initialize if we haven't initialized yet, or if the game mode changed
     if (!hasInitialized.current || lastInitMode.current !== isNewGame) {
