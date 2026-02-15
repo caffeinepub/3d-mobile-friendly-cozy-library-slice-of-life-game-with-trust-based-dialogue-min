@@ -1,87 +1,39 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-15T00:30:39.873Z",
+  "generatedAt": "2026-02-15T00:43:10.020Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 4,
-    "implemented": 4,
+    "total": 1,
+    "implemented": 1,
     "items": [
       {
-        "id": "REQ-41",
-        "summary": "Add a username-based admin access mechanism (local-only) that unlocks admin-only UI controls when the entered username exactly matches a single configured username.",
+        "id": "REQ-46",
+        "summary": "Add a developer-facing deployment troubleshooting guide that explains how to retry a failed network deployment and how to diagnose common deployment failures for this Internet Computer app (including canister stopped / out-of-cycles scenarios and how to verify canister status before re-deploying). All documentation text must be in English.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/config/adminGate.ts",
-          "frontend/src/state/useAdminGateStore.ts",
-          "frontend/src/ui/AdminAccessPanel.tsx",
-          "frontend/src/ui/TitleScreen.tsx"
+          "frontend/DEPLOYMENT_TROUBLESHOOTING.md",
+          "frontend/OPS_CANISTER_AVAILABILITY.md"
         ],
         "matchedFiles": [
-          "frontend/src/config/adminGate.ts",
-          "frontend/src/state/useAdminGateStore.ts",
-          "frontend/src/ui/AdminAccessPanel.tsx",
-          "frontend/src/ui/TitleScreen.tsx"
-        ]
-      },
-      {
-        "id": "REQ-42",
-        "summary": "Hide admin-only controls on the Title Screen unless admin mode is unlocked, including the Online/Offline server access toggle, server status indicator, and the button that opens the Diagnostic Terminal.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/ui/TitleScreen.tsx",
-          "frontend/src/App.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/ui/TitleScreen.tsx"
-        ]
-      },
-      {
-        "id": "REQ-43",
-        "summary": "Hide admin-only controls during gameplay unless admin mode is unlocked, including access to the Diagnostic Terminal from the Pause Menu, and prevent the keyboard shortcut from opening the terminal when not in admin mode.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/game/ui/PauseMenu.tsx",
-          "frontend/src/ui/DiagnosticTerminalOverlay.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/game/ui/PauseMenu.tsx",
-          "frontend/src/ui/DiagnosticTerminalOverlay.tsx"
-        ]
-      },
-      {
-        "id": "REQ-44",
-        "summary": "Provide an in-app way to lock/logout admin mode (clear the stored admin state) from the same place where the username is entered, with clear English feedback.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/state/useAdminGateStore.ts",
-          "frontend/src/ui/AdminAccessPanel.tsx",
-          "frontend/src/ui/TitleScreen.tsx",
-          "frontend/src/game/ui/PauseMenu.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/state/useAdminGateStore.ts",
-          "frontend/src/ui/AdminAccessPanel.tsx",
-          "frontend/src/ui/TitleScreen.tsx",
-          "frontend/src/game/ui/PauseMenu.tsx"
+          "frontend/DEPLOYMENT_TROUBLESHOOTING.md",
+          "frontend/OPS_CANISTER_AVAILABILITY.md"
         ]
       }
     ]
   },
   "changedFiles": [
+    "backend/main.mo",
+    "backend/migration.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/config/adminGate.ts",
-    "frontend/src/game/ui/PauseMenu.tsx",
-    "frontend/src/state/useAdminGateStore.ts",
-    "frontend/src/ui/AdminAccessPanel.tsx",
-    "frontend/src/ui/DiagnosticTerminalOverlay.tsx",
-    "frontend/src/ui/TitleScreen.tsx",
+    "frontend/DEPLOYMENT_TROUBLESHOOTING.md",
+    "frontend/OPS_CANISTER_AVAILABILITY.md",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

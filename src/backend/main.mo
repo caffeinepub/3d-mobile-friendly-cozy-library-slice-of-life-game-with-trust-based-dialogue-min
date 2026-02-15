@@ -6,7 +6,9 @@ import Blob "mo:core/Blob";
 import Runtime "mo:core/Runtime";
 import Time "mo:core/Time";
 import Principal "mo:core/Principal";
+import Migration "migration";
 
+(with migration = Migration.run)
 actor {
   public query ({ caller }) func isAvailable() : async Bool {
     true;

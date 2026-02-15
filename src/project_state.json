@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 21,
+  "projectStateVersion": 25,
   "summary": "3D mobile-friendly slice-of-life adventure/visual-novel hybrid set entirely in Puro’s library, focused on building friendship/trust through dialogue and cozy activities, featuring multiple endings including a low-friendship Betrayal ending with Special Edition variants.",
   "architectural_notes": [
     "Core gameplay loop centered on a hub-based, single-location library environment with repeatable daily activities and relationship progression.",
@@ -10,7 +10,8 @@
     "Backend availability requirement: keep the Internet Computer canister running/always-online (monitoring + auto-restart/ops process) to prevent launch flows (startNewGame/continueGame) from failing due to a stopped canister.",
     "Potential scope conflict: IC canisters generally cannot be started/stopped from within the app/canister itself; any server on/off control likely must be an ops/admin-only external action (or simulated locally) rather than a true canister lifecycle toggle.",
     "User reiterates requirement for an in-app switch to set the backend/server online/offline (true on/off control), which may conflict with IC canister lifecycle limitations.",
-    "User requests admin-only switches be restricted by a specific username (not by Internet Identity principal), implying some form of username capture/storage and a trust model for admin gating."
+    "User requests admin-only switches be restricted by a specific username (not by Internet Identity principal), implying some form of username capture/storage and a trust model for admin gating.",
+    "Admin-mode gating username updated: unlock admin-only controls only when entered username exactly matches \"hood\"."
   ],
   "known_issues": [
     "Art/style scope conflict: user requests a 3D game, but gameplay style mentions 2D pixel art aesthetics—needs final decision on visual style.",
@@ -18,9 +19,10 @@
     "New Game fails with IC0508 non_replicated_rejection: canister pmng3-byaaa-aaaag-awtia-cai is stopped (reject_code 5), resulting in Game Mounted: No.",
     "React runtime error: \"Maximum update depth exceeded\" indicating an infinite render/update loop (likely repeated setState in componentDidUpdate/componentWillUpdate or an effect without stable dependencies).",
     "Request conflict risk: user asked for an in-app server on/off switch, but existing requirement states the terminal must not claim to start/stop/restart the backend canister; needs clarification/decision (admin-only external control vs simulated toggle).",
-    "Admin gating approach conflict: earlier plan uses Internet Identity principal; user now requests username-based gating, which may be spoofable without strong authentication—needs a decision on security model."
+    "Admin gating approach conflict: earlier plan uses Internet Identity principal; user now requests username-based gating, which may be spoofable without strong authentication—needs a decision on security model.",
+    "Deployment to network failed (deployment error); user requested retry deployment."
   ],
-  "isFixRequest": false,
+  "isFixRequest": true,
   "existing_features": [
     {
       "id": "feature-create-a-single-location-3d-game-scene-set-entirely-in-a-dim-cozy-dusty-library-with-bookshelves-vents-and-a-central-fruit-bearing-bonsai-tree-that-the-player-can-explore",
@@ -363,6 +365,22 @@
       "title": "Provide an in-app way to lock/logout admin mode (clear the stored admin state) from the same place where the username is entered, with clear English feedback.",
       "reqIds": [
         "REQ-44"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-local-only-admin-username-gate-so-that-admin-mode-unlocks-only-when-the-entered-username-exactly-matches-hood-case-sensitive-replacing-the-current-configured-admin-username",
+      "title": "Update the local-only admin username gate so that admin mode unlocks only when the entered username exactly matches \"hood\" (case-sensitive), replacing the current configured admin username.",
+      "reqIds": [
+        "REQ-45"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-developer-facing-deployment-troubleshooting-guide-that-explains-how-to-retry-a-failed-network-deployment-and-how-to-diagnose-common-deployment-failures-for-this-internet-computer-app-including-canister-stopped-out-of-cycles-scenarios-and-how-to-verify-canister-status-before-re-deploying-all-documentation-text-must-be-in-english",
+      "title": "Add a developer-facing deployment troubleshooting guide that explains how to retry a failed network deployment and how to diagnose common deployment failures for this Internet Computer app (including canister stopped / out-of-cycles scenarios and how to verify canister status before re-deploying). All documentation text must be in English.",
+      "reqIds": [
+        "REQ-46"
       ],
       "version": 1
     }

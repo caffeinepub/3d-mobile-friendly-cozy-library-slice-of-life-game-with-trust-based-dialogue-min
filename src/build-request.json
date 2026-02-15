@@ -1,95 +1,49 @@
 {
   "kind": "build_request",
-  "title": "Gate admin-only switches behind a specific username",
+  "title": "Add deployment retry & troubleshooting guidance for failed network deploys",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-41",
-      "text": "Add a username-based admin access mechanism (local-only) that unlocks admin-only UI controls when the entered username exactly matches a single configured username.",
-      "target": "frontend",
+      "id": "REQ-46",
+      "text": "Add a developer-facing deployment troubleshooting guide that explains how to retry a failed network deployment and how to diagnose common deployment failures for this Internet Computer app (including canister stopped / out-of-cycles scenarios and how to verify canister status before re-deploying). All documentation text must be in English.",
+      "target": "both",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-3"
         ],
         "quotes": [
-          "Just make it a spicific username"
+          "Retry deployment"
         ]
       },
       "acceptanceCriteria": [
-        "There is a single configured admin username value (e.g., in a small frontend config module) that can be changed by developers without editing multiple files.",
-        "A user can enter a username in the app and attempt to unlock admin mode.",
-        "Admin mode is granted only when the entered username exactly matches the configured admin username (case-sensitive unless explicitly documented otherwise).",
-        "Admin mode state persists across page reloads (e.g., via local storage).",
-        "The UI includes clear English text indicating this is a local-only gate (not secure authentication)."
-      ]
-    },
-    {
-      "id": "REQ-42",
-      "text": "Hide admin-only controls on the Title Screen unless admin mode is unlocked, including the Online/Offline server access toggle, server status indicator, and the button that opens the Diagnostic Terminal.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "Just make it a spicific username"
-        ]
-      },
-      "acceptanceCriteria": [
-        "When not in admin mode, the Title Screen does not render the server access toggle UI, the ServerStatusIndicator, or the 'Diagnostic Terminal' button.",
-        "When in admin mode, the Title Screen renders the existing server access toggle UI and ServerStatusIndicator with their current behavior.",
-        "When not in admin mode, New Game and Continue still function using the existing server access behavior (server access remains enabled/disabled based on its persisted value), but the user cannot change that value via hidden UI."
-      ]
-    },
-    {
-      "id": "REQ-43",
-      "text": "Hide admin-only controls during gameplay unless admin mode is unlocked, including access to the Diagnostic Terminal from the Pause Menu, and prevent the keyboard shortcut from opening the terminal when not in admin mode.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "Just make it a spicific username"
-        ]
-      },
-      "acceptanceCriteria": [
-        "When not in admin mode, the Pause Menu does not render the 'Diagnostic Terminal' button.",
-        "When not in admin mode, the Ctrl+` / Cmd+` keyboard shortcut does not open the Diagnostic Terminal overlay.",
-        "When in admin mode, the Pause Menu and keyboard shortcut behave as they do today."
-      ]
-    },
-    {
-      "id": "REQ-44",
-      "text": "Provide an in-app way to lock/logout admin mode (clear the stored admin state) from the same place where the username is entered, with clear English feedback.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "Just make it a spicific username"
-        ]
-      },
-      "acceptanceCriteria": [
-        "The admin access UI provides a 'Lock Admin Mode' / 'Log out' action that removes admin access immediately.",
-        "After locking admin mode, the admin-only controls are hidden again on both Title Screen and Pause Menu.",
-        "All user-facing messages are in English and confirm whether admin mode is locked or unlocked."
+        "A new markdown document exists in the repo that provides step-by-step instructions to retry deployment after a failure.",
+        "The guide includes a section listing common failure modes (build failure, identity/auth issues, canister stopped, out of cycles) and what to check next.",
+        "The guide references the existing canister availability operations guidance (frontend/OPS_CANISTER_AVAILABILITY.md) rather than duplicating it verbatim.",
+        "All user-facing/documentation text added is in English."
       ]
     }
   ],
   "constraints": [
-    "Do not use Gmail/Google account data for gating (not available to the app).",
-    "Do not modify any files under frontend/src/components/ui (Shadcn components are read-only).",
-    "Keep all changes within the existing single-frontend app architecture; do not add new backend services."
+    "Do not edit files under frontend/src/components/ui (read-only).",
+    "Do not edit frontend immutable hook/entry files: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx.",
+    "Backend must remain a single Motoko actor in backend/main.mo; only add backend/migration.mo if a state upgrade is required."
   ],
   "nonGoals": [
-    "This username gate is not secure authentication and does not need to prevent a determined user from spoofing admin access.",
-    "Do not implement third-party login providers beyond Internet Identity.",
-    "Do not add backend-enforced admin authorization (no principal allowlist, no canister-side role checks) as part of this change unless explicitly requested later."
+    "Do not add any in-app UI that claims to redeploy, start/stop, or restart the backend canister from the frontend.",
+    "Do not introduce any third-party deployment services or external CI/CD providers."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
   }
 }

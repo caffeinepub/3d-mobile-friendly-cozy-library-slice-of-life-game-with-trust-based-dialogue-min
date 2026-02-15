@@ -1,111 +1,27 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Username-gated local admin mode for diagnostic/server controls",
+  "title": "Deployment retry & troubleshooting documentation for failed network deploys",
   "requirements": [
     {
-      "id": "REQ-41",
-      "summary": "Add a local-only, username-based admin mode with persisted unlock state and clear user messaging.",
+      "id": "REQ-46",
+      "summary": "Add an English deployment troubleshooting guide covering retrying failed IC network deploys and diagnosing common failures, referencing the existing canister availability ops guide.",
       "acceptanceCriteria": [
-        "There is a single configured admin username value (e.g., in a small frontend config module) that can be changed by developers without editing multiple files.",
-        "A user can enter a username in the app and attempt to unlock admin mode.",
-        "Admin mode is granted only when the entered username exactly matches the configured admin username (case-sensitive unless explicitly documented otherwise).",
-        "Admin mode state persists across page reloads (e.g., via local storage).",
-        "The UI includes clear English text indicating this is a local-only gate (not secure authentication)."
+        "A new markdown document exists in the repo that provides step-by-step instructions to retry deployment after a failure.",
+        "The guide includes a section listing common failure modes (build failure, identity/auth issues, canister stopped, out of cycles) and what to check next.",
+        "The guide references the existing canister availability operations guidance (frontend/OPS_CANISTER_AVAILABILITY.md) rather than duplicating it verbatim.",
+        "All user-facing/documentation text added is in English."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/config/adminGate.ts",
+          "path": "frontend/DEPLOYMENT_TROUBLESHOOTING.md",
           "operation": "create",
-          "description": "Create a small frontend config module exporting a single configured admin username constant and related localStorage key(s) so developers can change the admin username in one place."
+          "description": "Create a developer-facing English markdown guide describing how to retry a failed network deployment (including verifying canister status before redeploying) and how to diagnose common deployment failures (build failure, identity/auth issues, canister stopped, out-of-cycles). Include explicit references/links to frontend/OPS_CANISTER_AVAILABILITY.md for canister availability operations rather than duplicating that guidance."
         },
         {
-          "path": "frontend/src/state/useAdminGateStore.ts",
-          "operation": "create",
-          "description": "Create a persisted Zustand store for admin mode state (locked/unlocked), actions to attempt unlock via exact username match against the configured value, and an action to lock/clear admin mode (local-only)."
-        },
-        {
-          "path": "frontend/src/ui/AdminAccessPanel.tsx",
-          "operation": "create",
-          "description": "Add an Admin Access UI panel that lets the user enter a username and attempt to unlock admin mode, shows clear English feedback (locked/unlocked), and explicitly states this is a local-only gate (not secure authentication). Use shadcn-ui primitives already in the app (e.g., Input/Button/Card/Alert) without modifying frontend/src/components/ui. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/ui/TitleScreen.tsx",
+          "path": "frontend/OPS_CANISTER_AVAILABILITY.md",
           "operation": "modify",
-          "description": "Wire the new AdminAccessPanel into the Title Screen (same screen where admin-only controls exist) so users can enter a username and unlock admin mode, and so the panel can reflect persisted admin state on reload. Use existing shadcn-ui components; do not modify frontend/src/components/ui. Verify the component's usage instructions before implementing."
-        }
-      ]
-    },
-    {
-      "id": "REQ-42",
-      "summary": "Hide Title Screen admin-only controls unless admin mode is unlocked while preserving existing persisted server access behavior for New Game/Continue.",
-      "acceptanceCriteria": [
-        "When not in admin mode, the Title Screen does not render the server access toggle UI, the ServerStatusIndicator, or the 'Diagnostic Terminal' button.",
-        "When in admin mode, the Title Screen renders the existing server access toggle UI and ServerStatusIndicator with their current behavior.",
-        "When not in admin mode, New Game and Continue still function using the existing server access behavior (server access remains enabled/disabled based on its persisted value), but the user cannot change that value via hidden UI."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/ui/TitleScreen.tsx",
-          "operation": "modify",
-          "description": "Conditionally render the server access toggle UI, the ServerStatusIndicator, and the 'Diagnostic Terminal' button only when admin mode is unlocked (from the new admin gate store). Ensure New Game/Continue keep using the existing persisted server access flag even when the toggle/status UI is hidden."
-        },
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Ensure Title Screen behavior continues to rely on the persisted server access setting for launch flows while the ability to change/inspect server access on the Title Screen is gated behind admin mode (no changes to backend interaction; only gate the UI controls)."
-        }
-      ]
-    },
-    {
-      "id": "REQ-43",
-      "summary": "Hide in-game admin-only terminal access unless admin mode is unlocked and disable the global keyboard shortcut when not in admin mode.",
-      "acceptanceCriteria": [
-        "When not in admin mode, the Pause Menu does not render the 'Diagnostic Terminal' button.",
-        "When not in admin mode, the Ctrl+` / Cmd+` keyboard shortcut does not open the Diagnostic Terminal overlay.",
-        "When in admin mode, the Pause Menu and keyboard shortcut behave as they do today."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/game/ui/PauseMenu.tsx",
-          "operation": "modify",
-          "description": "Gate rendering of the Pause Menu 'Diagnostic Terminal' button behind the admin mode state from the admin gate store; when not admin, do not render the button."
-        },
-        {
-          "path": "frontend/src/ui/DiagnosticTerminalOverlay.tsx",
-          "operation": "modify",
-          "description": "Update the Ctrl+` / Cmd+` keyboard shortcut handler so it only opens/toggles the terminal when admin mode is unlocked; when not in admin mode, prevent opening the overlay via the shortcut (closing via Escape should still work if already open)."
-        }
-      ]
-    },
-    {
-      "id": "REQ-44",
-      "summary": "Add an in-app action to lock/logout admin mode from the same place as username entry with clear English feedback and immediate UI effect.",
-      "acceptanceCriteria": [
-        "The admin access UI provides a 'Lock Admin Mode' / 'Log out' action that removes admin access immediately.",
-        "After locking admin mode, the admin-only controls are hidden again on both Title Screen and Pause Menu.",
-        "All user-facing messages are in English and confirm whether admin mode is locked or unlocked."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/state/useAdminGateStore.ts",
-          "operation": "modify",
-          "description": "Add/confirm a lock/logout action that clears the persisted admin state immediately (and any related persisted values as intended), so UI gating updates instantly across the app."
-        },
-        {
-          "path": "frontend/src/ui/AdminAccessPanel.tsx",
-          "operation": "modify",
-          "description": "Add a clearly labeled 'Lock Admin Mode' / 'Log out' control within the same admin access panel as username entry, with immediate English feedback indicating the new locked/unlocked state. Use existing shadcn-ui primitives without modifying frontend/src/components/ui. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/ui/TitleScreen.tsx",
-          "operation": "modify",
-          "description": "Ensure that locking admin mode from the AdminAccessPanel immediately hides Title Screen admin-only controls (server toggle/status/terminal button) and that the panel’s messaging reflects the updated state."
-        },
-        {
-          "path": "frontend/src/game/ui/PauseMenu.tsx",
-          "operation": "modify",
-          "description": "Ensure Pause Menu immediately reflects locked admin mode by hiding the Diagnostic Terminal button after logout/lock (reactive to the persisted admin gate store state)."
+          "description": "Add a short English cross-reference pointing developers to frontend/DEPLOYMENT_TROUBLESHOOTING.md for deployment retry and broader failure-diagnosis steps, without duplicating troubleshooting content already covered in this ops guide."
         }
       ]
     }
