@@ -1,63 +1,75 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Fix infinite React update loop on gameplay mount by guarding initialization and stabilizing effect dependencies",
+  "title": "Local server access toggle (persisted) with Title Screen + Diagnostic Terminal integration",
   "requirements": [
     {
-      "id": "REQ-28",
-      "summary": "Eliminate the gameplay-mount \"Maximum update depth exceeded\" error by removing render/update loops caused by repeated initialization state updates.",
+      "id": "REQ-36",
+      "summary": "Add a persisted local in-app toggle that gates all backend-canister calls and disables backend availability polling when OFF.",
       "acceptanceCriteria": [
-        "Starting a New Game transitions from the Title screen to gameplay without throwing \"Maximum update depth exceeded\" in the browser console.",
-        "Continuing a game transitions from the Title screen to gameplay without throwing \"Maximum update depth exceeded\" in the browser console.",
-        "Gameplay remains interactive (HUD renders, mobile controls overlay renders) after mount."
+        "A user can toggle a clearly labeled on/off control to enable or disable backend server access.",
+        "The toggle state persists across reloads (e.g., via local storage or an existing persisted store pattern).",
+        "When server access is OFF, the app does not perform backend availability polling (useBackendAvailability) and does not attempt backend calls for New Game / Continue.",
+        "All user-facing text describing this toggle is in English and does not claim it starts/stops the Internet Computer canister itself."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/game/GameView.tsx",
-          "operation": "modify",
-          "description": "Refactor gameplay mount logic to avoid any effect-triggered re-render loop: ensure game initialization and audio start are not invoked in a way that continuously updates state, and reduce unnecessary re-renders from broad Zustand subscriptions."
+          "path": "frontend/src/state/useServerAccessStore.ts",
+          "operation": "create",
+          "description": "Create a small Zustand persisted store (using the existing persisted-store pattern in the app) that holds a boolean like `serverAccessEnabled` (default ON) and exposes actions to enable/disable/toggle it; persist via local storage so the preference survives reloads."
         },
         {
-          "path": "frontend/src/game/audio/useAudio.ts",
+          "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Stabilize the audio manager API (especially background music start) to prevent identity-driven effect re-runs that can cascade into repeated state updates."
+          "description": "Wire the persisted server-access state into the app’s backend interaction flow: (1) disable backend availability polling by passing `enabled: false` into useBackendAvailability when server access is OFF, and (2) add local guards in `handleNewGame` / `handleContinue` to prevent attempting any backend calls when server access is OFF (use only local messaging and avoid any wording implying the canister is being started/stopped)."
         }
       ]
     },
     {
-      "id": "REQ-29",
-      "summary": "Make `GameView` initialization resilient to re-renders and React Strict Mode by guarding `initializeGame(isNewGame)` so it only runs when appropriate.",
+      "id": "REQ-37",
+      "summary": "Expose the server access toggle on the Title Screen and reflect the local disabled state by disabling New Game/Continue and showing a clear English explanation instead of server-offline polling UI.",
       "acceptanceCriteria": [
-        "`initializeGame(true)` does not repeatedly reset the Zustand store in a way that causes a re-render loop.",
-        "Toggling unrelated UI state (e.g., opening/closing pause menu) does not cause game re-initialization.",
-        "No infinite loop occurs even if React Strict Mode causes effects to run more than once in development."
+        "Title Screen shows a visible status when server access is OFF (e.g., “Server access is disabled in this app”).",
+        "New Game and Continue buttons are disabled when server access is OFF, regardless of backend health.",
+        "If server access is OFF, the existing “Server Offline” alert UI is not shown as a result of polling (because polling is disabled); instead, the UI communicates the local disabled state.",
+        "No changes are required to immutable paths under frontend/src/hooks/useInternetIdentity.ts(x), frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/game/GameView.tsx",
+          "path": "frontend/src/ui/TitleScreen.tsx",
           "operation": "modify",
-          "description": "Add an explicit initialization guard (e.g., ref-based \"has initialized\" / \"last initialized mode\") so `initializeGame(isNewGame)` only runs once per mount and/or only when `isNewGame` meaningfully changes; also ensure the initialization effect is not coupled to unrelated UI state changes."
+          "description": "Integrate a clearly labeled local 'Server access' ON/OFF control directly into the Title Screen UI; use existing shadcn-ui primitives already used here (e.g., Card/Alert/Button) for consistent styling (Verify the component's usage instructions before implementing). When OFF: show a visible English explanation that backend calls are disabled locally, disable New Game and Continue regardless of backend health, and suppress the existing 'Server Offline' alert behavior (treat local OFF as a distinct state)."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Pass the server-access state into TitleScreen so it can render the local status/explanation and enforce button disabling independent of backend availability (ensure any backend availability state is not used to drive 'Server Offline' UI when server access is OFF)."
         }
       ]
     },
     {
-      "id": "REQ-30",
-      "summary": "Stabilize gameplay-mount effect dependencies (e.g., audio functions) to prevent initialization re-running due to unstable function identities.",
+      "id": "REQ-38",
+      "summary": "Add diagnostic terminal commands to turn local server access ON/OFF, update help text, and make 'server status' reflect that checks are disabled when server access is OFF.",
       "acceptanceCriteria": [
-        "`GameView` does not re-run its initialization effect solely because a function dependency identity changes between renders.",
-        "Background music playback attempt still occurs on gameplay start, but does not contribute to any repeated state updates or render loops.",
-        "No new user-facing error text is introduced as part of this fix (keep user-facing text in English if any is added)."
+        "Terminal supports commands to set server access ON and OFF (exact command names are up to implementation but must be documented in the terminal 'help' output).",
+        "Terminal output clearly states this is a local app toggle and does not start/stop/restart the canister.",
+        "When server access is OFF, 'server status' (availability check) returns a clear English message indicating checks are disabled because server access is OFF."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/game/audio/useAudio.ts",
+          "path": "frontend/src/ui/terminal/commands.ts",
           "operation": "modify",
-          "description": "Memoize `playBackgroundMusic` (and any other callable functions returned by `useAudioManager`) so their identity remains stable across renders unless behavior must change."
+          "description": "Extend the command parser to support new commands that set the local server-access toggle ON/OFF (document the exact command names in the terminal help output). Update 'server status' so that when local server access is OFF it prints a clear English message that availability checks are disabled due to the local toggle, and it must not claim to start/stop/restart the canister."
         },
         {
-          "path": "frontend/src/game/GameView.tsx",
+          "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Adjust `GameView` effects so function dependencies (e.g., `playBackgroundMusic`) cannot cause repeated initialization; if needed, separate concerns into multiple effects (initialization vs. audio start) and/or use refs to call the latest callbacks without making them effect dependencies."
+          "description": "Update the `checkServerStatus` function passed into the DiagnosticTerminalOverlay to respect the local server-access toggle (when OFF, return a disabled/checks-not-performed result so commands can report accurately without calling the backend)."
+        },
+        {
+          "path": "frontend/src/ui/DiagnosticTerminalOverlay.tsx",
+          "operation": "modify",
+          "description": "Ensure the terminal overlay’s command execution context includes everything needed for the new server-access commands (if required by the chosen implementation approach), without adding any authentication flow."
         }
       ]
     }

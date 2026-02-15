@@ -1,72 +1,74 @@
 {
   "kind": "build_request",
-  "title": "Fix React 'Maximum update depth exceeded' infinite update loop during gameplay mount",
-  "priority": "high",
+  "title": "Add a UI switch to enable/disable backend server access (local toggle)",
+  "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-28",
-      "text": "Eliminate the React runtime error \"Maximum update depth exceeded\" that occurs during gameplay initialization by fixing any render/update loops triggered by state updates inside effects or lifecycle-equivalent logic (e.g., repeated store resets, unstable effect dependencies).",
+      "id": "REQ-36",
+      "text": "Add an in-app on/off switch that toggles whether the app is allowed to call the backend canister (local “server access” toggle), and persist this preference across page reloads.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-6"
+          "msg-4"
         ],
         "quotes": [
-          "Error is... Maximum update depth exceeded. This can happen when a component repeatedly calls setState inside componentWillUpdate or componentDidUpdate. React limits the number of nested updates to prevent infinite loops."
+          "Make a switch to turn the server on/off"
         ]
       },
       "acceptanceCriteria": [
-        "Starting a New Game transitions from the Title screen to gameplay without throwing \"Maximum update depth exceeded\" in the browser console.",
-        "Continuing a game transitions from the Title screen to gameplay without throwing \"Maximum update depth exceeded\" in the browser console.",
-        "Gameplay remains interactive (HUD renders, mobile controls overlay renders) after mount."
+        "A user can toggle a clearly labeled on/off control to enable or disable backend server access.",
+        "The toggle state persists across reloads (e.g., via local storage or an existing persisted store pattern).",
+        "When server access is OFF, the app does not perform backend availability polling (useBackendAvailability) and does not attempt backend calls for New Game / Continue.",
+        "All user-facing text describing this toggle is in English and does not claim it starts/stops the Internet Computer canister itself."
       ]
     },
     {
-      "id": "REQ-29",
-      "text": "Make gameplay initialization in `frontend/src/game/GameView.tsx` resilient to React re-renders and Strict Mode double-invocation by ensuring `initializeGame(isNewGame)` is not repeatedly invoked in a way that causes continuous state updates. Add a guard so initialization runs only when appropriate (e.g., once per mount and/or only when `isNewGame` changes meaningfully).",
+      "id": "REQ-37",
+      "text": "Integrate the server access toggle into the Title Screen so that when server access is disabled, New Game and Continue are disabled and the user is shown a clear English explanation that backend calls are disabled locally.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-6"
+          "msg-4"
         ],
         "quotes": [
-          "Maximum update depth exceeded. This can happen when a component repeatedly calls setState..."
+          "Make a switch to turn the server on/off"
         ]
       },
       "acceptanceCriteria": [
-        "`initializeGame(true)` does not repeatedly reset the Zustand store in a way that causes a re-render loop.",
-        "Toggling unrelated UI state (e.g., opening/closing pause menu) does not cause game re-initialization.",
-        "No infinite loop occurs even if React Strict Mode causes effects to run more than once in development."
+        "Title Screen shows a visible status when server access is OFF (e.g., “Server access is disabled in this app”).",
+        "New Game and Continue buttons are disabled when server access is OFF, regardless of backend health.",
+        "If server access is OFF, the existing “Server Offline” alert UI is not shown as a result of polling (because polling is disabled); instead, the UI communicates the local disabled state.",
+        "No changes are required to immutable paths under frontend/src/hooks/useInternetIdentity.ts(x), frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui."
       ]
     },
     {
-      "id": "REQ-30",
-      "text": "Stabilize effect dependencies involved in gameplay mount to prevent re-running initialization due to unstable function identities (e.g., `playBackgroundMusic` from `frontend/src/game/audio/useAudio.ts`). Ensure any functions used in `GameView` effects are memoized or invoked from effects that cannot repeatedly trigger store updates.",
+      "id": "REQ-38",
+      "text": "Extend the Diagnostic Terminal command set to support toggling the local server access switch (diagnostic-only), and update terminal help text accordingly.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-6"
+          "msg-4"
         ],
         "quotes": [
-          "Maximum update depth exceeded... repeatedly calls setState..."
+          "Make a switch to turn the server on/off"
         ]
       },
       "acceptanceCriteria": [
-        "`GameView` does not re-run its initialization effect solely because a function dependency identity changes between renders.",
-        "Background music playback attempt still occurs on gameplay start, but does not contribute to any repeated state updates or render loops.",
-        "No new user-facing error text is introduced as part of this fix (keep user-facing text in English if any is added)."
+        "Terminal supports commands to set server access ON and OFF (exact command names are up to implementation but must be documented in the terminal 'help' output).",
+        "Terminal output clearly states this is a local app toggle and does not start/stop/restart the canister.",
+        "When server access is OFF, 'server status' (availability check) returns a clear English message indicating checks are disabled because server access is OFF."
       ]
     }
   ],
   "constraints": [
-    "Do not edit any files under `frontend/src/components/ui` (read-only UI component sources).",
-    "Do not edit immutable hook files: `frontend/src/hooks/useInternetIdentity.ts`, `frontend/src/hooks/useInternetIdentity.tsx`, `frontend/src/hooks/useActor.ts`, `frontend/src/main.tsx`.",
-    "Keep the existing single-page app navigation flow in `frontend/src/App.tsx` (Title → Game → error screens) intact while fixing the update loop."
+    "Do not implement any functionality that claims to start/stop/restart the backend canister from within the app; the toggle must be a local control over whether the frontend makes backend calls.",
+    "Respect the single-actor backend architecture; no backend changes are required for this request.",
+    "Do not edit frontend immutable paths: frontend/src/hooks/useInternetIdentity.ts(x), frontend/src/hooks/useActor.ts, frontend/src/main.tsx, and anything under frontend/src/components/ui."
   ],
   "nonGoals": [
-    "Adding new gameplay features, content, or UI redesign unrelated to fixing the update-depth error.",
-    "Changing backend Motoko APIs or save schema for this issue.",
-    "Implementing new third-party monitoring/logging services."
+    "Adding real operational canister start/stop/restart controls (these require controller access and are out of scope).",
+    "Adding third-party admin auth or privileged control panels.",
+    "Changing backend availability semantics; backend/main.mo isAvailable remains a simple health check."
   ],
   "imageRequirements": {
     "required": [],

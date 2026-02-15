@@ -1,8 +1,12 @@
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { BookOpen, Settings, Info, Loader2, AlertCircle, RefreshCw } from 'lucide-react';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { BookOpen, Settings, Info, Loader2, AlertCircle, RefreshCw, Terminal, Power } from 'lucide-react';
 import type { BackendAvailabilityState } from '../hooks/useBackendAvailability';
+import { useTerminalStore } from './terminal/useTerminalStore';
+import { useServerAccessStore } from '../state/useServerAccessStore';
 
 interface TitleScreenProps {
   onNewGame: () => void;
@@ -12,6 +16,7 @@ interface TitleScreenProps {
   isLaunching?: boolean;
   continueDisabled?: boolean;
   backendAvailability?: BackendAvailabilityState;
+  serverAccessEnabled: boolean;
 }
 
 export default function TitleScreen({
@@ -22,9 +27,14 @@ export default function TitleScreen({
   isLaunching = false,
   continueDisabled = false,
   backendAvailability,
+  serverAccessEnabled,
 }: TitleScreenProps) {
-  const isServerOffline = backendAvailability && !backendAvailability.isHealthy && !backendAvailability.isChecking;
-  const isCheckingServer = backendAvailability?.isChecking;
+  const { open: openTerminal } = useTerminalStore();
+  const { toggleServerAccess } = useServerAccessStore();
+  
+  // Only show server offline if server access is enabled
+  const isServerOffline = serverAccessEnabled && backendAvailability && !backendAvailability.isHealthy && !backendAvailability.isChecking;
+  const isCheckingServer = serverAccessEnabled && backendAvailability?.isChecking;
 
   return (
     <div
@@ -45,6 +55,34 @@ export default function TitleScreen({
             className="w-full max-w-sm"
           />
 
+          {/* Server Access Toggle */}
+          <div className="w-full flex items-center justify-between p-3 rounded-lg border bg-muted/50">
+            <div className="flex items-center gap-2">
+              <Power className="h-4 w-4 text-muted-foreground" />
+              <Label htmlFor="server-access" className="cursor-pointer text-sm font-medium">
+                Server Access
+              </Label>
+            </div>
+            <Switch
+              id="server-access"
+              checked={serverAccessEnabled}
+              onCheckedChange={toggleServerAccess}
+              disabled={isLaunching}
+            />
+          </div>
+
+          {/* Server Access Disabled Alert */}
+          {!serverAccessEnabled && (
+            <Alert className="w-full">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Server Access Disabled</AlertTitle>
+              <AlertDescription>
+                Backend server calls are disabled in this app. Enable server access above to start or continue a game.
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {/* Server Offline Alert - only shown when server access is enabled */}
           {isServerOffline && (
             <Alert variant="destructive" className="w-full">
               <AlertCircle className="h-4 w-4" />
@@ -64,6 +102,7 @@ export default function TitleScreen({
             </Alert>
           )}
 
+          {/* Server Checking Status - only shown when server access is enabled */}
           {isCheckingServer && (
             <div className="w-full text-center text-sm text-muted-foreground flex items-center justify-center gap-2">
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -76,7 +115,7 @@ export default function TitleScreen({
               onClick={onNewGame}
               size="lg"
               className="w-full text-lg"
-              disabled={isLaunching || isServerOffline || isCheckingServer}
+              disabled={isLaunching || !serverAccessEnabled || isServerOffline || isCheckingServer}
             >
               {isLaunching ? (
                 <>
@@ -96,7 +135,7 @@ export default function TitleScreen({
               variant="secondary"
               size="lg"
               className="w-full text-lg"
-              disabled={isLaunching || continueDisabled || isServerOffline || isCheckingServer}
+              disabled={isLaunching || continueDisabled || !serverAccessEnabled || isServerOffline || isCheckingServer}
             >
               {isLaunching ? (
                 <>
@@ -131,6 +170,17 @@ export default function TitleScreen({
                 Credits
               </Button>
             </div>
+
+            <Button
+              onClick={openTerminal}
+              variant="outline"
+              size="sm"
+              className="w-full mt-2"
+              disabled={isLaunching}
+            >
+              <Terminal className="mr-2 h-4 w-4" />
+              Diagnostic Terminal
+            </Button>
           </div>
         </div>
       </Card>

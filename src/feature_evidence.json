@@ -2,11 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-eliminate-the-react-runtime-error-maximum-update-depth-exceeded-that-occurs-during-gameplay-initialization-by-fixing-any-render-update-loops-triggered-by-state-updates-inside-effects-or-lifecycle-equivalent-logic-e-g-repeated-store-resets-unstable-effect-dependencies",
-      "featureTitle": "Eliminate the React runtime error \"Maximum update depth exceeded\" that occurs during gameplay initialization by fixing any render/update loops triggered by state updates inside effects or lifecycle-equivalent logic (e.g., repeated store resets, unstable effect dependencies).",
+      "featureId": "feature-add-an-in-app-on-off-switch-that-toggles-whether-the-app-is-allowed-to-call-the-backend-canister-local-server-access-toggle-and-persist-this-preference-across-page-reloads",
+      "featureTitle": "Add an in-app on/off switch that toggles whether the app is allowed to call the backend canister (local “server access” toggle), and persist this preference across page reloads.",
       "files": [
-        "frontend/src/game/GameView.tsx",
-        "frontend/src/game/audio/useAudio.ts"
+        "frontend/src/App.tsx",
+        "frontend/src/state/useServerAccessStore.ts"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -16,15 +16,16 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-28"
+        "REQ-36"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-make-gameplay-initialization-in-frontend-src-game-gameview-tsx-resilient-to-react-re-renders-and-strict-mode-double-invocation-by-ensuring-initializegame-isnewgame-is-not-repeatedly-invoked-in-a-way-that-causes-continuous-state-updates-add-a-guard-so-initialization-runs-only-when-appropriate-e-g-once-per-mount-and-or-only-when-isnewgame-changes-meaningfully",
-      "featureTitle": "Make gameplay initialization in `frontend/src/game/GameView.tsx` resilient to React re-renders and Strict Mode double-invocation by ensuring `initializeGame(isNewGame)` is not repeatedly invoked in a way that causes continuous state updates. Add a guard so initialization runs only when appropriate (e.g., once per mount and/or only when `isNewGame` changes meaningfully).",
+      "featureId": "feature-integrate-the-server-access-toggle-into-the-title-screen-so-that-when-server-access-is-disabled-new-game-and-continue-are-disabled-and-the-user-is-shown-a-clear-english-explanation-that-backend-calls-are-disabled-locally",
+      "featureTitle": "Integrate the server access toggle into the Title Screen so that when server access is disabled, New Game and Continue are disabled and the user is shown a clear English explanation that backend calls are disabled locally.",
       "files": [
-        "frontend/src/game/GameView.tsx"
+        "frontend/src/App.tsx",
+        "frontend/src/ui/TitleScreen.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -34,16 +35,17 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-29"
+        "REQ-37"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-stabilize-effect-dependencies-involved-in-gameplay-mount-to-prevent-re-running-initialization-due-to-unstable-function-identities-e-g-playbackgroundmusic-from-frontend-src-game-audio-useaudio-ts-ensure-any-functions-used-in-gameview-effects-are-memoized-or-invoked-from-effects-that-cannot-repeatedly-trigger-store-updates",
-      "featureTitle": "Stabilize effect dependencies involved in gameplay mount to prevent re-running initialization due to unstable function identities (e.g., `playBackgroundMusic` from `frontend/src/game/audio/useAudio.ts`). Ensure any functions used in `GameView` effects are memoized or invoked from effects that cannot repeatedly trigger store updates.",
+      "featureId": "feature-extend-the-diagnostic-terminal-command-set-to-support-toggling-the-local-server-access-switch-diagnostic-only-and-update-terminal-help-text-accordingly",
+      "featureTitle": "Extend the Diagnostic Terminal command set to support toggling the local server access switch (diagnostic-only), and update terminal help text accordingly.",
       "files": [
-        "frontend/src/game/GameView.tsx",
-        "frontend/src/game/audio/useAudio.ts"
+        "frontend/src/App.tsx",
+        "frontend/src/ui/DiagnosticTerminalOverlay.tsx",
+        "frontend/src/ui/terminal/commands.ts"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -53,7 +55,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-30"
+        "REQ-38"
       ],
       "confidence": "high"
     }

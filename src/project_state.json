@@ -1,21 +1,23 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 13,
+  "projectStateVersion": 17,
   "summary": "3D mobile-friendly slice-of-life adventure/visual-novel hybrid set entirely in Puro’s library, focused on building friendship/trust through dialogue and cozy activities, featuring multiple endings including a low-friendship Betrayal ending with Special Edition variants.",
   "architectural_notes": [
     "Core gameplay loop centered on a hub-based, single-location library environment with repeatable daily activities and relationship progression.",
     "Ending selection logic driven primarily by Trust/Friendship thresholds (including Special Edition sub-variants for very low vs slightly low friendship).",
     "Project should include a clear startup/entrypoint file (e.g., main executable scene/script) used by build/deployment to launch the game.",
     "Startup/New Game depends on an Internet Computer canister method call (startNewGame); app should handle canister availability (stopped) with preflight/health checks and user-facing recovery messaging.",
-    "Backend availability requirement: keep the Internet Computer canister running/always-online (monitoring + auto-restart/ops process) to prevent launch flows (startNewGame/continueGame) from failing due to a stopped canister."
+    "Backend availability requirement: keep the Internet Computer canister running/always-online (monitoring + auto-restart/ops process) to prevent launch flows (startNewGame/continueGame) from failing due to a stopped canister.",
+    "Potential scope conflict: IC canisters generally cannot be started/stopped from within the app/canister itself; any server on/off control likely must be an ops/admin-only external action (or simulated locally) rather than a true canister lifecycle toggle."
   ],
   "known_issues": [
     "Art/style scope conflict: user requests a 3D game, but gameplay style mentions 2D pixel art aesthetics—needs final decision on visual style.",
     "App/game fails to start when clicking the startup/entrypoint (startup launch issue reported by user).",
     "New Game fails with IC0508 non_replicated_rejection: canister pmng3-byaaa-aaaag-awtia-cai is stopped (reject_code 5), resulting in Game Mounted: No.",
-    "React runtime error: \"Maximum update depth exceeded\" indicating an infinite render/update loop (likely repeated setState in componentDidUpdate/componentWillUpdate or an effect without stable dependencies)."
+    "React runtime error: \"Maximum update depth exceeded\" indicating an infinite render/update loop (likely repeated setState in componentDidUpdate/componentWillUpdate or an effect without stable dependencies).",
+    "Request conflict risk: user asked for an in-app server on/off switch, but existing requirement states the terminal must not claim to start/stop/restart the backend canister; needs clarification/decision (admin-only external control vs simulated toggle)."
   ],
-  "isFixRequest": true,
+  "isFixRequest": false,
   "existing_features": [
     {
       "id": "feature-create-a-single-location-3d-game-scene-set-entirely-in-a-dim-cozy-dusty-library-with-bookshelves-vents-and-a-central-fruit-bearing-bonsai-tree-that-the-player-can-explore",
@@ -248,6 +250,70 @@
         "REQ-30"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-add-an-in-app-terminal-ui-that-can-be-opened-from-both-the-title-screen-flow-and-during-gameplay-showing-a-scrollable-output-area-and-a-command-input-field-english-ui-text-only",
+      "title": "Add an in-app terminal UI that can be opened from both the Title Screen flow and during gameplay, showing a scrollable output area and a command input field (English UI text only).",
+      "reqIds": [
+        "REQ-31"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-a-small-built-in-command-set-for-the-terminal-focused-on-diagnostics-not-arbitrary-code-execution-including-commands-to-view-help-clear-the-log-and-check-backend-availability-by-calling-the-existing-backend-availability-check-actor-isavailable",
+      "title": "Implement a small built-in command set for the terminal focused on diagnostics (not arbitrary code execution), including commands to view help, clear the log, and check backend availability by calling the existing backend availability check (actor.isAvailable).",
+      "reqIds": [
+        "REQ-32"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-expose-useful-app-game-diagnostics-in-the-terminal-output-including-current-screen-context-and-the-most-recent-launch-diagnostics-startupcomplete-lastlaunchaction-launchstage-gamemounted-last-error-so-users-can-self-diagnose-why-new-game-continue-failed",
+      "title": "Expose useful app/game diagnostics in the terminal output, including current screen context and the most recent launch diagnostics (startupComplete, lastLaunchAction, launchStage, gameMounted, last error), so users can self-diagnose why New Game/Continue failed.",
+      "reqIds": [
+        "REQ-33"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-safe-open-close-interactions-for-the-terminal-including-a-keyboard-shortcut-on-desktop-e-g-ctrl-or-and-a-close-button-without-interfering-with-existing-gameplay-controls-on-mobile",
+      "title": "Add safe open/close interactions for the terminal, including a keyboard shortcut on desktop (e.g., Ctrl+` or `) and a close button, without interfering with existing gameplay controls on mobile.",
+      "reqIds": [
+        "REQ-34"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-the-terminal-is-explicitly-diagnostic-only-it-must-not-claim-to-be-able-to-start-stop-restart-the-backend-canister-and-it-must-not-attempt-to-execute-arbitrary-shell-commands",
+      "title": "Ensure the terminal is explicitly diagnostic-only: it must not claim to be able to start/stop/restart the backend canister, and it must not attempt to execute arbitrary shell commands.",
+      "reqIds": [
+        "REQ-35"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-an-in-app-on-off-switch-that-toggles-whether-the-app-is-allowed-to-call-the-backend-canister-local-server-access-toggle-and-persist-this-preference-across-page-reloads",
+      "title": "Add an in-app on/off switch that toggles whether the app is allowed to call the backend canister (local “server access” toggle), and persist this preference across page reloads.",
+      "reqIds": [
+        "REQ-36"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-integrate-the-server-access-toggle-into-the-title-screen-so-that-when-server-access-is-disabled-new-game-and-continue-are-disabled-and-the-user-is-shown-a-clear-english-explanation-that-backend-calls-are-disabled-locally",
+      "title": "Integrate the server access toggle into the Title Screen so that when server access is disabled, New Game and Continue are disabled and the user is shown a clear English explanation that backend calls are disabled locally.",
+      "reqIds": [
+        "REQ-37"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-extend-the-diagnostic-terminal-command-set-to-support-toggling-the-local-server-access-switch-diagnostic-only-and-update-terminal-help-text-accordingly",
+      "title": "Extend the Diagnostic Terminal command set to support toggling the local server access switch (diagnostic-only), and update terminal help text accordingly.",
+      "reqIds": [
+        "REQ-38"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -347,6 +413,18 @@
       "reqIds": [
         "REQ-25"
       ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-17",
+      "summary": "Add an in-app terminal/console for the game (developer/user-facing) to run/view commands or diagnostics (e.g., server/backend status)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-18",
+      "summary": "Add an in-app switch/control to turn the game server/backend (IC canister) on/off from the UI (e.g., via the terminal)",
+      "reqIds": [],
       "status": "pending"
     }
   ],

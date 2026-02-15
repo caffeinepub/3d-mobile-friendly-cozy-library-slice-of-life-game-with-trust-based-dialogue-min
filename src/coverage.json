@@ -1,7 +1,7 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-14T23:59:37.445Z",
+  "generatedAt": "2026-02-15T00:19:43.687Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
@@ -11,40 +11,44 @@
     "implemented": 3,
     "items": [
       {
-        "id": "REQ-28",
-        "summary": "Eliminate the React runtime error \"Maximum update depth exceeded\" that occurs during gameplay initialization by fixing any render/update loops triggered by state updates inside effects or lifecycle-equivalent logic (e.g., repeated store resets, unstable effect dependencies).",
+        "id": "REQ-36",
+        "summary": "Add an in-app on/off switch that toggles whether the app is allowed to call the backend canister (local “server access” toggle), and persist this preference across page reloads.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/game/GameView.tsx",
-          "frontend/src/game/audio/useAudio.ts"
+          "frontend/src/state/useServerAccessStore.ts",
+          "frontend/src/App.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/game/GameView.tsx",
-          "frontend/src/game/audio/useAudio.ts"
+          "frontend/src/state/useServerAccessStore.ts",
+          "frontend/src/App.tsx"
         ]
       },
       {
-        "id": "REQ-29",
-        "summary": "Make gameplay initialization in `frontend/src/game/GameView.tsx` resilient to React re-renders and Strict Mode double-invocation by ensuring `initializeGame(isNewGame)` is not repeatedly invoked in a way that causes continuous state updates. Add a guard so initialization runs only when appropriate (e.g., once per mount and/or only when `isNewGame` changes meaningfully).",
+        "id": "REQ-37",
+        "summary": "Integrate the server access toggle into the Title Screen so that when server access is disabled, New Game and Continue are disabled and the user is shown a clear English explanation that backend calls are disabled locally.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/game/GameView.tsx"
+          "frontend/src/ui/TitleScreen.tsx",
+          "frontend/src/App.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/game/GameView.tsx"
+          "frontend/src/ui/TitleScreen.tsx",
+          "frontend/src/App.tsx"
         ]
       },
       {
-        "id": "REQ-30",
-        "summary": "Stabilize effect dependencies involved in gameplay mount to prevent re-running initialization due to unstable function identities (e.g., `playBackgroundMusic` from `frontend/src/game/audio/useAudio.ts`). Ensure any functions used in `GameView` effects are memoized or invoked from effects that cannot repeatedly trigger store updates.",
+        "id": "REQ-38",
+        "summary": "Extend the Diagnostic Terminal command set to support toggling the local server access switch (diagnostic-only), and update terminal help text accordingly.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/game/audio/useAudio.ts",
-          "frontend/src/game/GameView.tsx"
+          "frontend/src/ui/terminal/commands.ts",
+          "frontend/src/App.tsx",
+          "frontend/src/ui/DiagnosticTerminalOverlay.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/game/audio/useAudio.ts",
-          "frontend/src/game/GameView.tsx"
+          "frontend/src/ui/terminal/commands.ts",
+          "frontend/src/App.tsx",
+          "frontend/src/ui/DiagnosticTerminalOverlay.tsx"
         ]
       }
     ]
@@ -54,8 +58,11 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/game/GameView.tsx",
-    "frontend/src/game/audio/useAudio.ts",
+    "frontend/src/App.tsx",
+    "frontend/src/state/useServerAccessStore.ts",
+    "frontend/src/ui/DiagnosticTerminalOverlay.tsx",
+    "frontend/src/ui/TitleScreen.tsx",
+    "frontend/src/ui/terminal/commands.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

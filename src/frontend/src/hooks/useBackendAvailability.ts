@@ -60,3 +60,26 @@ export function useBackendAvailability(options?: { enabled?: boolean; refetchInt
     },
   };
 }
+
+/**
+ * Standalone helper to perform a one-off availability check.
+ * Can be used by the terminal or other components that need to check
+ * backend availability without using the React Query hook.
+ */
+export async function checkBackendAvailability(
+  actor: any
+): Promise<{ healthy: boolean; error?: string }> {
+  if (!actor) {
+    return { healthy: false, error: 'Backend actor is not initialized yet' };
+  }
+
+  try {
+    const result = await actor.isAvailable();
+    return { healthy: result === true };
+  } catch (error) {
+    return {
+      healthy: false,
+      error: error instanceof Error ? error.message : String(error),
+    };
+  }
+}

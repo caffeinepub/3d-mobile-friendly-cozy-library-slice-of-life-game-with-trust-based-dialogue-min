@@ -12,9 +12,10 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { useGameStore } from '../state/useGameStore';
-import { Play, RotateCcw, Settings, Home } from 'lucide-react';
+import { Play, RotateCcw, Settings, Home, Terminal } from 'lucide-react';
 import { useState } from 'react';
 import SettingsScreen from './SettingsScreen';
+import { useTerminalStore } from '../../ui/terminal/useTerminalStore';
 
 interface Props {
   onResume: () => void;
@@ -24,6 +25,7 @@ interface Props {
 export default function PauseMenu({ onResume, onBackToTitle }: Props) {
   const { resetProgress, setShowActivities, setShowMiniGames, setShowCustomization, setShowMoments, setShowLetters } = useGameStore();
   const [showSettings, setShowSettings] = useState(false);
+  const { open: openTerminal } = useTerminalStore();
 
   const handleReset = () => {
     resetProgress();
@@ -53,6 +55,10 @@ export default function PauseMenu({ onResume, onBackToTitle }: Props) {
   const handleOpenLetters = () => {
     onResume();
     setShowLetters(true);
+  };
+
+  const handleOpenTerminal = () => {
+    openTerminal();
   };
 
   if (showSettings) {
@@ -94,6 +100,11 @@ export default function PauseMenu({ onResume, onBackToTitle }: Props) {
             <Button onClick={() => setShowSettings(true)} variant="outline" className="w-full justify-start">
               <Settings className="mr-2 h-5 w-5" />
               Settings
+            </Button>
+
+            <Button onClick={handleOpenTerminal} variant="outline" className="w-full justify-start mt-1">
+              <Terminal className="mr-2 h-5 w-5" />
+              Diagnostic Terminal
             </Button>
 
             <AlertDialog>

@@ -1,11 +1,12 @@
 # Specification
 
 ## Summary
-**Goal:** Fix the React “Maximum update depth exceeded” error by preventing infinite update loops during gameplay initialization/mount.
+**Goal:** Add a local, persistent “server access” toggle so users can enable/disable frontend calls to the backend canister and see clear UI feedback when disabled.
 
 **Planned changes:**
-- Update `frontend/src/game/GameView.tsx` to guard gameplay initialization so `initializeGame(isNewGame)` runs only when appropriate (e.g., once per mount and/or only when `isNewGame` meaningfully changes), including resilience to React Strict Mode double-invocation.
-- Stabilize effect dependencies involved in gameplay mount to prevent re-running initialization due to unstable function identities (e.g., memoize or restructure usage of `playBackgroundMusic` from `frontend/src/game/audio/useAudio.ts`).
-- Ensure transitions from Title → Gameplay (New Game and Continue) no longer trigger repeated store resets or state updates that cause render/update loops.
+- Add a clearly labeled in-app on/off switch for “Server access” that is persisted across page reloads.
+- Integrate the toggle into the Title Screen: show an English “server access disabled locally” status message and disable New Game / Continue when OFF.
+- Ensure that when server access is OFF, backend availability polling is not performed and backend calls for New Game / Continue are not attempted.
+- Extend the Diagnostic Terminal with commands to set server access ON/OFF and update `help` output; make “server status” report that checks are disabled when server access is OFF.
 
-**User-visible outcome:** Starting a New Game or Continuing a game reliably enters gameplay without console errors, and gameplay remains interactive after mount (HUD and mobile controls render normally).
+**User-visible outcome:** Users can switch backend server access on/off locally, the setting persists after reload, the title screen reflects the disabled state (with New Game/Continue disabled), and the diagnostic terminal can control and explain the toggle.

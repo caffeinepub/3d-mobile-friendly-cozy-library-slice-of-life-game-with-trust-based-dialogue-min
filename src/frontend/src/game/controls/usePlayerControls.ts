@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useGameStore } from '../state/useGameStore';
+import { useTerminalStore } from '../../ui/terminal/useTerminalStore';
 
 interface ControlState {
   movement: { x: number; z: number };
@@ -8,12 +9,14 @@ interface ControlState {
 
 export function usePlayerControls() {
   const { isPaused } = useGameStore();
+  const { isOpen: isTerminalOpen } = useTerminalStore();
   const [keys, setKeys] = useState<Set<string>>(new Set());
   const [joystick, setJoystick] = useState({ x: 0, y: 0 });
   const [lookDelta, setLookDelta] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
-    if (isPaused) return;
+    // Don't process keyboard input if paused or terminal is open
+    if (isPaused || isTerminalOpen) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       setKeys(prev => new Set(prev).add(e.key.toLowerCase()));
@@ -34,7 +37,7 @@ export function usePlayerControls() {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, [isPaused]);
+  }, [isPaused, isTerminalOpen]);
 
   const updateJoystick = useCallback((x: number, y: number) => {
     setJoystick({ x, y });
