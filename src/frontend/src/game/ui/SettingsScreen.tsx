@@ -4,6 +4,7 @@ import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { useAudioManager } from '../audio/useAudio';
+import { useSettingsStore } from '../state/useSettingsStore';
 import { ArrowLeft } from 'lucide-react';
 
 interface Props {
@@ -12,6 +13,7 @@ interface Props {
 
 export default function SettingsScreen({ onBack }: Props) {
   const { volume, isMuted, setVolume, toggleMute } = useAudioManager();
+  const { aimSensitivity, setAimSensitivity } = useSettingsStore();
 
   return (
     <div className="w-full h-full flex items-center justify-center p-4 bg-background">
@@ -42,6 +44,21 @@ export default function SettingsScreen({ onBack }: Props) {
                 disabled={isMuted}
               />
               <p className="text-xs text-muted-foreground text-right">{volume}%</p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="aim-sensitivity">Aim Sensitivity</Label>
+              <Slider
+                id="aim-sensitivity"
+                min={0.1}
+                max={3.0}
+                step={0.1}
+                value={[aimSensitivity]}
+                onValueChange={([v]) => setAimSensitivity(v)}
+              />
+              <p className="text-xs text-muted-foreground text-right">
+                {Math.round(aimSensitivity * 100)}%
+              </p>
             </div>
           </div>
 

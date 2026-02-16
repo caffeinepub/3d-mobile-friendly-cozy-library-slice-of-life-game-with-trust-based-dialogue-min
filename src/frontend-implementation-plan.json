@@ -1,38 +1,94 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Mobile right-side screen-drag look controls",
+  "title": "White Latex Beast enemies + non-graphic transfur encounter with persisted outcome sync",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Replace the small mobile Look widget with a large right-side touch drag area that drives the existing look delta pipeline without affecting the left movement joystick, and respects pause/terminal disable rules.",
+      "summary": "Add glossy white \"White Latex Beast\" 3D enemies in the hive that patrol/wander and chase the player within an aggro radius.",
       "acceptanceCriteria": [
-        "On touch devices, dragging a finger on the right side of the screen produces continuous camera rotation (yaw/pitch) using the existing look delta pipeline (usePlayerControls -> usePlayerControlsStore -> scene camera rotation).",
-        "The look drag area covers the right portion of the screen (e.g., right half), not just the small 32x32 circle.",
-        "The left joystick area remains dedicated to movement input and is not impacted by the new look area.",
-        "The look control is disabled while the game is paused or the diagnostic terminal is open (consistent with existing isDisabled behavior)."
+        "When the player enters the hive scene, at least one enemy is present/spawned and visible as a glossy white creature (not just a static prop).",
+        "Enemies have continuous movement behavior: idle/patrol when far, chase when within a defined distance.",
+        "Enemy movement updates every frame without causing major frame drops (no obvious stutter beyond existing scene performance)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/game/controls/MobileControlsOverlay.tsx",
+          "path": "frontend/src/game/enemies/WhiteLatexBeast.tsx",
+          "operation": "create",
+          "description": "Create a reusable react-three-fiber enemy component that renders as a glossy white latex creature and implements lightweight per-frame AI (wander/patrol vs chase) based on distance to the player. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/game/enemies/types.ts",
+          "operation": "create",
+          "description": "Add shared enemy-related types/constants (e.g., aggro radius, capture radius, movement speeds) to keep tuning centralized and avoid duplicated magic numbers across scenes. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/game/scene/HiveScene.tsx",
           "operation": "modify",
-          "description": "Expand the look input surface from the current small circular Look element into a large right-side screen touch area (e.g., right half of the viewport) that captures drag movement and calls updateLook with scaled deltas. Ensure the left joystick remains on the left and continues to receive its own touch interactions without interference (including layering/pointer-events so the right-side look area does not block the joystick). Also ensure look drag handling is gated by the existing isDisabled (paused/terminal open) behavior and resets look deltas to neutral when disabled."
+          "description": "Spawn and render one or more White Latex Beast enemies in the hive scene; wire player world position into the enemy AI and ensure enemies update movement every frame while respecting existing scene bounds/performance constraints. Verify the component's usage instructions before implementing."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Fix right-side look drag initialization/reset so each new touch drag starts smoothly from the initial touch point, ends cleanly, and never leaves residual look drift.",
+      "summary": "Trigger a non-graphic transfur encounter on enemy contact that temporarily disables controls, shows an English message/screen effect, and respawns the player to a defined hive spawn position.",
       "acceptanceCriteria": [
-        "Starting a new drag on the right-side look area immediately begins tracking deltas from the initial touch point.",
-        "Lifting the finger ends the look drag and resets any stored last-touch state so a subsequent drag does not jump.",
-        "Releasing touch sets look delta back to neutral (no continued camera drift after the drag ends)."
+        "When an enemy collides with (or gets within a small capture radius of) the player, a transformation encounter is triggered.",
+        "During the encounter, player controls are temporarily disabled or effectively prevented from continuing normal movement until the encounter resolves.",
+        "After the encounter resolves, the player is placed into a well-defined post-encounter state (e.g., respawned to hiveSpawnPosition) and a visible English message indicates what happened."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/game/controls/MobileControlsOverlay.tsx",
+          "path": "frontend/src/game/state/useGameStore.ts",
           "operation": "modify",
-          "description": "Update the look drag state machine to initialize on touchstart (store initial touch position and the active touch identifier), compute deltas on touchmove relative to the last stored position, and fully reset on touchend/touchcancel (clear last-touch state and active identifier, call updateLook(0, 0)). Ensure a new drag always starts from its own initial touch point (no 'move once' requirement) and that multi-touch (e.g., joystick + look) does not cause the look handler to read the wrong touch."
+          "description": "Add transfur encounter UI/runtime state (e.g., isInTransfurEncounter, lastTransfurMessage) and actions to start/resolve an encounter, including pausing gameplay, setting a clear English message, and setting hiveSpawnPosition for a deterministic respawn. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/game/ui/TransfurOverlay.tsx",
+          "operation": "create",
+          "description": "Create a small overlay UI (screen tint/flash + message) to clearly indicate a non-graphic transformation encounter in English while controls are disabled. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/game/GameView.tsx",
+          "operation": "modify",
+          "description": "Render the TransfurOverlay above the Canvas when an encounter is active and ensure pause/controls disabling is applied consistently (leveraging existing isPaused behavior). Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/game/scene/HiveScene.tsx",
+          "operation": "modify",
+          "description": "Detect enemy capture/collision with the player (distance-based capture radius) and trigger the transfur encounter flow; on resolution, respawn the player at hiveSpawnPosition and prevent immediate re-triggering via a short cooldown. Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Sync persisted transfur outcome fields with the backend-pro տրամ  state (transfurred / timesTransfurred) during load/continue and record new encounters when online.",
+      "acceptanceCriteria": [
+        "Backend GameState includes new fields for transformation tracking (e.g., a boolean flag and/or a counter) and these values are returned by getGameState/continueGame.",
+        "A new backend update method (or an extension of an existing one) allows the frontend to record a transformation encounter without trapping.",
+        "Frontend updates the persisted local game store to reflect backend-provided transformation fields when continuing/loading.",
+        "If the canister state schema changes, a conditional migration is added in backend/migration.mo so existing saves do not trap on upgrade."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/game/state/useGameStore.ts",
+          "operation": "modify",
+          "description": "Add persisted fields for transfurred and timesTransfurred and a hydration action that maps backend GameState into the local Zustand store (including bigint->number conversions where needed). Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Add a React Query mutation hook to record a transfur encounter when online (wrapping the existing backend capability) and invalidate/refetch game state as appropriate. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Wire backend GameState hydration into the existing new-game/continue flows by applying returned/queried state to the local game store (including transfur tracking fields), while keeping offline mode fully local. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/game/scene/HiveScene.tsx",
+          "operation": "modify",
+          "description": "On transfur encounter resolution, invoke the new recordTransfurred mutation when online (and update local state immediately for responsiveness), while ensuring offline mode still increments local tracking without backend calls. Verify the component's usage instructions before implementing."
         }
       ]
     }

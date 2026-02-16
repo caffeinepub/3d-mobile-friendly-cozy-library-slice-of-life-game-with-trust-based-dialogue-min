@@ -8,6 +8,11 @@
 
 import { IDL } from '@icp-sdk/core/candid';
 
+export const UserRole = IDL.Variant({
+  'admin' : IDL.Null,
+  'user' : IDL.Null,
+  'guest' : IDL.Null,
+});
 export const Time = IDL.Int;
 export const Letter = IDL.Record({
   'content' : IDL.Text,
@@ -26,19 +31,37 @@ export const GameState = IDL.Record({
   'trustLevel' : IDL.Int,
   'endingsUnlocked' : IDL.Vec(IDL.Text),
   'unlockedMoments' : IDL.Vec(IDL.Text),
+  'transfurred' : IDL.Bool,
   'completedActivities' : IDL.Vec(IDL.Text),
+  'timesTransfurred' : IDL.Nat,
   'libraryCustomizations' : IDL.Vec(LibraryCustomization),
+});
+export const UserProfile = IDL.Record({
+  'gamesPlayed' : IDL.Nat,
+  'name' : IDL.Text,
 });
 
 export const idlService = IDL.Service({
+  '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
+  'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
   'completeActivity' : IDL.Func([IDL.Text], [], []),
   'continueGame' : IDL.Func([], [GameState], []),
+  'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
+  'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
   'getGameState' : IDL.Func([], [GameState], []),
+  'getUserProfile' : IDL.Func(
+      [IDL.Principal],
+      [IDL.Opt(UserProfile)],
+      ['query'],
+    ),
   'isAvailable' : IDL.Func([], [IDL.Bool], ['query']),
+  'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
   'makeChoice' : IDL.Func([IDL.Nat, IDL.Nat], [], []),
   'placeCustomization' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [], []),
+  'recordTransfurred' : IDL.Func([], [], []),
   'resetProgress' : IDL.Func([], [], []),
   'respondToLetter' : IDL.Func([IDL.Nat, IDL.Text], [], []),
+  'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
   'startNewGame' : IDL.Func([], [], []),
   'unlockMoment' : IDL.Func([IDL.Text], [], []),
   'writeLetter' : IDL.Func([IDL.Text], [], []),
@@ -47,6 +70,11 @@ export const idlService = IDL.Service({
 export const idlInitArgs = [];
 
 export const idlFactory = ({ IDL }) => {
+  const UserRole = IDL.Variant({
+    'admin' : IDL.Null,
+    'user' : IDL.Null,
+    'guest' : IDL.Null,
+  });
   const Time = IDL.Int;
   const Letter = IDL.Record({
     'content' : IDL.Text,
@@ -65,19 +93,37 @@ export const idlFactory = ({ IDL }) => {
     'trustLevel' : IDL.Int,
     'endingsUnlocked' : IDL.Vec(IDL.Text),
     'unlockedMoments' : IDL.Vec(IDL.Text),
+    'transfurred' : IDL.Bool,
     'completedActivities' : IDL.Vec(IDL.Text),
+    'timesTransfurred' : IDL.Nat,
     'libraryCustomizations' : IDL.Vec(LibraryCustomization),
+  });
+  const UserProfile = IDL.Record({
+    'gamesPlayed' : IDL.Nat,
+    'name' : IDL.Text,
   });
   
   return IDL.Service({
+    '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
+    'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
     'completeActivity' : IDL.Func([IDL.Text], [], []),
     'continueGame' : IDL.Func([], [GameState], []),
+    'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
+    'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
     'getGameState' : IDL.Func([], [GameState], []),
+    'getUserProfile' : IDL.Func(
+        [IDL.Principal],
+        [IDL.Opt(UserProfile)],
+        ['query'],
+      ),
     'isAvailable' : IDL.Func([], [IDL.Bool], ['query']),
+    'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
     'makeChoice' : IDL.Func([IDL.Nat, IDL.Nat], [], []),
     'placeCustomization' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [], []),
+    'recordTransfurred' : IDL.Func([], [], []),
     'resetProgress' : IDL.Func([], [], []),
     'respondToLetter' : IDL.Func([IDL.Nat, IDL.Text], [], []),
+    'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
     'startNewGame' : IDL.Func([], [], []),
     'unlockMoment' : IDL.Func([IDL.Text], [], []),
     'writeLetter' : IDL.Func([IDL.Text], [], []),

@@ -6,6 +6,7 @@ import Puro from '../characters/Puro';
 import { usePlayerControls } from '../controls/usePlayerControls';
 import { usePlayerControlsStore } from '../controls/usePlayerControlsStore';
 import { useGameStore } from '../state/useGameStore';
+import { useSettingsStore } from '../state/useSettingsStore';
 import { toast } from 'sonner';
 
 export default function LibraryScene() {
@@ -14,6 +15,7 @@ export default function LibraryScene() {
   const { movement, look } = usePlayerControls();
   const controlsStore = usePlayerControlsStore();
   const { libraryCustomizations, teleportToHive } = useGameStore();
+  const { aimSensitivity } = useSettingsStore();
   
   // Jump physics state
   const [verticalVelocity, setVerticalVelocity] = useState(0);
@@ -79,9 +81,9 @@ export default function LibraryScene() {
       setIsGrounded(true);
     }
 
-    // Apply camera look
-    state.camera.rotation.y += look.x * delta;
-    state.camera.rotation.x += look.y * delta;
+    // Apply camera look with sensitivity multiplier
+    state.camera.rotation.y += look.x * delta * aimSensitivity;
+    state.camera.rotation.x += look.y * delta * aimSensitivity;
     state.camera.rotation.x = THREE.MathUtils.clamp(state.camera.rotation.x, -Math.PI / 3, Math.PI / 3);
 
     // Update camera position to follow player

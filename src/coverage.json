@@ -1,45 +1,90 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-16T00:53:18.143Z",
+  "generatedAt": "2026-02-16T01:12:08.963Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 2,
-    "implemented": 2,
+    "total": 3,
+    "implemented": 3,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Update the mobile look/aim control so the player looks around by dragging on the right side of the screen (a large right-side touch area), rather than only inside the small circular \"Look\" widget.",
+        "summary": "Add one or more \"White Latex Beast\" enemy entities to the 3D gameplay (at minimum in the hive scene) that visually read as glossy white latex creatures and that actively move (patrol/wander) and then chase the player when within an aggro radius.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/game/controls/MobileControlsOverlay.tsx"
+          "frontend/src/game/enemies/WhiteLatexBeast.tsx",
+          "frontend/src/game/enemies/types.ts",
+          "frontend/src/game/scene/HiveScene.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/game/controls/MobileControlsOverlay.tsx"
+          "frontend/src/game/enemies/WhiteLatexBeast.tsx",
+          "frontend/src/game/enemies/types.ts",
+          "frontend/src/game/scene/HiveScene.tsx"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "Ensure the right-side look drag area correctly initializes and resets drag state on touch start/end so the first movement after touching down results in smooth look deltas (no requirement to \"move once\" before it starts responding).",
+        "summary": "Implement a player \"transfur\" (transformation) encounter mechanic triggered by enemy contact: when an enemy reaches the player, show a clear, non-graphic transformation event (e.g., brief screen effect + message) and apply an in-game consequence (e.g., respawn in the hive spawn position and/or trust/ending-impacting state change). Use English for any on-screen text.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/game/controls/MobileControlsOverlay.tsx"
+          "frontend/src/game/state/useGameStore.ts",
+          "frontend/src/game/ui/TransfurOverlay.tsx",
+          "frontend/src/game/GameView.tsx",
+          "frontend/src/game/scene/HiveScene.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/game/controls/MobileControlsOverlay.tsx"
+          "frontend/src/game/state/useGameStore.ts",
+          "frontend/src/game/ui/TransfurOverlay.tsx",
+          "frontend/src/game/GameView.tsx",
+          "frontend/src/game/scene/HiveScene.tsx"
+        ]
+      },
+      {
+        "id": "REQ-3",
+        "summary": "Persist transformation encounter outcomes in the backend game state so the app can remember that the player has been \"transfurred\" (or how many times) across reloads/continue game. Update backend GameState, associated APIs, and frontend state hydration/sync to include these new fields.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/game/state/useGameStore.ts",
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/App.tsx",
+          "frontend/src/game/scene/HiveScene.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/game/state/useGameStore.ts",
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/App.tsx",
+          "frontend/src/game/scene/HiveScene.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
+    "backend/authorization/MixinAuthorization.mo",
+    "backend/authorization/access-control.mo",
+    "backend/main.mo",
+    "backend/migration.mo",
     "build-request.json",
+    "caffeine.lock.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/game/controls/MobileControlsOverlay.tsx",
+    "frontend/src/App.tsx",
+    "frontend/src/backend.d.ts",
+    "frontend/src/backend.ts",
+    "frontend/src/declarations/backend.did.d.ts",
+    "frontend/src/declarations/backend.did.js",
+    "frontend/src/game/GameView.tsx",
+    "frontend/src/game/enemies/WhiteLatexBeast.tsx",
+    "frontend/src/game/enemies/types.ts",
+    "frontend/src/game/scene/HiveScene.tsx",
+    "frontend/src/game/state/useGameStore.ts",
+    "frontend/src/game/ui/TransfurOverlay.tsx",
+    "frontend/src/hooks/useActor.ts",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/utils/urlParams.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

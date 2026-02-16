@@ -125,6 +125,21 @@ export function useWriteLetter() {
   });
 }
 
+export function useRecordTransfurred() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      if (!actor) throw new Error('Actor not initialized');
+      return actor.recordTransfurred();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['gameState'] });
+    },
+  });
+}
+
 export function useResetProgress() {
   const { actor } = useActor();
   const queryClient = useQueryClient();

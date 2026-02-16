@@ -44,7 +44,7 @@ export default function App() {
   const startNewGameMutation = useStartNewGame();
   const continueGameMutation = useContinueGame();
   const { actor } = useActor();
-  const { hasLocalSave } = useGameStore();
+  const { hasLocalSave, hydrateFromBackend } = useGameStore();
 
   // Backend availability check - always active on title screen
   const backendAvailability = useBackendAvailability({
@@ -152,7 +152,9 @@ export default function App() {
     });
 
     try {
-      await continueGameMutation.mutateAsync();
+      const backendState = await continueGameMutation.mutateAsync();
+      // Hydrate local store with backend state including transfur tracking
+      hydrateFromBackend(backendState);
       setDiagnostics((prev) => ({ ...prev, launchStage: 'mounting-game' }));
       setIsNewGame(false);
       setCurrentScreen('game');

@@ -13,6 +13,7 @@ import LettersPanel from './ui/LettersPanel';
 import PauseMenu from './ui/PauseMenu';
 import EndingScene from './story/EndingScene';
 import MobileControlsOverlay from './controls/MobileControlsOverlay';
+import TransfurOverlay from './ui/TransfurOverlay';
 import { useAudioManager } from './audio/useAudio';
 import { Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -37,6 +38,9 @@ export default function GameView({ isNewGame, onBackToTitle, onMounted, onMountE
     isPaused,
     setPaused,
     currentScene,
+    isInTransfurEncounter,
+    lastTransfurMessage,
+    resolveTransfurEncounter,
   } = useGameStore();
   const [showPauseMenu, setShowPauseMenu] = useState(false);
   const [canvasMounted, setCanvasMounted] = useState(false);
@@ -115,6 +119,14 @@ export default function GameView({ isNewGame, onBackToTitle, onMounted, onMountE
 
       {/* Mobile Controls */}
       <MobileControlsOverlay />
+
+      {/* Transfur Encounter Overlay */}
+      {isInTransfurEncounter && (
+        <TransfurOverlay
+          message={lastTransfurMessage}
+          onComplete={resolveTransfurEncounter}
+        />
+      )}
 
       {/* UI Panels */}
       {showDialogue && <DialoguePanel />}

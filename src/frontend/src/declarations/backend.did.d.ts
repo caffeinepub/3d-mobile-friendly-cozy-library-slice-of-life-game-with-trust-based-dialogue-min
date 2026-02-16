@@ -16,7 +16,9 @@ export interface GameState {
   'trustLevel' : bigint,
   'endingsUnlocked' : Array<string>,
   'unlockedMoments' : Array<string>,
+  'transfurred' : boolean,
   'completedActivities' : Array<string>,
+  'timesTransfurred' : bigint,
   'libraryCustomizations' : Array<LibraryCustomization>,
 }
 export interface Letter {
@@ -31,15 +33,27 @@ export interface LibraryCustomization {
   'location' : string,
 }
 export type Time = bigint;
+export interface UserProfile { 'gamesPlayed' : bigint, 'name' : string }
+export type UserRole = { 'admin' : null } |
+  { 'user' : null } |
+  { 'guest' : null };
 export interface _SERVICE {
+  '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
+  'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
   'completeActivity' : ActorMethod<[string], undefined>,
   'continueGame' : ActorMethod<[], GameState>,
+  'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
+  'getCallerUserRole' : ActorMethod<[], UserRole>,
   'getGameState' : ActorMethod<[], GameState>,
+  'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'isAvailable' : ActorMethod<[], boolean>,
+  'isCallerAdmin' : ActorMethod<[], boolean>,
   'makeChoice' : ActorMethod<[bigint, bigint], undefined>,
   'placeCustomization' : ActorMethod<[string, string, string], undefined>,
+  'recordTransfurred' : ActorMethod<[], undefined>,
   'resetProgress' : ActorMethod<[], undefined>,
   'respondToLetter' : ActorMethod<[bigint, string], undefined>,
+  'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
   'startNewGame' : ActorMethod<[], undefined>,
   'unlockMoment' : ActorMethod<[string], undefined>,
   'writeLetter' : ActorMethod<[string], undefined>,

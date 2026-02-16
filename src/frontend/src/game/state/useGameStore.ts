@@ -27,6 +27,12 @@ interface GameStore extends UIState {
   discoveredItems: string[];
   hasLocalSave: boolean;
   
+  // Transfur tracking
+  transfurred: boolean;
+  timesTransfurred: number;
+  isInTransfurEncounter: boolean;
+  lastTransfurMessage: string;
+  
   // Scene state
   currentScene: SceneType;
   hiveSpawnPosition: [number, number, number];
@@ -44,6 +50,12 @@ interface GameStore extends UIState {
   discoverItem: (itemName: string) => void;
   setCurrentDialogueNode: (node: number | null) => void;
   resetProgress: () => void;
+  
+  // Transfur actions
+  startTransfurEncounter: (message: string) => void;
+  resolveTransfurEncounter: () => void;
+  recordTransfur: () => void;
+  hydrateFromBackend: (backendState: BackendGameState) => void;
   
   // Scene actions
   teleportToHive: () => void;
@@ -70,6 +82,10 @@ const defaultState = {
   endingsUnlocked: [],
   discoveredItems: [],
   hasLocalSave: false,
+  transfurred: false,
+  timesTransfurred: 0,
+  isInTransfurEncounter: false,
+  lastTransfurMessage: '',
   currentScene: 'library' as SceneType,
   hiveSpawnPosition: [0, 0, 0] as [number, number, number],
   showDialogue: false,
@@ -153,6 +169,40 @@ export const useGameStore = create<GameStore>()(
       setCurrentDialogueNode: (node: number | null) => set({ currentDialogueNode: node }),
 
       resetProgress: () => set(defaultState),
+      
+      startTransfurEncounter: (message: string) => set({ 
+        isInTransfurEncounter: true,
+        lastTransfurMessage: message,
+        isPaused: true,
+      }),
+      
+      resolveTransfurEncounter: () => set({ 
+        isInTransfurEncounter: false,
+        isPaused: false,
+        hiveSpawnPosition: [0, 0, 0], // Respawn at center
+      }),
+      
+      recordTransfur: () => set((state) => ({
+        transfurred: true,
+        timesTransfurred: state.timesTransfurred + 1,
+      })),
+      
+      hydrateFromBackend: (backendState: BackendGameState) => set({
+        trustLevel: Number(backendState.trustLevel),
+        currentDialogueNode: backendState.currentDialogueNode ? Number(backendState.currentDialogueNode) : null,
+        completedActivities: backendState.completedActivities,
+        libraryCustomizations: backendState.libraryCustomizations,
+        unlockedMoments: backendState.unlockedMoments,
+        letters: backendState.letters.map(letter => ({
+          fromPlayer: letter.fromPlayer,
+          content: letter.content,
+          timestamp: Number(letter.timestamp),
+          response: letter.response,
+        })),
+        endingsUnlocked: backendState.endingsUnlocked,
+        transfurred: backendState.transfurred,
+        timesTransfurred: Number(backendState.timesTransfurred),
+      }),
       
       teleportToHive: () => set({ 
         currentScene: 'hive',

@@ -1,53 +1,73 @@
 {
   "kind": "build_request",
-  "title": "Change mobile look controls to right-side screen drag",
+  "title": "Add white latex beast enemies that attempt to transform (“transfur”) the player",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Update the mobile look/aim control so the player looks around by dragging on the right side of the screen (a large right-side touch area), rather than only inside the small circular \"Look\" widget.",
+      "text": "Add one or more \"White Latex Beast\" enemy entities to the 3D gameplay (at minimum in the hive scene) that visually read as glossy white latex creatures and that actively move (patrol/wander) and then chase the player when within an aggro radius.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-user-1"
         ],
         "quotes": [
-          "Make looking around dragging around the right side of the screen."
+          "Try to make white latex beasts that try to transfur me"
         ]
       },
       "acceptanceCriteria": [
-        "On touch devices, dragging a finger on the right side of the screen produces continuous camera rotation (yaw/pitch) using the existing look delta pipeline (usePlayerControls -> usePlayerControlsStore -> scene camera rotation).",
-        "The look drag area covers the right portion of the screen (e.g., right half), not just the small 32x32 circle.",
-        "The left joystick area remains dedicated to movement input and is not impacted by the new look area.",
-        "The look control is disabled while the game is paused or the diagnostic terminal is open (consistent with existing isDisabled behavior)."
+        "When the player enters the hive scene, at least one enemy is present/spawned and visible as a glossy white creature (not just a static prop).",
+        "Enemies have continuous movement behavior: idle/patrol when far, chase when within a defined distance.",
+        "Enemy movement updates every frame without causing major frame drops (no obvious stutter beyond existing scene performance)."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Ensure the right-side look drag area correctly initializes and resets drag state on touch start/end so the first movement after touching down results in smooth look deltas (no requirement to \"move once\" before it starts responding).",
+      "text": "Implement a player \"transfur\" (transformation) encounter mechanic triggered by enemy contact: when an enemy reaches the player, show a clear, non-graphic transformation event (e.g., brief screen effect + message) and apply an in-game consequence (e.g., respawn in the hive spawn position and/or trust/ending-impacting state change). Use English for any on-screen text.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-user-1"
         ],
         "quotes": [
-          "Make looking around dragging around the right side of the screen."
+          "Try to make white latex beasts that try to transfur me"
         ]
       },
       "acceptanceCriteria": [
-        "Starting a new drag on the right-side look area immediately begins tracking deltas from the initial touch point.",
-        "Lifting the finger ends the look drag and resets any stored last-touch state so a subsequent drag does not jump.",
-        "Releasing touch sets look delta back to neutral (no continued camera drift after the drag ends)."
+        "When an enemy collides with (or gets within a small capture radius of) the player, a transformation encounter is triggered.",
+        "During the encounter, player controls are temporarily disabled or effectively prevented from continuing normal movement until the encounter resolves.",
+        "After the encounter resolves, the player is placed into a well-defined post-encounter state (e.g., respawned to hiveSpawnPosition) and a visible English message indicates what happened."
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Persist transformation encounter outcomes in the backend game state so the app can remember that the player has been \"transfurred\" (or how many times) across reloads/continue game. Update backend GameState, associated APIs, and frontend state hydration/sync to include these new fields.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-user-1"
+        ],
+        "quotes": [
+          "Try to make white latex beasts that try to transfur me"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Backend GameState includes new fields for transformation tracking (e.g., a boolean flag and/or a counter) and these values are returned by getGameState/continueGame.",
+        "A new backend update method (or an extension of an existing one) allows the frontend to record a transformation encounter without trapping.",
+        "Frontend updates the persisted local game store to reflect backend-provided transformation fields when continuing/loading.",
+        "If the canister state schema changes, a conditional migration is added in backend/migration.mo so existing saves do not trap on upgrade."
       ]
     }
   ],
   "constraints": [
-    "Frontend immutable paths must not be edited: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui.",
-    "Keep all backend logic in the single Motoko actor (no backend changes expected for this request)."
+    "Backend must remain a single Motoko actor in backend/main.mo; add backend/migration.mo only if required for existing state upgrades.",
+    "Do not edit files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or any files in frontend/src/components/ui (compose them instead).",
+    "Use English for any user-facing UI text."
   ],
   "nonGoals": [
-    "Changing keyboard/mouse look behavior for desktop users (unless required incidentally by the right-side drag implementation).",
-    "Adding new gameplay features (combat, enemies, new scenes, etc.)."
+    "Do not add explicit/graphic sexual content; keep the transformation encounter non-graphic and game-appropriate.",
+    "Do not add multiplayer, real-time networking, or external database services.",
+    "Do not add third-party authentication providers beyond Internet Identity."
   ],
   "imageRequirements": {
     "required": [],

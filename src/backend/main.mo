@@ -6,10 +6,16 @@ import Blob "mo:core/Blob";
 import Runtime "mo:core/Runtime";
 import Time "mo:core/Time";
 import Principal "mo:core/Principal";
+import Migration "migration";
+import MixinAuthorization "authorization/MixinAuthorization";
+import AccessControl "authorization/access-control";
 
-
-
+(with migration = Migration.run)
 actor {
+  // Initialize the access control system
+  let accessControlState = AccessControl.initState();
+  include MixinAuthorization(accessControlState);
+
   public query ({ caller }) func isAvailable() : async Bool {
     true;
   };
@@ -65,8 +71,16 @@ actor {
     unlockedMoments : [Text];
     letters : [Letter];
     endingsUnlocked : [Text];
+    transfurred : Bool;
+    timesTransfurred : Nat;
   };
 
+  public type UserProfile = {
+    name : Text;
+    gamesPlayed : Nat;
+  };
+
+  // Use DEFAULT_STATE constant instead of persistent variable for compatibility
   let defaultState : GameState = {
     trustLevel = 50;
     currentDialogueNode = null;
@@ -75,9 +89,12 @@ actor {
     unlockedMoments = [];
     letters = [];
     endingsUnlocked = [];
+    transfurred = false;
+    timesTransfurred = 0;
   };
 
   let gameStates = Map.empty<Blob, GameState>();
+  let userProfiles = Map.empty<Principal, UserProfile>();
 
   let dialogueNodes = Map.fromIter<Nat, DialogueNode>([(0, {
     id = 0;
@@ -157,12 +174,41 @@ actor {
     ].values()
   );
 
+  // User profile management functions
+  public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can access profiles");
+    };
+    userProfiles.get(caller);
+  };
+
+  public query ({ caller }) func getUserProfile(user : Principal) : async ?UserProfile {
+    if (caller != user and not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Can only view your own profile");
+    };
+    userProfiles.get(user);
+  };
+
+  public shared ({ caller }) func saveCallerUserProfile(profile : UserProfile) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can save profiles");
+    };
+    userProfiles.add(caller, profile);
+  };
+
+  // Game functions with authorization
   public shared ({ caller }) func startNewGame() : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can start a game");
+    };
     let callerId = caller.toBlob();
     gameStates.add(callerId, defaultState);
   };
 
   public shared ({ caller }) func continueGame() : async GameState {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can continue a game");
+    };
     let callerId = caller.toBlob();
     switch (gameStates.get(callerId)) {
       case (null) { Runtime.trap("No saved game found. Please start a new game.") };
@@ -171,6 +217,9 @@ actor {
   };
 
   public shared ({ caller }) func makeChoice(nodeId : Nat, choiceId : Nat) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can make choices");
+    };
     let callerId = caller.toBlob();
     switch (gameStates.get(callerId)) {
       case (null) { Runtime.trap("Game state not found") };
@@ -191,6 +240,8 @@ actor {
                   unlockedMoments = state.unlockedMoments;
                   letters = state.letters;
                   endingsUnlocked = state.endingsUnlocked;
+                  transfurred = state.transfurred;
+                  timesTransfurred = state.timesTransfurred;
                 };
                 gameStates.add(callerId, newState);
               };
@@ -202,6 +253,9 @@ actor {
   };
 
   public shared ({ caller }) func completeActivity(activityName : Text) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can complete activities");
+    };
     let callerId = caller.toBlob();
     switch (gameStates.get(callerId)) {
       case (null) { Runtime.trap("Game state not found") };
@@ -223,6 +277,8 @@ actor {
               unlockedMoments = state.unlockedMoments;
               letters = state.letters;
               endingsUnlocked = state.endingsUnlocked;
+              transfurred = state.transfurred;
+              timesTransfurred = state.timesTransfurred;
             };
             gameStates.add(callerId, newState);
           };
@@ -232,6 +288,9 @@ actor {
   };
 
   public shared ({ caller }) func placeCustomization(itemName : Text, description : Text, location : Text) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can place customizations");
+    };
     let callerId = caller.toBlob();
     switch (gameStates.get(callerId)) {
       case (null) { Runtime.trap("Game state not found") };
@@ -250,6 +309,8 @@ actor {
           unlockedMoments = state.unlockedMoments;
           letters = state.letters;
           endingsUnlocked = state.endingsUnlocked;
+          transfurred = state.transfurred;
+          timesTransfurred = state.timesTransfurred;
         };
         gameStates.add(callerId, newState);
       };
@@ -257,6 +318,9 @@ actor {
   };
 
   public shared ({ caller }) func unlockMoment(momentTitle : Text) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can unlock moments");
+    };
     let callerId = caller.toBlob();
     switch (gameStates.get(callerId)) {
       case (null) { Runtime.trap("Game state not found") };
@@ -277,6 +341,8 @@ actor {
               unlockedMoments = newUnlocked;
               letters = state.letters;
               endingsUnlocked = state.endingsUnlocked;
+              transfurred = state.transfurred;
+              timesTransfurred = state.timesTransfurred;
             };
             gameStates.add(callerId, newState);
           };
@@ -286,6 +352,9 @@ actor {
   };
 
   public shared ({ caller }) func writeLetter(content : Text) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can write letters");
+    };
     let callerId = caller.toBlob();
     switch (gameStates.get(callerId)) {
       case (null) { Runtime.trap("Game state not found") };
@@ -305,6 +374,8 @@ actor {
           unlockedMoments = state.unlockedMoments;
           letters = newLetters;
           endingsUnlocked = state.endingsUnlocked;
+          transfurred = state.transfurred;
+          timesTransfurred = state.timesTransfurred;
         };
         gameStates.add(callerId, newState);
       };
@@ -312,6 +383,9 @@ actor {
   };
 
   public shared ({ caller }) func respondToLetter(letterIndex : Nat, response : Text) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can respond to letters");
+    };
     let callerId = caller.toBlob();
     switch (gameStates.get(callerId)) {
       case (null) { Runtime.trap("Game state not found") };
@@ -339,6 +413,32 @@ actor {
           unlockedMoments = state.unlockedMoments;
           letters = updatedLetters;
           endingsUnlocked = state.endingsUnlocked;
+          transfurred = state.transfurred;
+          timesTransfurred = state.timesTransfurred;
+        };
+        gameStates.add(callerId, newState);
+      };
+    };
+  };
+
+  public shared ({ caller }) func recordTransfurred() : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can record transformation outcomes");
+    };
+    let callerId = caller.toBlob();
+    switch (gameStates.get(callerId)) {
+      case (null) { Runtime.trap("Game state not found") };
+      case (?state) {
+        let newState : GameState = {
+          trustLevel = state.trustLevel;
+          currentDialogueNode = state.currentDialogueNode;
+          completedActivities = state.completedActivities;
+          libraryCustomizations = state.libraryCustomizations;
+          unlockedMoments = state.unlockedMoments;
+          letters = state.letters;
+          endingsUnlocked = state.endingsUnlocked;
+          transfurred = true;
+          timesTransfurred = state.timesTransfurred + 1;
         };
         gameStates.add(callerId, newState);
       };
@@ -346,6 +446,9 @@ actor {
   };
 
   public shared ({ caller }) func getGameState() : async GameState {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can access game state");
+    };
     let callerId = caller.toBlob();
     switch (gameStates.get(callerId)) {
       case (null) { Runtime.trap("Game state not found") };
@@ -354,6 +457,9 @@ actor {
   };
 
   public shared ({ caller }) func resetProgress() : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can reset progress");
+    };
     let callerId = caller.toBlob();
     gameStates.add(callerId, defaultState);
   };

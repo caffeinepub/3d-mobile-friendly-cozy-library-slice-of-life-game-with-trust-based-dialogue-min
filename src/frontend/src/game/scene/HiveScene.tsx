@@ -5,16 +5,29 @@ import * as THREE from 'three';
 import { usePlayerControls } from '../controls/usePlayerControls';
 import { usePlayerControlsStore } from '../controls/usePlayerControlsStore';
 import { useGameStore } from '../state/useGameStore';
+import { useSettingsStore } from '../state/useSettingsStore';
+import WhiteLatexBeast from '../enemies/WhiteLatexBeast';
+import { useRecordTransfurred } from '../../hooks/useQueries';
 
 export default function HiveScene() {
   const playerRef = useRef<THREE.Group>(null);
   const { movement, look } = usePlayerControls();
   const controlsStore = usePlayerControlsStore();
-  const { hiveSpawnPosition } = useGameStore();
+  const { 
+    hiveSpawnPosition, 
+    isInTransfurEncounter,
+    startTransfurEncounter,
+    resolveTransfurEncounter,
+    recordTransfur,
+  } = useGameStore();
+  const { aimSensitivity } = useSettingsStore();
+  const recordTransfurredMutation = useRecordTransfurred();
   
   // Jump physics state
   const [verticalVelocity, setVerticalVelocity] = useState(0);
   const [isGrounded, setIsGrounded] = useState(true);
+  const [playerWorldPosition, setPlayerWorldPosition] = useState<[number, number, number]>([0, 0, 0]);
+  const captureCooldown = useRef(0);
 
   // Generate procedural forest layout
   const treePositions = useMemo(() => {
@@ -36,8 +49,52 @@ export default function HiveScene() {
     return positions;
   }, []);
 
+  // Enemy spawn positions
+  const enemySpawns = useMemo<Array<[number, number, number]>>(() => [
+    [8, 0, 8],
+    [-10, 0, 6],
+    [6, 0, -10],
+    [-8, 0, -8],
+  ], []);
+
+  const handleEnemyCapture = () => {
+    if (captureCooldown.current > 0 || isInTransfurEncounter) return;
+    
+    // Start encounter
+    const messages = [
+      "The white latex creature envelops you in a warm embrace...",
+      "You feel yourself changing as the latex spreads...",
+      "The transformation is complete. You are one with the hive now.",
+      "The white latex absorbs you into its collective...",
+    ];
+    const message = messages[Math.floor(Math.random() * messages.length)];
+    
+    startTransfurEncounter(message);
+    recordTransfur();
+    
+    // Record to backend if online (non-blocking)
+    recordTransfurredMutation.mutate(undefined, {
+      onError: (error) => {
+        console.warn('Failed to sync transfur to backend (offline mode):', error);
+      },
+    });
+    
+    // Set cooldown
+    captureCooldown.current = 3.0;
+  };
+
   useFrame((state, delta) => {
     if (!playerRef.current) return;
+
+    // Update capture cooldown
+    if (captureCooldown.current > 0) {
+      captureCooldown.current -= delta;
+    }
+
+    // Disable movement during encounter
+    if (isInTransfurEncounter) {
+      return;
+    }
 
     // Apply horizontal movement
     const speed = 2;
@@ -75,9 +132,16 @@ export default function HiveScene() {
       setIsGrounded(true);
     }
 
-    // Apply camera look
-    state.camera.rotation.y += look.x * delta;
-    state.camera.rotation.x += look.y * delta;
+    // Update player world position for enemies
+    setPlayerWorldPosition([
+      playerRef.current.position.x,
+      playerRef.current.position.y,
+      playerRef.current.position.z,
+    ]);
+
+    // Apply camera look with sensitivity multiplier
+    state.camera.rotation.y += look.x * delta * aimSensitivity;
+    state.camera.rotation.x += look.y * delta * aimSensitivity;
     state.camera.rotation.x = THREE.MathUtils.clamp(state.camera.rotation.x, -Math.PI / 3, Math.PI / 3);
 
     // Update camera position to follow player
@@ -85,6 +149,10 @@ export default function HiveScene() {
     state.camera.position.y = playerRef.current.position.y + 1.6; // Eye height
     state.camera.position.z = playerRef.current.position.z;
   });
+
+  const handleTransfurComplete = () => {
+    resolveTransfurEncounter();
+  };
 
   return (
     <>
@@ -100,6 +168,17 @@ export default function HiveScene() {
           <meshStandardMaterial color="#4a90e2" metalness={0.3} roughness={0.7} />
         </mesh>
       </group>
+
+      {/* White Latex Beast enemies */}
+      {enemySpawns.map((spawn, i) => (
+        <WhiteLatexBeast
+          key={i}
+          spawnPosition={spawn}
+          playerPosition={playerWorldPosition}
+          onCapture={handleEnemyCapture}
+          disabled={isInTransfurEncounter}
+        />
+      ))}
 
       {/* Floor - white latex-like surface */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
@@ -184,7 +263,7 @@ function LatexTree({ position, seed }: { position: [number, number, number]; see
       })}
       
       {/* Top foliage */}
-      <mesh position={[0, height + foliageSize * 0.5, 0]} castShadow>
+      <mesh position={[0, height, 0]} castShadow>
         <sphereGeometry args={[foliageSize * 1.2, 12, 12]} />
         <meshStandardMaterial 
           color="#ffffff" 
@@ -199,38 +278,33 @@ function LatexTree({ position, seed }: { position: [number, number, number]; see
 }
 
 function LatexFormation({ position }: { position: [number, number, number] }) {
-  const groupRef = useRef<THREE.Group>(null);
-  
-  useFrame((state) => {
-    if (!groupRef.current) return;
-    groupRef.current.position.y = Math.sin(state.clock.elapsedTime * 0.4) * 0.1;
-  });
-
   return (
-    <group ref={groupRef} position={position}>
-      {/* Organic blob-like formations */}
+    <group position={position}>
+      {/* Organic blob formations */}
       <mesh position={[0, 0.5, 0]} castShadow>
         <sphereGeometry args={[0.8, 12, 12]} />
         <meshStandardMaterial 
-          color="#f8f8fc" 
-          metalness={0.5}
-          roughness={0.2}
+          color="#fafafa" 
+          metalness={0.3}
+          roughness={0.3}
         />
       </mesh>
       <mesh position={[0.6, 0.3, 0.4]} castShadow>
         <sphereGeometry args={[0.5, 12, 12]} />
         <meshStandardMaterial 
-          color="#f8f8fc" 
-          metalness={0.5}
+          color="#ffffff" 
+          metalness={0.4}
           roughness={0.2}
+          transparent
+          opacity={0.9}
         />
       </mesh>
       <mesh position={[-0.5, 0.4, -0.3]} castShadow>
         <sphereGeometry args={[0.6, 12, 12]} />
         <meshStandardMaterial 
-          color="#f8f8fc" 
-          metalness={0.5}
-          roughness={0.2}
+          color="#f5f5fa" 
+          metalness={0.35}
+          roughness={0.25}
         />
       </mesh>
     </group>
