@@ -1,11 +1,11 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { ENEMY_CONSTANTS } from './types';
 
 interface WhiteLatexBeastProps {
   spawnPosition: [number, number, number];
-  playerPosition: [number, number, number];
+  playerPositionRef: React.MutableRefObject<[number, number, number]>;
   onCapture: () => void;
   disabled?: boolean;
 }
@@ -14,7 +14,7 @@ type AIPhase = 'wander' | 'ambush' | 'chase';
 
 export default function WhiteLatexBeast({
   spawnPosition,
-  playerPosition,
+  playerPositionRef,
   onCapture,
   disabled = false,
 }: WhiteLatexBeastProps) {
@@ -33,7 +33,8 @@ export default function WhiteLatexBeast({
   useFrame((state, delta) => {
     if (!groupRef.current || disabled || captureTriggered) return;
 
-    const playerPos = new THREE.Vector3(...playerPosition);
+    // Read player position from ref (no re-render dependency)
+    const playerPos = new THREE.Vector3(...playerPositionRef.current);
     const currentPos = position.clone();
     const distanceToPlayer = currentPos.distanceTo(playerPos);
 

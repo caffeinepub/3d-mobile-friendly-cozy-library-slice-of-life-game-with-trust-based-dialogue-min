@@ -1,30 +1,53 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-16T01:23:06.237Z",
-  "summary": "Diff implements an AI phase state machine for WhiteLatexBeast with a new ambush phase, adds enemy constants for ambush duration and escape distance, and updates chase behavior to track the player continuously and terminate on escape distance. Also includes unrelated project metadata/summary file updates not requested in the BuildRequest.",
-  "missing_requirements": [],
-  "hallucinated_features": [
+  "generatedAt": "2026-02-16T01:35:38.026Z",
+  "summary": "REQ-2/REQ-3/REQ-4 appear partially addressed in the modified scene/character code (hooks violation removed; per-frame physics moved to refs; Puro rendered as a sprite/billboard with hover+click). However, REQ-5 (adding the required static image assets) is not implemented in the diff (no new files added), and there are signs of additional unrequested backend expansions.",
+  "missing_requirements": [
     {
-      "description": "Updated/added project metadata tracking for the feature request (project_state.json)",
-      "reason": "BuildRequest only asked for gameplay/AI changes and constants; it did not request maintaining a separate project state tracking file.",
+      "id": "REQ-5",
+      "requirement": "Add the required Puro visual assets as static files under `frontend/public/assets/generated/` with the exact filenames specified (puro-idle-front.dim_512x512.png, puro-idle-34.dim_512x512.png, puro-hover.dim_512x512.png), and load them directly from the frontend.",
+      "reason": "The diff shows `Puro.tsx` loading image paths under `/assets/generated/`, but the diff reports **no added files**, and there is no evidence that the required PNGs were added under `frontend/public/assets/generated/`. Also, `puro-idle-34.dim_512x512.png` is required but not referenced/loaded in the shown Puro component.",
       "evidence": [
-        "project_state.json"
+        "frontend/src/game/characters/Puro.tsx",
+        "<file-diff> ADDED FILES: - none"
       ]
     },
     {
-      "description": "Updated a generated/aggregate frontend file summary listing many components unrelated to the requested enemy AI change",
-      "reason": "BuildRequest does not mention modifying documentation/summary artifacts; only specifies enemy AI/constants behavior changes and constraints.",
+      "id": "REQ-1",
+      "requirement": "Scan the project for runtime errors, React warnings, and obvious logic bugs; fix or remove buggy code paths without changing intended gameplay behavior.",
+      "reason": "The diff shows some targeted fixes (hooks usage, per-frame state updates), but it does not provide sufficient evidence of a broader scan ensuring no runtime errors/React warnings remain, nor confirmation that both Library and Hive scenes are playable after all fixes. Given truncation, this cannot be verified from the diff summary alone.",
       "evidence": [
+        "frontend/src/game/scene/LibraryScene.tsx",
+        "frontend/src/game/scene/HiveScene.tsx",
         "frontend-file-summaries.txt"
       ]
     }
   ],
-  "confidence": 0.74,
+  "hallucinated_features": [
+    {
+      "description": "Large expansion of backend domain models/state (dialogue nodes, activities, moments, letters, endings, transfur tracking fields, access control mixin) beyond the requested frontend bug fixes and Puro visual redesign.",
+      "reason": "BuildRequest constraints emphasize keeping backend as a single actor (which may still be true), but requirements focus on frontend runtime/React fixes and Puro visuals/assets. The backend changes shown look like substantial new functionality/data modeling not explicitly requested by REQ-1..REQ-5.",
+      "evidence": [
+        "backend/main.mo"
+      ]
+    },
+    {
+      "description": "New/changed enemy AI state machine phases (wander/ambush/chase) and additional behavior in `WhiteLatexBeast`.",
+      "reason": "The BuildRequest explicitly lists non-goals including not adding new chase systems/enemies/scenes beyond what exists. The diff shows a more elaborate AI phase system; while it could be a refactor/bugfix, the summary evidence looks like feature expansion beyond the stated request.",
+      "evidence": [
+        "frontend/src/game/enemies/WhiteLatexBeast.tsx"
+      ]
+    }
+  ],
+  "confidence": 0.62,
   "changed_files": [
+    "backend/main.mo",
     "frontend-file-summaries.txt",
+    "frontend/src/game/characters/Puro.tsx",
     "frontend/src/game/enemies/WhiteLatexBeast.tsx",
-    "frontend/src/game/enemies/types.ts",
+    "frontend/src/game/scene/HiveScene.tsx",
+    "frontend/src/game/scene/LibraryScene.tsx",
     "project_state.json"
   ]
 }

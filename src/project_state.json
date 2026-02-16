@@ -1,40 +1,49 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Implement ambush-followed chase behavior for white latex enemies: chase starts immediately after ambush, continuously tracks player, and ends when player escapes a specified distance.",
+  "summary": "New project",
   "architectural_notes": [],
   "known_issues": [],
-  "isFixRequest": false,
+  "isFixRequest": true,
+  "imageRequirements": "## Required Images\n- Stylized black latex wolf humanoid character sprite, front-facing, neutral/idle pose, high-contrast cartoon shading, transparent background (puro-idle-front.dim_512x512.png)\n- Stylized black latex wolf humanoid character sprite, slight 3/4 view, neutral/idle pose, high-contrast cartoon shading, transparent background (puro-idle-34.dim_512x512.png)\n- Stylized black latex wolf humanoid character sprite, hover/highlight variant (slightly brighter rim light), transparent background (puro-hover.dim_512x512.png)",
   "existing_features": [
     {
-      "id": "feature-update-the-whitelatexbeast-enemy-ai-to-include-an-ambush-phase-that-triggers-before-chasing-when-the-enemy-decides-to-engage-the-player-it-must-play-an-ambush-animation-state-and-then-transition-into-chase-immediately-after-the-ambush-animation-ends",
-      "title": "Update the WhiteLatexBeast enemy AI to include an \"ambush\" phase that triggers before chasing: when the enemy decides to engage the player, it must play an ambush animation/state and then transition into chase immediately after the ambush animation ends.",
+      "id": "feature-scan-the-project-for-runtime-errors-react-warnings-and-obvious-logic-bugs-fix-or-remove-the-buggy-code-paths-without-changing-intended-gameplay-behavior",
+      "title": "Scan the project for runtime errors, React warnings, and obvious logic bugs; fix or remove the buggy code paths without changing intended gameplay behavior.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-during-the-chase-phase-make-whitelatexbeast-continuously-track-the-player-s-current-position-each-frame-i-e-chase-direction-updates-in-real-time-based-on-the-player-s-latest-position",
-      "title": "During the chase phase, make WhiteLatexBeast continuously track the player's current position each frame (i.e., chase direction updates in real time based on the player's latest position).",
+      "id": "feature-fix-the-invalid-react-hooks-usage-in-the-library-scene-texture-loading-so-that-hooks-are-not-conditionally-imperatively-invoked-remove-the-current-try-catch-hook-invocation-pattern-while-preserving-the-fallback-behavior-if-the-wood-texture-cannot-be-used",
+      "title": "Fix the invalid React Hooks usage in the Library scene texture loading so that hooks are not conditionally/imperatively invoked (remove the current try/catch hook invocation pattern) while preserving the fallback behavior if the wood texture cannot be used.",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
     },
     {
-      "id": "feature-change-chase-termination-so-that-once-the-enemy-has-begun-chasing-after-ambush-it-continues-chasing-until-the-player-escapes-beyond-a-configured-escape-distance-at-which-point-the-enemy-stops-chasing-and-returns-to-wandering-behavior",
-      "title": "Change chase termination so that once the enemy has begun chasing (after ambush), it continues chasing until the player escapes beyond a configured escape distance, at which point the enemy stops chasing and returns to wandering behavior.",
+      "id": "feature-fix-performance-logic-bugs-caused-by-updating-react-state-inside-the-render-loop-useframe-for-movement-jump-camera-logic-in-libraryscene-tsx-and-hivescene-tsx-by-moving-per-frame-physics-state-e-g-vertical-velocity-grounded-state-player-world-position-to-refs-or-other-non-re-rendering-storage-while-keeping-the-same-movement-feel-and-collision-behavior",
+      "title": "Fix performance/logic bugs caused by updating React state inside the render loop (`useFrame`) for movement/jump/camera logic in `LibraryScene.tsx` and `HiveScene.tsx` by moving per-frame physics state (e.g., vertical velocity, grounded state, player world position) to refs or other non-re-rendering storage, while keeping the same movement feel and collision behavior.",
       "reqIds": [
         "REQ-3"
       ],
       "version": 1
     },
     {
-      "id": "feature-add-adjust-enemy-tuning-constants-in-frontend-src-game-enemies-types-ts-to-support-ambush-escape-based-chase-e-g-an-ambush-duration-and-an-escape-radius-distance-and-ensure-the-hivescene-behavior-remains-stable-with-multiple-enemies-and-while-transfur-encounter-ui-is-active-disabled-enemies-must-not-progress-ambush-chase-timers-or-move",
-      "title": "Add/adjust enemy tuning constants in frontend/src/game/enemies/types.ts to support ambush + escape-based chase (e.g., an ambush duration and an escape radius/distance), and ensure the HiveScene behavior remains stable with multiple enemies and while transfur encounter UI is active (disabled enemies must not progress ambush/chase timers or move).",
+      "id": "feature-update-the-puro-character-rendering-to-visually-resemble-puro-from-dragonsnow-s-changed-stylized-game-accurate-look-while-keeping-it-in-the-current-3d-scene-pipeline-implement-a-clearly-non-3d-look-e-g-billboard-sprite-or-flat-toon-cel-style-instead-of-the-current-simple-3d-capsule-sphere-model",
+      "title": "Update the Puro character rendering to visually resemble Puro from DragonSnow’s Changed (stylized, game-accurate look) while keeping it in the current 3D scene pipeline; implement a clearly non-3D look (e.g., billboard/sprite or flat toon/cel style) instead of the current simple 3D capsule/sphere model.",
       "reqIds": [
         "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-the-required-puro-visual-assets-as-static-files-under-frontend-public-assets-generated-and-load-them-directly-from-the-frontend-do-not-route-images-through-the-backend",
+      "title": "Add the required Puro visual assets as static files under `frontend/public/assets/generated/` and load them directly from the frontend (do not route images through the backend).",
+      "reqIds": [
+        "REQ-5"
       ],
       "version": 1
     }
@@ -42,12 +51,18 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "White latex enemies chase player immediately after ambush, continuously tracking player position, ending when player escapes a set distance.",
+      "summary": "Scan project for bugs and remove/fix any found issues",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Update Puro character visuals to resemble the original 'Changed' game by DragonSnow, with a non-3D look (\"except 3d\")",
       "reqIds": [],
       "status": "pending"
     }
   ],
-  "projectName": "Add ambush-triggered chase that continuously tracks the player and ends on escape distance",
+  "projectName": "Bug fixes and Puro visual redesign (non-3D look)",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

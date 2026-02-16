@@ -1,6 +1,6 @@
-import { useRef, useState } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Environment, useTexture } from '@react-three/drei';
+import { Environment } from '@react-three/drei';
 import * as THREE from 'three';
 import Puro from '../characters/Puro';
 import { usePlayerControls } from '../controls/usePlayerControls';
@@ -17,30 +17,34 @@ export default function LibraryScene() {
   const { libraryCustomizations, teleportToHive } = useGameStore();
   const { aimSensitivity } = useSettingsStore();
   
-  // Jump physics state
-  const [verticalVelocity, setVerticalVelocity] = useState(0);
-  const [isGrounded, setIsGrounded] = useState(true);
+  // Jump physics state - using refs to avoid per-frame re-renders
+  const verticalVelocityRef = useRef(0);
+  const isGroundedRef = useRef(true);
 
   // Proximity trigger state
   const wasInProximity = useRef(false);
   const lastTriggerTime = useRef(0);
   const hasTeleported = useRef(false);
 
-  // Load texture unconditionally (required by Rules of Hooks)
-  // If it fails, drei will handle the error and we'll use fallback material
-  let woodTexture: THREE.Texture | null = null;
-  try {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    woodTexture = useTexture('/assets/generated/wood-paper-texture-tile.dim_512x512.png');
-    if (woodTexture) {
-      woodTexture.wrapS = woodTexture.wrapT = THREE.RepeatWrapping;
-      woodTexture.repeat.set(4, 4);
-    }
-  } catch (error) {
-    // Texture loading failed, will use fallback material
-    console.warn('Failed to load wood texture, using fallback material');
-    woodTexture = null;
-  }
+  // Load texture using TextureLoader in an effect (not a hook)
+  const [woodTexture, setWoodTexture] = useState<THREE.Texture | null>(null);
+
+  useEffect(() => {
+    const loader = new THREE.TextureLoader();
+    loader.load(
+      '/assets/generated/wood-paper-texture-tile.dim_512x512.png',
+      (texture) => {
+        texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+        texture.repeat.set(4, 4);
+        setWoodTexture(texture);
+      },
+      undefined,
+      (error) => {
+        console.warn('Failed to load wood texture, using fallback material', error);
+        setWoodTexture(null);
+      }
+    );
+  }, []);
 
   useFrame((state, delta) => {
     if (!playerRef.current) return;
@@ -60,25 +64,22 @@ export default function LibraryScene() {
     const floorHeight = 0;
 
     // Check for jump request
-    if (controlsStore.consumeJump() && isGrounded) {
-      setVerticalVelocity(jumpForce);
-      setIsGrounded(false);
+    if (controlsStore.consumeJump() && isGroundedRef.current) {
+      verticalVelocityRef.current = jumpForce;
+      isGroundedRef.current = false;
     }
 
     // Apply gravity and vertical velocity
-    setVerticalVelocity(prev => {
-      const newVelocity = prev + gravity * delta;
-      return newVelocity;
-    });
+    verticalVelocityRef.current += gravity * delta;
 
     // Update vertical position
-    playerRef.current.position.y += verticalVelocity * delta;
+    playerRef.current.position.y += verticalVelocityRef.current * delta;
 
     // Ground collision
     if (playerRef.current.position.y <= floorHeight) {
       playerRef.current.position.y = floorHeight;
-      setVerticalVelocity(0);
-      setIsGrounded(true);
+      verticalVelocityRef.current = 0;
+      isGroundedRef.current = true;
     }
 
     // Apply camera look with sensitivity multiplier

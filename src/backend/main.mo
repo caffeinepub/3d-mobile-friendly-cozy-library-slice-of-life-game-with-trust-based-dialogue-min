@@ -10,9 +10,7 @@ import Principal "mo:core/Principal";
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
 
-
 actor {
-  // Initialize the access control system
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
 
@@ -80,7 +78,6 @@ actor {
     gamesPlayed : Nat;
   };
 
-  // Use DEFAULT_STATE constant instead of persistent variable for compatibility
   let defaultState : GameState = {
     trustLevel = 50;
     currentDialogueNode = null;

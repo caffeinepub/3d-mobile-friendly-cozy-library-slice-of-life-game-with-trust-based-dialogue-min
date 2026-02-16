@@ -1,5 +1,5 @@
-import { forwardRef, useState, useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { forwardRef, useState, useRef, useEffect } from 'react';
+import { useFrame, useLoader } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useGameStore } from '../state/useGameStore';
 
@@ -11,6 +11,18 @@ const Puro = forwardRef<THREE.Group, PuroProps>(({ position }, ref) => {
   const [hovered, setHovered] = useState(false);
   const { setShowDialogue } = useGameStore();
   const lastInteraction = useRef(0);
+  
+  // Load Puro sprite textures
+  const idleTexture = useLoader(THREE.TextureLoader, '/assets/generated/puro-idle-front.dim_512x512.png');
+  const hoverTexture = useLoader(THREE.TextureLoader, '/assets/generated/puro-hover.dim_512x512.png');
+
+  // Configure textures for transparency
+  useEffect(() => {
+    [idleTexture, hoverTexture].forEach(texture => {
+      texture.minFilter = THREE.LinearFilter;
+      texture.magFilter = THREE.LinearFilter;
+    });
+  }, [idleTexture, hoverTexture]);
 
   useFrame((state) => {
     if (!ref || typeof ref === 'function' || !ref.current) return;
@@ -36,6 +48,15 @@ const Puro = forwardRef<THREE.Group, PuroProps>(({ position }, ref) => {
     document.body.style.cursor = 'default';
   };
 
+  // Cleanup cursor on unmount
+  useEffect(() => {
+    return () => {
+      document.body.style.cursor = 'default';
+    };
+  }, []);
+
+  const currentTexture = hovered ? hoverTexture : idleTexture;
+
   return (
     <group 
       ref={ref} 
@@ -44,45 +65,25 @@ const Puro = forwardRef<THREE.Group, PuroProps>(({ position }, ref) => {
       onPointerOver={handlePointerOver}
       onPointerOut={handlePointerOut}
     >
-      {/* Body */}
-      <mesh position={[0, 0.8, 0]} castShadow>
-        <capsuleGeometry args={[0.3, 0.8, 8, 16]} />
-        <meshStandardMaterial 
-          color={hovered ? "#1a1a1a" : "#0a0a0a"} 
-          metalness={0.3}
-          roughness={0.7}
+      {/* Billboard sprite that always faces camera */}
+      <sprite scale={[2, 2, 1]}>
+        <spriteMaterial 
+          map={currentTexture} 
+          transparent={true}
+          alphaTest={0.1}
+          depthWrite={false}
         />
-      </mesh>
+      </sprite>
       
-      {/* Head */}
-      <mesh position={[0, 1.8, 0]} castShadow>
-        <sphereGeometry args={[0.35, 16, 16]} />
-        <meshStandardMaterial 
-          color={hovered ? "#1a1a1a" : "#0a0a0a"}
-          metalness={0.3}
-          roughness={0.7}
+      {/* Hover glow effect */}
+      {hovered && (
+        <pointLight 
+          position={[0, 1, 0]} 
+          intensity={0.5} 
+          distance={3} 
+          color="#ffffff" 
         />
-      </mesh>
-
-      {/* Eyes */}
-      <mesh position={[-0.12, 1.85, 0.3]} castShadow>
-        <sphereGeometry args={[0.08, 8, 8]} />
-        <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.5} />
-      </mesh>
-      <mesh position={[0.12, 1.85, 0.3]} castShadow>
-        <sphereGeometry args={[0.08, 8, 8]} />
-        <meshStandardMaterial color="#ffffff" emissive="#ffffff" emissiveIntensity={0.5} />
-      </mesh>
-
-      {/* Ears */}
-      <mesh position={[-0.25, 2.1, 0]} rotation={[0, 0, -0.3]} castShadow>
-        <coneGeometry args={[0.1, 0.3, 8]} />
-        <meshStandardMaterial color="#0a0a0a" />
-      </mesh>
-      <mesh position={[0.25, 2.1, 0]} rotation={[0, 0, 0.3]} castShadow>
-        <coneGeometry args={[0.1, 0.3, 8]} />
-        <meshStandardMaterial color="#0a0a0a" />
-      </mesh>
+      )}
     </group>
   );
 });

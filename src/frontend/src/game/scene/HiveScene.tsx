@@ -1,4 +1,4 @@
-import { useRef, useState, useMemo } from 'react';
+import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Environment } from '@react-three/drei';
 import * as THREE from 'three';
@@ -23,10 +23,10 @@ export default function HiveScene() {
   const { aimSensitivity } = useSettingsStore();
   const recordTransfurredMutation = useRecordTransfurred();
   
-  // Jump physics state
-  const [verticalVelocity, setVerticalVelocity] = useState(0);
-  const [isGrounded, setIsGrounded] = useState(true);
-  const [playerWorldPosition, setPlayerWorldPosition] = useState<[number, number, number]>([0, 0, 0]);
+  // Jump physics state - using refs to avoid per-frame re-renders
+  const verticalVelocityRef = useRef(0);
+  const isGroundedRef = useRef(true);
+  const playerWorldPositionRef = useRef<[number, number, number]>([0, 0, 0]);
   const captureCooldown = useRef(0);
 
   // Generate procedural forest layout
@@ -111,33 +111,30 @@ export default function HiveScene() {
     const floorHeight = 0;
 
     // Check for jump request
-    if (controlsStore.consumeJump() && isGrounded) {
-      setVerticalVelocity(jumpForce);
-      setIsGrounded(false);
+    if (controlsStore.consumeJump() && isGroundedRef.current) {
+      verticalVelocityRef.current = jumpForce;
+      isGroundedRef.current = false;
     }
 
     // Apply gravity and vertical velocity
-    setVerticalVelocity(prev => {
-      const newVelocity = prev + gravity * delta;
-      return newVelocity;
-    });
+    verticalVelocityRef.current += gravity * delta;
 
     // Update vertical position
-    playerRef.current.position.y += verticalVelocity * delta;
+    playerRef.current.position.y += verticalVelocityRef.current * delta;
 
     // Ground collision
     if (playerRef.current.position.y <= floorHeight) {
       playerRef.current.position.y = floorHeight;
-      setVerticalVelocity(0);
-      setIsGrounded(true);
+      verticalVelocityRef.current = 0;
+      isGroundedRef.current = true;
     }
 
-    // Update player world position for enemies
-    setPlayerWorldPosition([
+    // Update player world position ref for enemies (no re-render)
+    playerWorldPositionRef.current = [
       playerRef.current.position.x,
       playerRef.current.position.y,
       playerRef.current.position.z,
-    ]);
+    ];
 
     // Apply camera look with sensitivity multiplier
     state.camera.rotation.y += look.x * delta * aimSensitivity;
@@ -156,10 +153,10 @@ export default function HiveScene() {
 
   return (
     <>
-      <Environment preset="dawn" />
-      <ambientLight intensity={0.6} color="#f0f0f5" />
-      <directionalLight position={[10, 20, 10]} intensity={0.8} color="#ffffff" castShadow />
-      <fog attach="fog" args={['#e8e8f0', 10, 40]} />
+      <Environment preset="sunset" />
+      <ambientLight intensity={0.4} />
+      <directionalLight position={[10, 10, 5]} intensity={0.5} color="#e8f4ff" castShadow />
+      <pointLight position={[0, 5, 0]} intensity={0.3} color="#ffffff" />
 
       {/* Player avatar */}
       <group ref={playerRef} position={hiveSpawnPosition}>
@@ -169,142 +166,50 @@ export default function HiveScene() {
         </mesh>
       </group>
 
-      {/* White Latex Beast enemies */}
+      {/* Floor */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
+        <planeGeometry args={[60, 60]} />
+        <meshStandardMaterial color="#d4d4d4" roughness={0.8} />
+      </mesh>
+
+      {/* White latex forest */}
+      {treePositions.map((pos, i) => (
+        <WhiteLatexTree key={i} position={pos} />
+      ))}
+
+      {/* White Latex Beast enemies - pass ref getter for player position */}
       {enemySpawns.map((spawn, i) => (
         <WhiteLatexBeast
           key={i}
           spawnPosition={spawn}
-          playerPosition={playerWorldPosition}
+          playerPositionRef={playerWorldPositionRef}
           onCapture={handleEnemyCapture}
           disabled={isInTransfurEncounter}
         />
       ))}
-
-      {/* Floor - white latex-like surface */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
-        <planeGeometry args={[60, 60]} />
-        <meshStandardMaterial 
-          color="#f5f5fa" 
-          metalness={0.2}
-          roughness={0.4}
-        />
-      </mesh>
-
-      {/* Procedural white latex trees */}
-      {treePositions.map((pos, i) => (
-        <LatexTree key={i} position={pos} seed={i} />
-      ))}
-
-      {/* Ambient white latex formations */}
-      <LatexFormation position={[-8, 0, -8]} />
-      <LatexFormation position={[8, 0, 8]} />
-      <LatexFormation position={[-10, 0, 10]} />
-      <LatexFormation position={[10, 0, -10]} />
     </>
   );
 }
 
-function LatexTree({ position, seed }: { position: [number, number, number]; seed: number }) {
-  const groupRef = useRef<THREE.Group>(null);
-  
-  // Deterministic randomness based on seed
-  const random = (offset: number) => {
-    const x = Math.sin(seed * 12.9898 + offset) * 43758.5453;
-    return x - Math.floor(x);
-  };
-  
-  const height = 3 + random(1) * 2;
-  const trunkRadius = 0.15 + random(2) * 0.1;
-  const foliageSize = 0.8 + random(3) * 0.4;
-  const branches = Math.floor(3 + random(4) * 3);
-
-  useFrame((state) => {
-    if (!groupRef.current) return;
-    // Gentle sway animation
-    groupRef.current.rotation.z = Math.sin(state.clock.elapsedTime * 0.3 + seed) * 0.05;
-  });
-
-  return (
-    <group ref={groupRef} position={position}>
-      {/* Smooth trunk */}
-      <mesh position={[0, height / 2, 0]} castShadow>
-        <cylinderGeometry args={[trunkRadius * 0.8, trunkRadius, height, 12]} />
-        <meshStandardMaterial 
-          color="#fafafa" 
-          metalness={0.3}
-          roughness={0.3}
-        />
-      </mesh>
-      
-      {/* Foliage clusters */}
-      {Array.from({ length: branches }).map((_, i) => {
-        const angle = (i / branches) * Math.PI * 2;
-        const branchHeight = height * 0.6 + random(i + 10) * height * 0.3;
-        const branchRadius = 0.5 + random(i + 20) * 0.3;
-        const offsetX = Math.cos(angle) * branchRadius;
-        const offsetZ = Math.sin(angle) * branchRadius;
-        
-        return (
-          <mesh 
-            key={i} 
-            position={[offsetX, branchHeight, offsetZ]} 
-            castShadow
-          >
-            <sphereGeometry args={[foliageSize, 12, 12]} />
-            <meshStandardMaterial 
-              color="#ffffff" 
-              metalness={0.4}
-              roughness={0.2}
-              transparent
-              opacity={0.9}
-            />
-          </mesh>
-        );
-      })}
-      
-      {/* Top foliage */}
-      <mesh position={[0, height, 0]} castShadow>
-        <sphereGeometry args={[foliageSize * 1.2, 12, 12]} />
-        <meshStandardMaterial 
-          color="#ffffff" 
-          metalness={0.4}
-          roughness={0.2}
-          transparent
-          opacity={0.95}
-        />
-      </mesh>
-    </group>
-  );
-}
-
-function LatexFormation({ position }: { position: [number, number, number] }) {
+function WhiteLatexTree({ position }: { position: [number, number, number] }) {
   return (
     <group position={position}>
-      {/* Organic blob formations */}
-      <mesh position={[0, 0.5, 0]} castShadow>
-        <sphereGeometry args={[0.8, 12, 12]} />
+      {/* Trunk */}
+      <mesh position={[0, 1.5, 0]} castShadow>
+        <cylinderGeometry args={[0.2, 0.3, 3, 8]} />
         <meshStandardMaterial 
-          color="#fafafa" 
-          metalness={0.3}
-          roughness={0.3}
+          color="#f0f0f0" 
+          metalness={0.3} 
+          roughness={0.4}
         />
       </mesh>
-      <mesh position={[0.6, 0.3, 0.4]} castShadow>
-        <sphereGeometry args={[0.5, 12, 12]} />
+      {/* Foliage */}
+      <mesh position={[0, 3.5, 0]} castShadow>
+        <sphereGeometry args={[1.2, 8, 8]} />
         <meshStandardMaterial 
           color="#ffffff" 
-          metalness={0.4}
-          roughness={0.2}
-          transparent
-          opacity={0.9}
-        />
-      </mesh>
-      <mesh position={[-0.5, 0.4, -0.3]} castShadow>
-        <sphereGeometry args={[0.6, 12, 12]} />
-        <meshStandardMaterial 
-          color="#f5f5fa" 
-          metalness={0.35}
-          roughness={0.25}
+          metalness={0.4} 
+          roughness={0.3}
         />
       </mesh>
     </group>

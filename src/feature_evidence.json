@@ -2,10 +2,13 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-the-whitelatexbeast-enemy-ai-to-include-an-ambush-phase-that-triggers-before-chasing-when-the-enemy-decides-to-engage-the-player-it-must-play-an-ambush-animation-state-and-then-transition-into-chase-immediately-after-the-ambush-animation-ends",
-      "featureTitle": "Update the WhiteLatexBeast enemy AI to include an \"ambush\" phase that triggers before chasing: when the enemy decides to engage the player, it must play an ambush animation/state and then transition into chase immediately after the ambush animation ends.",
+      "featureId": "feature-scan-the-project-for-runtime-errors-react-warnings-and-obvious-logic-bugs-fix-or-remove-the-buggy-code-paths-without-changing-intended-gameplay-behavior",
+      "featureTitle": "Scan the project for runtime errors, React warnings, and obvious logic bugs; fix or remove the buggy code paths without changing intended gameplay behavior.",
       "files": [
-        "frontend/src/game/enemies/WhiteLatexBeast.tsx"
+        "frontend/src/game/characters/Puro.tsx",
+        "frontend/src/game/enemies/WhiteLatexBeast.tsx",
+        "frontend/src/game/scene/HiveScene.tsx",
+        "frontend/src/game/scene/LibraryScene.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -21,10 +24,10 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-during-the-chase-phase-make-whitelatexbeast-continuously-track-the-player-s-current-position-each-frame-i-e-chase-direction-updates-in-real-time-based-on-the-player-s-latest-position",
-      "featureTitle": "During the chase phase, make WhiteLatexBeast continuously track the player's current position each frame (i.e., chase direction updates in real time based on the player's latest position).",
+      "featureId": "feature-fix-the-invalid-react-hooks-usage-in-the-library-scene-texture-loading-so-that-hooks-are-not-conditionally-imperatively-invoked-remove-the-current-try-catch-hook-invocation-pattern-while-preserving-the-fallback-behavior-if-the-wood-texture-cannot-be-used",
+      "featureTitle": "Fix the invalid React Hooks usage in the Library scene texture loading so that hooks are not conditionally/imperatively invoked (remove the current try/catch hook invocation pattern) while preserving the fallback behavior if the wood texture cannot be used.",
       "files": [
-        "frontend/src/game/enemies/WhiteLatexBeast.tsx"
+        "frontend/src/game/scene/LibraryScene.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -40,10 +43,12 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-change-chase-termination-so-that-once-the-enemy-has-begun-chasing-after-ambush-it-continues-chasing-until-the-player-escapes-beyond-a-configured-escape-distance-at-which-point-the-enemy-stops-chasing-and-returns-to-wandering-behavior",
-      "featureTitle": "Change chase termination so that once the enemy has begun chasing (after ambush), it continues chasing until the player escapes beyond a configured escape distance, at which point the enemy stops chasing and returns to wandering behavior.",
+      "featureId": "feature-fix-performance-logic-bugs-caused-by-updating-react-state-inside-the-render-loop-useframe-for-movement-jump-camera-logic-in-libraryscene-tsx-and-hivescene-tsx-by-moving-per-frame-physics-state-e-g-vertical-velocity-grounded-state-player-world-position-to-refs-or-other-non-re-rendering-storage-while-keeping-the-same-movement-feel-and-collision-behavior",
+      "featureTitle": "Fix performance/logic bugs caused by updating React state inside the render loop (`useFrame`) for movement/jump/camera logic in `LibraryScene.tsx` and `HiveScene.tsx` by moving per-frame physics state (e.g., vertical velocity, grounded state, player world position) to refs or other non-re-rendering storage, while keeping the same movement feel and collision behavior.",
       "files": [
-        "frontend/src/game/enemies/WhiteLatexBeast.tsx"
+        "frontend/src/game/enemies/WhiteLatexBeast.tsx",
+        "frontend/src/game/scene/HiveScene.tsx",
+        "frontend/src/game/scene/LibraryScene.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -59,11 +64,11 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-add-adjust-enemy-tuning-constants-in-frontend-src-game-enemies-types-ts-to-support-ambush-escape-based-chase-e-g-an-ambush-duration-and-an-escape-radius-distance-and-ensure-the-hivescene-behavior-remains-stable-with-multiple-enemies-and-while-transfur-encounter-ui-is-active-disabled-enemies-must-not-progress-ambush-chase-timers-or-move",
-      "featureTitle": "Add/adjust enemy tuning constants in frontend/src/game/enemies/types.ts to support ambush + escape-based chase (e.g., an ambush duration and an escape radius/distance), and ensure the HiveScene behavior remains stable with multiple enemies and while transfur encounter UI is active (disabled enemies must not progress ambush/chase timers or move).",
+      "featureId": "feature-update-the-puro-character-rendering-to-visually-resemble-puro-from-dragonsnow-s-changed-stylized-game-accurate-look-while-keeping-it-in-the-current-3d-scene-pipeline-implement-a-clearly-non-3d-look-e-g-billboard-sprite-or-flat-toon-cel-style-instead-of-the-current-simple-3d-capsule-sphere-model",
+      "featureTitle": "Update the Puro character rendering to visually resemble Puro from DragonSnow’s Changed (stylized, game-accurate look) while keeping it in the current 3D scene pipeline; implement a clearly non-3D look (e.g., billboard/sprite or flat toon/cel style) instead of the current simple 3D capsule/sphere model.",
       "files": [
-        "frontend/src/game/enemies/WhiteLatexBeast.tsx",
-        "frontend/src/game/enemies/types.ts"
+        "frontend/src/game/characters/Puro.tsx",
+        "frontend/src/game/scene/LibraryScene.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -75,6 +80,25 @@
       ],
       "testIds": [
         "REQ-4"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-the-required-puro-visual-assets-as-static-files-under-frontend-public-assets-generated-and-load-them-directly-from-the-frontend-do-not-route-images-through-the-backend",
+      "featureTitle": "Add the required Puro visual assets as static files under `frontend/public/assets/generated/` and load them directly from the frontend (do not route images through the backend).",
+      "files": [
+        "frontend/src/game/characters/Puro.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0"
+      ],
+      "testIds": [
+        "REQ-5"
       ],
       "confidence": "high"
     }

@@ -1,12 +1,13 @@
 # Specification
 
 ## Summary
-**Goal:** Add an ambush-triggered chase for WhiteLatexBeast that immediately transitions into a continuously-updating chase, and only ends once the player escapes beyond a configured distance.
+**Goal:** Fix runtime/React issues and redesign the Puro character to a stylized, clearly non-3D look while preserving current gameplay.
 
 **Planned changes:**
-- Update WhiteLatexBeast AI to add an "ambush" state that plays when the enemy first engages the player, then transitions directly into chase when ambush completes.
-- Modify chase behavior so the enemy continuously tracks the player’s current position each frame (direction and facing update in real time).
-- Change chase termination rules so chase persists after it starts and only ends when the player exceeds a configurable escape distance, then returns to existing wander behavior.
-- Add/adjust tuning constants in `frontend/src/game/enemies/types.ts` for ambush + escape-distance chase, and ensure disabled enemies (e.g., during transfur encounter UI) do not move or advance AI/timers.
+- Scan and fix/remove runtime errors, React warnings, and obvious logic bugs without changing intended gameplay behavior.
+- Refactor Library scene texture loading to follow valid React Hooks rules while keeping the wood-texture fallback behavior.
+- Refactor per-frame movement/jump/camera logic in Library and Hive scenes to avoid updating React state inside `useFrame` (move per-frame physics state to refs or other non-rendering storage) while preserving movement feel, collisions, and Hive enemy chase behavior.
+- Replace the current basic 3D capsule/sphere Puro model with a flat/stylized non-3D rendering approach (e.g., sprite/billboard or toon-flat) that remains positioned/interactable, including click-to-dialogue and hover feedback.
+- Add and load new Puro image assets from `frontend/public/assets/generated/` directly in the frontend (no backend routing).
 
-**User-visible outcome:** When a WhiteLatexBeast engages, it ambushes and then immediately begins a chase that actively follows the player’s movements, only giving up once the player gets far enough away.
+**User-visible outcome:** The game builds cleanly, Library and Hive remain playable with stable performance, and Puro appears as a stylized non-3D character with working hover and dialogue interactions.

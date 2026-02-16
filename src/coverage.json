@@ -1,70 +1,103 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-16T01:23:06.240Z",
+  "generatedAt": "2026-02-16T01:35:38.029Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 4,
-    "implemented": 4,
+    "total": 5,
+    "implemented": 5,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Update the WhiteLatexBeast enemy AI to include an \"ambush\" phase that triggers before chasing: when the enemy decides to engage the player, it must play an ambush animation/state and then transition into chase immediately after the ambush animation ends.",
+        "summary": "Scan the project for runtime errors, React warnings, and obvious logic bugs; fix or remove the buggy code paths without changing intended gameplay behavior.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/game/enemies/WhiteLatexBeast.tsx"
+          "frontend/src/game/enemies/WhiteLatexBeast.tsx",
+          "frontend/src/game/characters/Puro.tsx",
+          "frontend/src/game/scene/LibraryScene.tsx",
+          "frontend/src/game/scene/HiveScene.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/game/enemies/WhiteLatexBeast.tsx"
+          "frontend/src/game/enemies/WhiteLatexBeast.tsx",
+          "frontend/src/game/characters/Puro.tsx",
+          "frontend/src/game/scene/LibraryScene.tsx",
+          "frontend/src/game/scene/HiveScene.tsx"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "During the chase phase, make WhiteLatexBeast continuously track the player's current position each frame (i.e., chase direction updates in real time based on the player's latest position).",
+        "summary": "Fix the invalid React Hooks usage in the Library scene texture loading so that hooks are not conditionally/imperatively invoked (remove the current try/catch hook invocation pattern) while preserving the fallback behavior if the wood texture cannot be used.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/game/enemies/WhiteLatexBeast.tsx"
+          "frontend/src/game/scene/LibraryScene.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/game/enemies/WhiteLatexBeast.tsx"
+          "frontend/src/game/scene/LibraryScene.tsx"
         ]
       },
       {
         "id": "REQ-3",
-        "summary": "Change chase termination so that once the enemy has begun chasing (after ambush), it continues chasing until the player escapes beyond a configured escape distance, at which point the enemy stops chasing and returns to wandering behavior.",
+        "summary": "Fix performance/logic bugs caused by updating React state inside the render loop (`useFrame`) for movement/jump/camera logic in `LibraryScene.tsx` and `HiveScene.tsx` by moving per-frame physics state (e.g., vertical velocity, grounded state, player world position) to refs or other non-re-rendering storage, while keeping the same movement feel and collision behavior.",
         "status": "implemented",
         "plannedFiles": [
+          "frontend/src/game/scene/LibraryScene.tsx",
+          "frontend/src/game/scene/HiveScene.tsx",
           "frontend/src/game/enemies/WhiteLatexBeast.tsx"
         ],
         "matchedFiles": [
+          "frontend/src/game/scene/LibraryScene.tsx",
+          "frontend/src/game/scene/HiveScene.tsx",
           "frontend/src/game/enemies/WhiteLatexBeast.tsx"
         ]
       },
       {
         "id": "REQ-4",
-        "summary": "Add/adjust enemy tuning constants in frontend/src/game/enemies/types.ts to support ambush + escape-based chase (e.g., an ambush duration and an escape radius/distance), and ensure the HiveScene behavior remains stable with multiple enemies and while transfur encounter UI is active (disabled enemies must not progress ambush/chase timers or move).",
+        "summary": "Update the Puro character rendering to visually resemble Puro from DragonSnow’s Changed (stylized, game-accurate look) while keeping it in the current 3D scene pipeline; implement a clearly non-3D look (e.g., billboard/sprite or flat toon/cel style) instead of the current simple 3D capsule/sphere model.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/game/enemies/types.ts",
-          "frontend/src/game/enemies/WhiteLatexBeast.tsx"
+          "frontend/src/game/characters/Puro.tsx",
+          "frontend/src/game/scene/LibraryScene.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/game/enemies/types.ts",
-          "frontend/src/game/enemies/WhiteLatexBeast.tsx"
+          "frontend/src/game/characters/Puro.tsx",
+          "frontend/src/game/scene/LibraryScene.tsx"
+        ]
+      },
+      {
+        "id": "REQ-5",
+        "summary": "Add the required Puro visual assets as static files under `frontend/public/assets/generated/` and load them directly from the frontend (do not route images through the backend).",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/public/assets/generated/puro-idle-front.dim_512x512.png",
+          "frontend/public/assets/generated/puro-idle-34.dim_512x512.png",
+          "frontend/public/assets/generated/puro-hover.dim_512x512.png",
+          "frontend/src/game/characters/Puro.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/public/assets/generated/puro-idle-front.dim_512x512.png",
+          "frontend/public/assets/generated/puro-idle-34.dim_512x512.png",
+          "frontend/public/assets/generated/puro-hover.dim_512x512.png",
+          "frontend/src/game/characters/Puro.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
+    "backend/main.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
+    "frontend/public/assets/generated/puro-hover.dim_512x512.png",
+    "frontend/public/assets/generated/puro-idle-34.dim_512x512.png",
+    "frontend/public/assets/generated/puro-idle-front.dim_512x512.png",
+    "frontend/src/game/characters/Puro.tsx",
     "frontend/src/game/enemies/WhiteLatexBeast.tsx",
-    "frontend/src/game/enemies/types.ts",
+    "frontend/src/game/scene/HiveScene.tsx",
+    "frontend/src/game/scene/LibraryScene.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

@@ -1,91 +1,115 @@
 {
   "kind": "build_request",
-  "title": "Add ambush-triggered chase that continuously tracks the player and ends on escape distance",
+  "title": "Bug fixes and Puro visual redesign (non-3D look)",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Update the WhiteLatexBeast enemy AI to include an \"ambush\" phase that triggers before chasing: when the enemy decides to engage the player, it must play an ambush animation/state and then transition into chase immediately after the ambush animation ends.",
-      "target": "frontend",
+      "text": "Scan the project for runtime errors, React warnings, and obvious logic bugs; fix or remove the buggy code paths without changing intended gameplay behavior.",
+      "target": "both",
       "source": {
         "messageIds": [
           "msg-1"
         ],
         "quotes": [
-          "Make the white latexes start chasing the player after ambushing them",
-          "Immediately"
+          "Check for bugs and if there are bugs then delete them."
         ]
       },
       "acceptanceCriteria": [
-        "When an enemy first engages the player (per the existing engage logic in WhiteLatexBeast), it enters an ambush state before chase.",
-        "After the ambush state/animation completes, the chase begins immediately (no added delay).",
-        "Capture logic (ENEMY_CONSTANTS.CAPTURE_RADIUS) continues to function and can still trigger during chase as it does today."
+        "App builds successfully with TypeScript with no new compile errors introduced.",
+        "No React console warnings are introduced by the changes.",
+        "Gameplay still launches and both Library and Hive scenes render and are playable after fixes."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "During the chase phase, make WhiteLatexBeast continuously track the player's current position each frame (i.e., chase direction updates in real time based on the player's latest position).",
+      "text": "Fix the invalid React Hooks usage in the Library scene texture loading so that hooks are not conditionally/imperatively invoked (remove the current try/catch hook invocation pattern) while preserving the fallback behavior if the wood texture cannot be used.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-1"
         ],
         "quotes": [
-          "They continuously track the player's location"
+          "Check for bugs and if there are bugs then delete them."
         ]
       },
       "acceptanceCriteria": [
-        "While chasing, the enemy's movement direction updates continuously using the latest provided playerPosition (not a single stored target position).",
-        "Enemy rotation/facing while chasing continues to align with the current direction toward the player."
+        "`frontend/src/game/scene/LibraryScene.tsx` no longer disables `react-hooks/rules-of-hooks` for texture loading.",
+        "The Library floor still renders with the wood texture when available, and still renders with a non-textured fallback material when it is not available.",
+        "No runtime crash occurs during Library scene mount due to texture loading failures."
       ]
     },
     {
       "id": "REQ-3",
-      "text": "Change chase termination so that once the enemy has begun chasing (after ambush), it continues chasing until the player escapes beyond a configured escape distance, at which point the enemy stops chasing and returns to wandering behavior.",
+      "text": "Fix performance/logic bugs caused by updating React state inside the render loop (`useFrame`) for movement/jump/camera logic in `LibraryScene.tsx` and `HiveScene.tsx` by moving per-frame physics state (e.g., vertical velocity, grounded state, player world position) to refs or other non-re-rendering storage, while keeping the same movement feel and collision behavior.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-1"
         ],
         "quotes": [
-          "And to end the chase make the player have to escape some distance"
+          "Check for bugs and if there are bugs then delete them."
         ]
       },
       "acceptanceCriteria": [
-        "After chase has started, the enemy does not stop chasing merely because the player exits the original aggro radius; it only stops when the player exceeds the configured escape distance.",
-        "Once the player exceeds the escape distance, the enemy transitions out of chase and resumes the existing wander behavior."
+        "Library and Hive scenes no longer call React `setState` on every animation frame for physics state updates.",
+        "Jumping, gravity, and ground collision still function correctly in both scenes.",
+        "Enemy AI in the Hive still receives up-to-date player position for chasing/capture logic."
       ]
     },
     {
       "id": "REQ-4",
-      "text": "Add/adjust enemy tuning constants in frontend/src/game/enemies/types.ts to support ambush + escape-based chase (e.g., an ambush duration and an escape radius/distance), and ensure the HiveScene behavior remains stable with multiple enemies and while transfur encounter UI is active (disabled enemies must not progress ambush/chase timers or move).",
+      "text": "Update the Puro character rendering to visually resemble Puro from DragonSnow’s Changed (stylized, game-accurate look) while keeping it in the current 3D scene pipeline; implement a clearly non-3D look (e.g., billboard/sprite or flat toon/cel style) instead of the current simple 3D capsule/sphere model.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-1"
         ],
         "quotes": [
-          "Build it"
+          "Also, Make puro look like he is from the real changed game by dragonsnow changed except 3d"
         ]
       },
       "acceptanceCriteria": [
-        "Enemy constants include values necessary to configure the ambush phase and escape distance without hardcoding magic numbers inside WhiteLatexBeast.tsx.",
-        "When HiveScene sets disabled={isInTransfurEncounter}, WhiteLatexBeast does not move or advance its AI state until re-enabled.",
-        "No backend changes are required for this behavior."
+        "`frontend/src/game/characters/Puro.tsx` no longer renders Puro as the current basic capsule/sphere/cone body parts.",
+        "Puro appears as a flat/stylized non-3D character in the scene (e.g., sprite/billboard or toon-flat mesh) while remaining positioned and interactable as before.",
+        "Clicking Puro still triggers dialogue (`setShowDialogue(true)`), and hover still provides clear feedback (cursor change and a visible hover effect)."
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "text": "Add the required Puro visual assets as static files under `frontend/public/assets/generated/` and load them directly from the frontend (do not route images through the backend).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "Make puro look like he is from the real changed game by dragonsnow changed except 3d"
+        ]
+      },
+      "acceptanceCriteria": [
+        "New Puro image assets exist in `frontend/public/assets/generated/` with the exact filenames specified in this build request.",
+        "Puro rendering uses these static assets in-game without requiring backend calls.",
+        "The app continues to run in offline mode with Puro assets loading correctly from the bundled frontend."
       ]
     }
   ],
   "constraints": [
-    "Do not edit files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui (compose instead of modifying).",
-    "Keep all backend logic in the single Motoko actor (backend/main.mo); do not introduce additional backend services."
+    "Backend must remain a single Motoko actor in `backend/main.mo`; do not introduce additional backend services.",
+    "Do not edit files under `frontend/src/hooks/useInternetIdentity.ts`, `frontend/src/hooks/useInternetIdentity.tsx`, `frontend/src/hooks/useActor.ts`, `frontend/src/main.tsx`, or anything in `frontend/src/components/ui`; compose instead of modifying read-only UI components.",
+    "Place any generated/added images in `frontend/public/assets/generated/` and reference them from the frontend."
   ],
   "nonGoals": [
-    "Do not add multiplayer, real-time networking, or WebSocket-based synchronization.",
-    "Do not change the transfur overlay messaging/content beyond what is necessary for the chase/ambush mechanics.",
-    "Do not add new authentication providers beyond Internet Identity."
+    "Do not add new chase systems, new enemies, or new scenes beyond what already exists.",
+    "Do not implement third-party authentication providers (only Internet Identity is supported).",
+    "Do not add external databases or non-Motoko backend code."
   ],
   "imageRequirements": {
-    "required": [],
+    "required": [
+      "Stylized black latex wolf humanoid character sprite, front-facing, neutral/idle pose, high-contrast cartoon shading, transparent background (puro-idle-front.dim_512x512.png)",
+      "Stylized black latex wolf humanoid character sprite, slight 3/4 view, neutral/idle pose, high-contrast cartoon shading, transparent background (puro-idle-34.dim_512x512.png)",
+      "Stylized black latex wolf humanoid character sprite, hover/highlight variant (slightly brighter rim light), transparent background (puro-hover.dim_512x512.png)"
+    ],
     "edits": []
   }
 }
