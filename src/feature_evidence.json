@@ -2,11 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-detect-when-the-player-character-avatar-touches-collides-with-puro-in-the-3d-library-scene-and-trigger-the-existing-secret-event-that-was-recently-added",
-      "featureTitle": "Detect when the player character avatar touches/collides with Puro in the 3D library scene and trigger the existing \"secret\" event that was recently added.",
+      "featureId": "feature-add-a-new-3d-scene-representing-the-hive-a-generated-3d-white-latex-forest-environment-inspired-by-the-changed-dragonsnow-white-latex-forest-using-only-original-procedurally-generated-geometry-materials-no-copyrighted-assets",
+      "featureTitle": "Add a new 3D scene representing “the hive”: a generated 3D “white latex forest” environment inspired by the *Changed* (DragonSnow) white latex forest, using only original/procedurally generated geometry/materials (no copyrighted assets).",
       "files": [
-        "frontend/src/game/characters/Puro.tsx",
-        "frontend/src/game/scene/LibraryScene.tsx"
+        "frontend/src/game/scene/HiveScene.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -16,16 +15,17 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-67"
+        "REQ-1"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-add-a-cooldown-one-shot-guard-so-the-touch-triggered-secret-event-does-not-repeatedly-fire-every-frame-while-the-player-remains-in-contact-with-puro",
-      "featureTitle": "Add a cooldown/one-shot guard so the touch-triggered secret event does not repeatedly fire every frame while the player remains in contact with Puro.",
+      "featureId": "feature-implement-player-teleport-on-touch-with-puro-when-the-player-avatar-collides-enters-proximity-with-the-existing-puro-3d-model-transition-gameplay-from-the-library-scene-to-the-hive-white-latex-forest-scene-and-place-the-player-at-a-defined-spawn-point-in-the-hive",
+      "featureTitle": "Implement player teleport-on-touch with Puro: when the player avatar collides/enters proximity with the existing Puro 3D model, transition gameplay from the library scene to the hive (white latex forest) scene and place the player at a defined spawn point in the hive.",
       "files": [
-        "frontend/src/game/characters/Puro.tsx",
-        "frontend/src/game/scene/LibraryScene.tsx"
+        "frontend/src/game/GameView.tsx",
+        "frontend/src/game/scene/LibraryScene.tsx",
+        "frontend/src/game/state/useGameStore.ts"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -35,13 +35,13 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-68"
+        "REQ-2"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-ensure-the-touch-interaction-remains-benign-and-consistent-with-the-existing-no-transfurring-rule-no-harm-or-transformation-on-contact-any-user-facing-text-used-by-the-secret-event-touch-feedback-must-be-in-english",
-      "featureTitle": "Ensure the touch interaction remains benign and consistent with the existing no-transfurring rule (no harm or transformation on contact). Any user-facing text used by the secret event/touch feedback must be in English.",
+      "featureId": "feature-replace-the-current-touch-puro-unlocks-admin-mode-proximity-secret-in-frontend-src-game-scene-libraryscene-tsx-with-the-new-teleport-to-hive-behavior-so-touching-puro-teleports-instead-of-unlocking-admin-mode-any-user-facing-feedback-text-related-to-teleport-must-be-in-english",
+      "featureTitle": "Replace the current “touch Puro unlocks admin mode” proximity secret in `frontend/src/game/scene/LibraryScene.tsx` with the new teleport-to-hive behavior (so touching Puro teleports instead of unlocking admin mode). Any user-facing feedback text related to teleport must be in English.",
       "files": [
         "frontend/src/game/scene/LibraryScene.tsx"
       ],
@@ -53,7 +53,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-69"
+        "REQ-3"
       ],
       "confidence": "high"
     }

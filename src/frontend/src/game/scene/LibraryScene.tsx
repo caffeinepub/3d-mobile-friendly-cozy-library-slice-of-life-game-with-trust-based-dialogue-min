@@ -6,7 +6,6 @@ import Puro from '../characters/Puro';
 import { usePlayerControls } from '../controls/usePlayerControls';
 import { usePlayerControlsStore } from '../controls/usePlayerControlsStore';
 import { useGameStore } from '../state/useGameStore';
-import { useAdminGateStore } from '../../state/useAdminGateStore';
 import { toast } from 'sonner';
 
 export default function LibraryScene() {
@@ -14,8 +13,7 @@ export default function LibraryScene() {
   const puroRef = useRef<THREE.Group>(null);
   const { movement, look } = usePlayerControls();
   const controlsStore = usePlayerControlsStore();
-  const { libraryCustomizations, isPaused } = useGameStore();
-  const { attemptUnlock, isUnlocked } = useAdminGateStore();
+  const { libraryCustomizations, teleportToHive } = useGameStore();
   
   // Jump physics state
   const [verticalVelocity, setVerticalVelocity] = useState(0);
@@ -24,6 +22,7 @@ export default function LibraryScene() {
   // Proximity trigger state
   const wasInProximity = useRef(false);
   const lastTriggerTime = useRef(0);
+  const hasTeleported = useRef(false);
 
   // Load texture unconditionally (required by Rules of Hooks)
   // If it fails, drei will handle the error and we'll use fallback material
@@ -90,8 +89,8 @@ export default function LibraryScene() {
     state.camera.position.y = playerRef.current.position.y + 1.6; // Eye height
     state.camera.position.z = playerRef.current.position.z;
 
-    // Proximity detection with Puro
-    if (puroRef.current && !isUnlocked) {
+    // Proximity detection with Puro for teleport
+    if (puroRef.current && !hasTeleported.current) {
       const playerPos = new THREE.Vector3();
       const puroPos = new THREE.Vector3();
       
@@ -111,11 +110,15 @@ export default function LibraryScene() {
         const cooldownMs = 2000; // 2 second cooldown
         
         if (now - lastTriggerTime.current > cooldownMs) {
-          // Trigger the secret: unlock admin mode
-          const success = attemptUnlock('ADMIN');
-          if (success) {
-            toast.success('Secret discovered! Admin mode unlocked.');
-          }
+          // Trigger teleport to hive
+          toast.success('Teleporting to the hive...');
+          hasTeleported.current = true;
+          
+          // Delay teleport slightly for toast visibility
+          setTimeout(() => {
+            teleportToHive();
+          }, 500);
+          
           lastTriggerTime.current = now;
         }
         wasInProximity.current = true;

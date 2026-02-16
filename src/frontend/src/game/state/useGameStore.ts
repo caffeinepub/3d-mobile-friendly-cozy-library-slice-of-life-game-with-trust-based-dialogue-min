@@ -13,6 +13,8 @@ interface UIState {
   isPaused: boolean;
 }
 
+type SceneType = 'library' | 'hive';
+
 interface GameStore extends UIState {
   // Game state
   trustLevel: number;
@@ -24,6 +26,10 @@ interface GameStore extends UIState {
   endingsUnlocked: string[];
   discoveredItems: string[];
   hasLocalSave: boolean;
+  
+  // Scene state
+  currentScene: SceneType;
+  hiveSpawnPosition: [number, number, number];
 
   // Actions
   initializeGame: (isNew: boolean) => void;
@@ -38,6 +44,10 @@ interface GameStore extends UIState {
   discoverItem: (itemName: string) => void;
   setCurrentDialogueNode: (node: number | null) => void;
   resetProgress: () => void;
+  
+  // Scene actions
+  teleportToHive: () => void;
+  setCurrentScene: (scene: SceneType) => void;
 
   // UI Actions
   setShowDialogue: (show: boolean) => void;
@@ -60,6 +70,8 @@ const defaultState = {
   endingsUnlocked: [],
   discoveredItems: [],
   hasLocalSave: false,
+  currentScene: 'library' as SceneType,
+  hiveSpawnPosition: [0, 0, 0] as [number, number, number],
   showDialogue: false,
   showActivities: false,
   showMiniGames: false,
@@ -141,6 +153,13 @@ export const useGameStore = create<GameStore>()(
       setCurrentDialogueNode: (node: number | null) => set({ currentDialogueNode: node }),
 
       resetProgress: () => set(defaultState),
+      
+      teleportToHive: () => set({ 
+        currentScene: 'hive',
+        hiveSpawnPosition: [0, 0, 0]
+      }),
+      
+      setCurrentScene: (scene: SceneType) => set({ currentScene: scene }),
 
       setShowDialogue: (show: boolean) => set({ showDialogue: show }),
       setShowActivities: (show: boolean) => set({ showActivities: show }),
@@ -152,7 +171,7 @@ export const useGameStore = create<GameStore>()(
       setPaused: (paused: boolean) => set({ isPaused: paused }),
     }),
     {
-      name: 'cozy-library-game',
+      name: 'game-storage',
     }
   )
 );

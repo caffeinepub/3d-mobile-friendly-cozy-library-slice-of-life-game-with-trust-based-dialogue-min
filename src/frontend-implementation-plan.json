@@ -1,72 +1,63 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Trigger existing secret event on player proximity to Puro (3D scene)",
+  "title": "Teleport from Library to procedurally generated Hive (white latex forest) on Puro touch",
   "requirements": [
     {
-      "id": "REQ-67",
-      "summary": "Add a proximity (collision-radius) check between the player avatar and Puro in the 3D library scene and invoke the existing secret event without requiring clicks, for both keyboard and mobile joystick movement.",
+      "id": "REQ-1",
+      "summary": "Add a new React Three Fiber “hive” 3D scene with an original, procedurally generated white/latex-like forest environment.",
       "acceptanceCriteria": [
-        "When the player avatar moves into contact range with Puro (e.g., within a small collision radius), the same secret event/sequence currently used elsewhere is triggered.",
-        "The secret event triggers from touch/collision without requiring a click on Puro.",
-        "The touch trigger works on both desktop (keyboard movement) and mobile (joystick movement)."
+        "A new React Three Fiber scene component exists for the white latex forest environment (the hive).",
+        "The hive scene renders without requiring external model downloads or third-party assets.",
+        "Visuals communicate a white/latex-like forest through lighting, palette, and materials while remaining clearly original (not a ripped recreation)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/game/scene/LibraryScene.tsx",
-          "operation": "modify",
-          "description": "Implement a lightweight per-frame proximity check between playerRef and Puro (using a small collision radius) and, when entering contact range, call the existing secret-event trigger used elsewhere in the app (route it through a shared function/store action rather than duplicating logic)."
-        },
-        {
-          "path": "frontend/src/game/state/useGameStore.ts",
-          "operation": "modify",
-          "description": "Add (or expose) a single store-level action that triggers the existing secret event/sequence so it can be invoked from the 3D proximity logic while reusing the exact same secret behavior already implemented elsewhere."
-        },
-        {
-          "path": "frontend/src/game/characters/Puro.tsx",
-          "operation": "modify",
-          "description": "Ensure Puro remains compatible with proximity detection by making its world position reliably accessible to LibraryScene (e.g., via an optional ref/prop or by keeping the authoritative Puro position available to the scene) while preserving the current click-to-open-dialogue interaction."
+          "path": "frontend/src/game/scene/HiveScene.tsx",
+          "operation": "create",
+          "description": "Create a new 3D scene component that procedurally generates an original “white latex forest” look (e.g., instanced smooth trunks, glossy/physical materials, fog, and lighting), using only code-defined geometry/materials (no external models/assets)."
         }
       ]
     },
     {
-      "id": "REQ-68",
-      "summary": "Prevent the touch-triggered secret event from firing repeatedly every frame while the player remains overlapping Puro, without breaking Puro’s click interaction.",
+      "id": "REQ-2",
+      "summary": "Implement teleport-on-touch with Puro to transition from the library scene to the hive scene and spawn the player at a defined hive start position with a one-shot/cooldown guard.",
       "acceptanceCriteria": [
-        "While the player remains overlapping/touching Puro, the secret event does not continuously re-trigger.",
-        "After the player separates and re-approaches (or after a short cooldown), the touch trigger can fire again in a controlled way.",
-        "The guard does not break Puro’s existing click-to-open-dialogue interaction."
+        "Touching/entering the existing Puro proximity radius triggers a scene change to the hive.",
+        "Teleport trigger uses a one-shot + cooldown/hysteresis guard so it does not repeatedly fire every frame while in contact.",
+        "After teleport, the camera and player controls continue to function normally in the hive scene."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/game/scene/LibraryScene.tsx",
+          "path": "frontend/src/game/state/useGameStore.ts",
           "operation": "modify",
-          "description": "Add a one-shot / cooldown guard for the proximity trigger (e.g., track overlap state and last-trigger time with refs, trigger only on entering the radius, and reset when the player exits beyond a small hysteresis margin) so the secret event does not re-fire every frame."
+          "description": "Add persistent in-game scene state (e.g., currentScene: 'library'|'hive') and actions to request a teleport to hive while storing a defined hive spawn position so the next scene can place the player consistently."
         },
         {
-          "path": "frontend/src/game/characters/Puro.tsx",
+          "path": "frontend/src/game/scene/LibraryScene.tsx",
           "operation": "modify",
-          "description": "Confirm the existing click interaction throttle remains intact and independent from the proximity guard (no shared timing state that could block normal click-to-open-dialogue)."
+          "description": "Update the Puro proximity check to trigger a one-shot teleport action (with cooldown/hysteresis retained) that switches the current scene to 'hive' and records the hive spawn; keep collision radius behavior and ensure user-facing teleport feedback text (if shown) is English."
+        },
+        {
+          "path": "frontend/src/game/GameView.tsx",
+          "operation": "modify",
+          "description": "Wire scene switching so the Canvas renders LibraryScene or HiveScene based on the store’s currentScene; ensure HiveScene consumes the stored spawn position and initializes player/camera accordingly so controls continue to work after transition."
         }
       ]
     },
     {
-      "id": "REQ-69",
-      "summary": "Keep touch interaction harmless (no transfurring/transform effects) and ensure any new touch-trigger feedback text is English-only.",
+      "id": "REQ-3",
+      "summary": "Replace the library scene’s Puro proximity admin-unlock secret with teleport-to-hive behavior while keeping Puro click dialogue unchanged and ensuring English-only feedback text.",
       "acceptanceCriteria": [
-        "Touching Puro does not apply any harmful effects or transformation mechanics.",
-        "Any new on-screen/toast text added specifically for the touch trigger is English-only."
+        "In the library scene, Puro proximity no longer calls `attemptUnlock('ADMIN')` as its primary effect.",
+        "If a toast/overlay is shown for teleport, its text is English-only.",
+        "Clicking Puro still opens dialogue as before (teleport is specifically on touch/proximity, not on click)."
       ],
       "file_operations": [
         {
           "path": "frontend/src/game/scene/LibraryScene.tsx",
           "operation": "modify",
-          "description": "Ensure the proximity-triggered secret invocation does not apply any additional contact effects (no damage, no transformation, no trust penalties/forced state changes) beyond what the existing secret event already does; if any optional feedback is added for touch activation, keep it English-only."
-        },
-        {
-          "path": "frontend/src/game/state/useGameStore.ts",
-          "operation": "modify",
-          "description": "Review the shared secret-event trigger action to ensure it remains benign on contact and does not introduce any harm/transformation mechanics; ensure any newly introduced user-facing strings related specifically to the touch trigger are English-only."
+          "description": "Remove/replace the existing proximity secret that unlocks admin mode (including `attemptUnlock('ADMIN')` and related toast) so proximity instead triggers teleport-to-hive; preserve Puro’s onClick behavior by not changing the Puro component’s click handler semantics."
         }
       ]
     }

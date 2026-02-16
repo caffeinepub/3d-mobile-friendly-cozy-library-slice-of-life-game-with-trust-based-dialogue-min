@@ -1,7 +1,7 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-15T03:09:35.331Z",
+  "generatedAt": "2026-02-16T00:46:06.848Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
@@ -11,39 +11,37 @@
     "implemented": 3,
     "items": [
       {
-        "id": "REQ-67",
-        "summary": "Detect when the player character avatar touches/collides with Puro in the 3D library scene and trigger the existing \"secret\" event that was recently added.",
+        "id": "REQ-1",
+        "summary": "Add a new 3D scene representing “the hive”: a generated 3D “white latex forest” environment inspired by the *Changed* (DragonSnow) white latex forest, using only original/procedurally generated geometry/materials (no copyrighted assets).",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/game/scene/LibraryScene.tsx",
+          "frontend/src/game/scene/HiveScene.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/game/scene/HiveScene.tsx"
+        ]
+      },
+      {
+        "id": "REQ-2",
+        "summary": "Implement player teleport-on-touch with Puro: when the player avatar collides/enters proximity with the existing Puro 3D model, transition gameplay from the library scene to the hive (white latex forest) scene and place the player at a defined spawn point in the hive.",
+        "status": "implemented",
+        "plannedFiles": [
           "frontend/src/game/state/useGameStore.ts",
-          "frontend/src/game/characters/Puro.tsx"
+          "frontend/src/game/scene/LibraryScene.tsx",
+          "frontend/src/game/GameView.tsx"
         ],
         "matchedFiles": [
+          "frontend/src/game/state/useGameStore.ts",
           "frontend/src/game/scene/LibraryScene.tsx",
-          "frontend/src/game/characters/Puro.tsx"
+          "frontend/src/game/GameView.tsx"
         ]
       },
       {
-        "id": "REQ-68",
-        "summary": "Add a cooldown/one-shot guard so the touch-triggered secret event does not repeatedly fire every frame while the player remains in contact with Puro.",
+        "id": "REQ-3",
+        "summary": "Replace the current “touch Puro unlocks admin mode” proximity secret in `frontend/src/game/scene/LibraryScene.tsx` with the new teleport-to-hive behavior (so touching Puro teleports instead of unlocking admin mode). Any user-facing feedback text related to teleport must be in English.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/game/scene/LibraryScene.tsx",
-          "frontend/src/game/characters/Puro.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/game/scene/LibraryScene.tsx",
-          "frontend/src/game/characters/Puro.tsx"
-        ]
-      },
-      {
-        "id": "REQ-69",
-        "summary": "Ensure the touch interaction remains benign and consistent with the existing no-transfurring rule (no harm or transformation on contact). Any user-facing text used by the secret event/touch feedback must be in English.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/game/scene/LibraryScene.tsx",
-          "frontend/src/game/state/useGameStore.ts"
+          "frontend/src/game/scene/LibraryScene.tsx"
         ],
         "matchedFiles": [
           "frontend/src/game/scene/LibraryScene.tsx"
@@ -56,8 +54,10 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/game/characters/Puro.tsx",
+    "frontend/src/game/GameView.tsx",
+    "frontend/src/game/scene/HiveScene.tsx",
     "frontend/src/game/scene/LibraryScene.tsx",
+    "frontend/src/game/state/useGameStore.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

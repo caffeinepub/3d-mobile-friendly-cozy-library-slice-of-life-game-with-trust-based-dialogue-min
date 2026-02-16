@@ -1,85 +1,82 @@
 {
   "kind": "build_request",
-  "title": "Trigger the existing secret event when the player touches Puro",
+  "title": "Teleport to generated 3D White Latex Forest (“the hive”) when touching Puro",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-67",
-      "text": "Detect when the player character avatar touches/collides with Puro in the 3D library scene and trigger the existing \"secret\" event that was recently added.",
+      "id": "REQ-1",
+      "text": "Add a new 3D scene representing “the hive”: a generated 3D “white latex forest” environment inspired by the *Changed* (DragonSnow) white latex forest, using only original/procedurally generated geometry/materials (no copyrighted assets).",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "recent-messages-5",
-          "recent-messages-9"
+          "msg-1"
         ],
         "quotes": [
-          "Make if your character touches puro then the secret that you recently added happens",
-          "Yes"
+          "The hive is the white latex forest",
+          "Make a 3d version",
+          "generate it",
+          "The white latex forest is from changed by dragonsnow"
         ]
       },
       "acceptanceCriteria": [
-        "When the player avatar moves into contact range with Puro (e.g., within a small collision radius), the same secret event/sequence currently used elsewhere is triggered.",
-        "The secret event triggers from touch/collision without requiring a click on Puro.",
-        "The touch trigger works on both desktop (keyboard movement) and mobile (joystick movement)."
+        "A new React Three Fiber scene component exists for the white latex forest environment (the hive).",
+        "The hive scene renders without requiring external model downloads or third-party assets.",
+        "Visuals communicate a white/latex-like forest through lighting, palette, and materials while remaining clearly original (not a ripped recreation)."
       ]
     },
     {
-      "id": "REQ-68",
-      "text": "Add a cooldown/one-shot guard so the touch-triggered secret event does not repeatedly fire every frame while the player remains in contact with Puro.",
+      "id": "REQ-2",
+      "text": "Implement player teleport-on-touch with Puro: when the player avatar collides/enters proximity with the existing Puro 3D model, transition gameplay from the library scene to the hive (white latex forest) scene and place the player at a defined spawn point in the hive.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "recent-messages-5"
+          "msg-1"
         ],
         "quotes": [
-          "Make if your character touches puro then the secret that you recently added happens"
+          "Make it teleport you to the hive if you touch puro",
+          "A 3d model that you added",
+          "Build it"
         ]
       },
       "acceptanceCriteria": [
-        "While the player remains overlapping/touching Puro, the secret event does not continuously re-trigger.",
-        "After the player separates and re-approaches (or after a short cooldown), the touch trigger can fire again in a controlled way.",
-        "The guard does not break Puro’s existing click-to-open-dialogue interaction."
+        "Touching/entering the existing Puro proximity radius triggers a scene change to the hive.",
+        "Teleport trigger uses a one-shot + cooldown/hysteresis guard so it does not repeatedly fire every frame while in contact.",
+        "After teleport, the camera and player controls continue to function normally in the hive scene."
       ]
     },
     {
-      "id": "REQ-69",
-      "text": "Ensure the touch interaction remains benign and consistent with the existing no-transfurring rule (no harm or transformation on contact). Any user-facing text used by the secret event/touch feedback must be in English.",
+      "id": "REQ-3",
+      "text": "Replace the current “touch Puro unlocks admin mode” proximity secret in `frontend/src/game/scene/LibraryScene.tsx` with the new teleport-to-hive behavior (so touching Puro teleports instead of unlocking admin mode). Any user-facing feedback text related to teleport must be in English.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "recent-messages-5"
+          "msg-1"
         ],
         "quotes": [
-          "Make if your character touches puro then the secret that you recently added happens"
+          "Make it teleport you to the hive if you touch puro",
+          "Build it"
         ]
       },
       "acceptanceCriteria": [
-        "Touching Puro does not apply any harmful effects or transformation mechanics.",
-        "Any new on-screen/toast text added specifically for the touch trigger is English-only."
+        "In the library scene, Puro proximity no longer calls `attemptUnlock('ADMIN')` as its primary effect.",
+        "If a toast/overlay is shown for teleport, its text is English-only.",
+        "Clicking Puro still opens dialogue as before (teleport is specifically on touch/proximity, not on click)."
       ]
     }
   ],
   "constraints": [
-    "Do not edit files under frontend/src/components/ui (read-only).",
-    "Do not edit frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, or frontend/src/main.tsx (immutable paths)."
+    "Do not edit files under `frontend/src/hooks/useInternetIdentity.ts`, `frontend/src/hooks/useInternetIdentity.tsx`, `frontend/src/hooks/useActor.ts`, `frontend/src/main.tsx`, or anything inside `frontend/src/components/ui` (compose them instead).",
+    "Keep all backend logic in the existing single Motoko actor (`backend/main.mo`) if any backend changes are later required; do not introduce additional backend services.",
+    "User-facing text introduced by this change must be in English."
   ],
   "nonGoals": [
-    "Do not add new endings, new dialogue branches, or new mini-games as part of this change.",
-    "Do not implement physics-engine-based collisions; a simple proximity/collision-radius check is sufficient unless already present.",
-    "Do not change backend Motoko logic unless the existing secret event is backend-driven and cannot be triggered from the frontend without it."
+    "Do not implement or integrate external 3D models/maps from *Changed* or any copyrighted asset extraction.",
+    "Do not add multiplayer, real-time networking, chat, or web sockets.",
+    "Do not add third-party authentication beyond Internet Identity.",
+    "Do not redesign unrelated UI panels/mini-games beyond what is necessary to support the new hive scene and teleport transition."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
-  },
-  "userProfileUpdate": {
-    "goalsToAdd": [],
-    "goalsToRemove": [],
-    "preferencesToAdd": [],
-    "preferencesToRemove": [],
-    "miscToAdd": [],
-    "miscToRemove": [],
-    "fieldsToSet": {},
-    "fieldsToDelete": []
   }
 }

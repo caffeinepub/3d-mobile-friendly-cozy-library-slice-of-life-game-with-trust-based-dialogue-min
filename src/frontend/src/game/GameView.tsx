@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { Canvas } from '@react-three/fiber';
 import LibraryScene from './scene/LibraryScene';
+import HiveScene from './scene/HiveScene';
 import { useGameStore } from './state/useGameStore';
 import TrustMeter from './ui/TrustMeter';
 import DialoguePanel from './ui/DialoguePanel';
@@ -35,6 +36,7 @@ export default function GameView({ isNewGame, onBackToTitle, onMounted, onMountE
     showEnding,
     isPaused,
     setPaused,
+    currentScene,
   } = useGameStore();
   const [showPauseMenu, setShowPauseMenu] = useState(false);
   const [canvasMounted, setCanvasMounted] = useState(false);
@@ -93,7 +95,7 @@ export default function GameView({ isNewGame, onBackToTitle, onMounted, onMountE
         className="w-full h-full"
         onCreated={handleCanvasCreated}
       >
-        <LibraryScene />
+        {currentScene === 'library' ? <LibraryScene /> : <HiveScene />}
       </Canvas>
 
       {/* HUD Overlay */}
