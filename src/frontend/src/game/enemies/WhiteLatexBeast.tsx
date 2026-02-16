@@ -10,6 +10,8 @@ interface WhiteLatexBeastProps {
   disabled?: boolean;
 }
 
+type AIPhase = 'wander' | 'ambush' | 'chase';
+
 export default function WhiteLatexBeast({
   spawnPosition,
   playerPosition,
@@ -23,9 +25,10 @@ export default function WhiteLatexBeast({
   const [wanderDirection, setWanderDirection] = useState<THREE.Vector3>(
     new THREE.Vector3(Math.random() - 0.5, 0, Math.random() - 0.5).normalize()
   );
-  const [isChasing, setIsChasing] = useState(false);
-  const [captureTriggered, setaptureTriggered] = useState(false);
+  const [aiPhase, setAIPhase] = useState<AIPhase>('wander');
+  const [captureTriggered, setCaptureTriggered] = useState(false);
   const wanderTimer = useRef(0);
+  const ambushTimer = useRef(0);
 
   useFrame((state, delta) => {
     if (!groupRef.current || disabled || captureTriggered) return;
@@ -36,48 +39,91 @@ export default function WhiteLatexBeast({
 
     // Check for capture
     if (distanceToPlayer < ENEMY_CONSTANTS.CAPTURE_RADIUS && !captureTriggered) {
-      setaptureTriggered(true);
+      setCaptureTriggered(true);
       onCapture();
       return;
     }
 
-    // Determine behavior based on distance
-    const shouldChase = distanceToPlayer < ENEMY_CONSTANTS.AGGRO_RADIUS;
-    setIsChasing(shouldChase);
-
     let newPosition = currentPos.clone();
 
-    if (shouldChase) {
-      // Chase player
-      const direction = playerPos.clone().sub(currentPos).normalize();
-      const movement = direction.multiplyScalar(ENEMY_CONSTANTS.CHASE_SPEED * delta);
-      newPosition.add(movement);
-    } else {
-      // Wander behavior
-      wanderTimer.current += delta;
+    // AI State Machine
+    if (aiPhase === 'wander') {
+      // Check if player enters aggro radius - transition to ambush
+      if (distanceToPlayer < ENEMY_CONSTANTS.AGGRO_RADIUS) {
+        setAIPhase('ambush');
+        ambushTimer.current = 0;
+      } else {
+        // Continue wandering
+        wanderTimer.current += delta;
 
-      if (wanderTimer.current > ENEMY_CONSTANTS.WANDER_CHANGE_INTERVAL) {
-        // Change wander direction
+        if (wanderTimer.current > ENEMY_CONSTANTS.WANDER_CHANGE_INTERVAL) {
+          // Change wander direction
+          const newDir = new THREE.Vector3(
+            Math.random() - 0.5,
+            0,
+            Math.random() - 0.5
+          ).normalize();
+          setWanderDirection(newDir);
+          wanderTimer.current = 0;
+        }
+
+        // Apply wander movement
+        const movement = wanderDirection.clone().multiplyScalar(ENEMY_CONSTANTS.WANDER_SPEED * delta);
+        newPosition.add(movement);
+
+        // Keep within wander radius of spawn
+        const spawnPos = new THREE.Vector3(...spawnPosition);
+        const distanceFromSpawn = newPosition.distanceTo(spawnPos);
+        if (distanceFromSpawn > ENEMY_CONSTANTS.WANDER_RADIUS) {
+          // Push back toward spawn
+          const toSpawn = spawnPos.clone().sub(newPosition).normalize();
+          newPosition.add(toSpawn.multiplyScalar(0.5));
+        }
+      }
+    } else if (aiPhase === 'ambush') {
+      // Play ambush animation/state for configured duration
+      ambushTimer.current += delta;
+
+      // Face player during ambush
+      const lookDirection = playerPos.clone().sub(currentPos);
+      lookDirection.y = 0;
+      if (lookDirection.length() > 0.01) {
+        const angle = Math.atan2(lookDirection.x, lookDirection.z);
+        groupRef.current.rotation.y = angle;
+      }
+
+      // Transition to chase when ambush completes
+      if (ambushTimer.current >= ENEMY_CONSTANTS.AMBUSH_DURATION) {
+        setAIPhase('chase');
+      }
+
+      // No movement during ambush - position stays the same
+    } else if (aiPhase === 'chase') {
+      // Check if player has escaped
+      if (distanceToPlayer > ENEMY_CONSTANTS.ESCAPE_DISTANCE) {
+        // Return to wander
+        setAIPhase('wander');
+        wanderTimer.current = 0;
+        // Reset wander direction
         const newDir = new THREE.Vector3(
           Math.random() - 0.5,
           0,
           Math.random() - 0.5
         ).normalize();
         setWanderDirection(newDir);
-        wanderTimer.current = 0;
-      }
+      } else {
+        // Continuously track player's current position
+        const direction = playerPos.clone().sub(currentPos).normalize();
+        const movement = direction.multiplyScalar(ENEMY_CONSTANTS.CHASE_SPEED * delta);
+        newPosition.add(movement);
 
-      // Apply wander movement
-      const movement = wanderDirection.clone().multiplyScalar(ENEMY_CONSTANTS.WANDER_SPEED * delta);
-      newPosition.add(movement);
-
-      // Keep within wander radius of spawn
-      const spawnPos = new THREE.Vector3(...spawnPosition);
-      const distanceFromSpawn = newPosition.distanceTo(spawnPos);
-      if (distanceFromSpawn > ENEMY_CONSTANTS.WANDER_RADIUS) {
-        // Push back toward spawn
-        const toSpawn = spawnPos.clone().sub(newPosition).normalize();
-        newPosition.add(toSpawn.multiplyScalar(0.5));
+        // Face movement direction (toward player)
+        const lookDirection = playerPos.clone().sub(currentPos);
+        lookDirection.y = 0;
+        if (lookDirection.length() > 0.01) {
+          const angle = Math.atan2(lookDirection.x, lookDirection.z);
+          groupRef.current.rotation.y = angle;
+        }
       }
     }
 
@@ -88,15 +134,8 @@ export default function WhiteLatexBeast({
     setPosition(newPosition);
     groupRef.current.position.copy(newPosition);
 
-    // Face movement direction
-    if (shouldChase) {
-      const lookDirection = playerPos.clone().sub(currentPos);
-      lookDirection.y = 0;
-      if (lookDirection.length() > 0.01) {
-        const angle = Math.atan2(lookDirection.x, lookDirection.z);
-        groupRef.current.rotation.y = angle;
-      }
-    } else {
+    // Update rotation for wander phase (chase/ambush handle their own rotation above)
+    if (aiPhase === 'wander') {
       const angle = Math.atan2(wanderDirection.x, wanderDirection.z);
       groupRef.current.rotation.y = angle;
     }
@@ -104,6 +143,10 @@ export default function WhiteLatexBeast({
     // Subtle idle animation
     groupRef.current.position.y = Math.sin(state.clock.elapsedTime * 2) * 0.05;
   });
+
+  // Determine eye color based on AI phase
+  const eyeColor = aiPhase === 'ambush' ? '#ffaa00' : aiPhase === 'chase' ? '#ff6b6b' : '#6bb6ff';
+  const eyeIntensity = aiPhase === 'ambush' ? 1.2 : aiPhase === 'chase' ? 0.8 : 0.8;
 
   return (
     <group ref={groupRef} position={spawnPosition}>
@@ -127,21 +170,21 @@ export default function WhiteLatexBeast({
         />
       </mesh>
 
-      {/* Eyes - glowing effect */}
+      {/* Eyes - glowing effect with phase-based colors */}
       <mesh position={[-0.12, 1.35, 0.3]}>
         <sphereGeometry args={[0.06, 8, 8]} />
         <meshStandardMaterial
-          color={isChasing ? '#ff6b6b' : '#6bb6ff'}
-          emissive={isChasing ? '#ff6b6b' : '#6bb6ff'}
-          emissiveIntensity={0.8}
+          color={eyeColor}
+          emissive={eyeColor}
+          emissiveIntensity={eyeIntensity}
         />
       </mesh>
       <mesh position={[0.12, 1.35, 0.3]}>
         <sphereGeometry args={[0.06, 8, 8]} />
         <meshStandardMaterial
-          color={isChasing ? '#ff6b6b' : '#6bb6ff'}
-          emissive={isChasing ? '#ff6b6b' : '#6bb6ff'}
-          emissiveIntensity={0.8}
+          color={eyeColor}
+          emissive={eyeColor}
+          emissiveIntensity={eyeIntensity}
         />
       </mesh>
 

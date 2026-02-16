@@ -1,90 +1,70 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-16T01:12:08.963Z",
+  "generatedAt": "2026-02-16T01:23:06.240Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 3,
-    "implemented": 3,
+    "total": 4,
+    "implemented": 4,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Add one or more \"White Latex Beast\" enemy entities to the 3D gameplay (at minimum in the hive scene) that visually read as glossy white latex creatures and that actively move (patrol/wander) and then chase the player when within an aggro radius.",
+        "summary": "Update the WhiteLatexBeast enemy AI to include an \"ambush\" phase that triggers before chasing: when the enemy decides to engage the player, it must play an ambush animation/state and then transition into chase immediately after the ambush animation ends.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/game/enemies/WhiteLatexBeast.tsx",
-          "frontend/src/game/enemies/types.ts",
-          "frontend/src/game/scene/HiveScene.tsx"
+          "frontend/src/game/enemies/WhiteLatexBeast.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/game/enemies/WhiteLatexBeast.tsx",
-          "frontend/src/game/enemies/types.ts",
-          "frontend/src/game/scene/HiveScene.tsx"
+          "frontend/src/game/enemies/WhiteLatexBeast.tsx"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "Implement a player \"transfur\" (transformation) encounter mechanic triggered by enemy contact: when an enemy reaches the player, show a clear, non-graphic transformation event (e.g., brief screen effect + message) and apply an in-game consequence (e.g., respawn in the hive spawn position and/or trust/ending-impacting state change). Use English for any on-screen text.",
+        "summary": "During the chase phase, make WhiteLatexBeast continuously track the player's current position each frame (i.e., chase direction updates in real time based on the player's latest position).",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/game/state/useGameStore.ts",
-          "frontend/src/game/ui/TransfurOverlay.tsx",
-          "frontend/src/game/GameView.tsx",
-          "frontend/src/game/scene/HiveScene.tsx"
+          "frontend/src/game/enemies/WhiteLatexBeast.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/game/state/useGameStore.ts",
-          "frontend/src/game/ui/TransfurOverlay.tsx",
-          "frontend/src/game/GameView.tsx",
-          "frontend/src/game/scene/HiveScene.tsx"
+          "frontend/src/game/enemies/WhiteLatexBeast.tsx"
         ]
       },
       {
         "id": "REQ-3",
-        "summary": "Persist transformation encounter outcomes in the backend game state so the app can remember that the player has been \"transfurred\" (or how many times) across reloads/continue game. Update backend GameState, associated APIs, and frontend state hydration/sync to include these new fields.",
+        "summary": "Change chase termination so that once the enemy has begun chasing (after ambush), it continues chasing until the player escapes beyond a configured escape distance, at which point the enemy stops chasing and returns to wandering behavior.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/game/state/useGameStore.ts",
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/App.tsx",
-          "frontend/src/game/scene/HiveScene.tsx"
+          "frontend/src/game/enemies/WhiteLatexBeast.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/game/state/useGameStore.ts",
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/App.tsx",
-          "frontend/src/game/scene/HiveScene.tsx"
+          "frontend/src/game/enemies/WhiteLatexBeast.tsx"
+        ]
+      },
+      {
+        "id": "REQ-4",
+        "summary": "Add/adjust enemy tuning constants in frontend/src/game/enemies/types.ts to support ambush + escape-based chase (e.g., an ambush duration and an escape radius/distance), and ensure the HiveScene behavior remains stable with multiple enemies and while transfur encounter UI is active (disabled enemies must not progress ambush/chase timers or move).",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/game/enemies/types.ts",
+          "frontend/src/game/enemies/WhiteLatexBeast.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/game/enemies/types.ts",
+          "frontend/src/game/enemies/WhiteLatexBeast.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
-    "backend/authorization/MixinAuthorization.mo",
-    "backend/authorization/access-control.mo",
-    "backend/main.mo",
-    "backend/migration.mo",
     "build-request.json",
-    "caffeine.lock.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/App.tsx",
-    "frontend/src/backend.d.ts",
-    "frontend/src/backend.ts",
-    "frontend/src/declarations/backend.did.d.ts",
-    "frontend/src/declarations/backend.did.js",
-    "frontend/src/game/GameView.tsx",
     "frontend/src/game/enemies/WhiteLatexBeast.tsx",
     "frontend/src/game/enemies/types.ts",
-    "frontend/src/game/scene/HiveScene.tsx",
-    "frontend/src/game/state/useGameStore.ts",
-    "frontend/src/game/ui/TransfurOverlay.tsx",
-    "frontend/src/hooks/useActor.ts",
-    "frontend/src/hooks/useQueries.ts",
-    "frontend/src/utils/urlParams.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

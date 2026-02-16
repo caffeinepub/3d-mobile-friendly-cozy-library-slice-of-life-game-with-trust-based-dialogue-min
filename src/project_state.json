@@ -1,32 +1,40 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "New project",
+  "summary": "Implement ambush-followed chase behavior for white latex enemies: chase starts immediately after ambush, continuously tracks player, and ends when player escapes a specified distance.",
   "architectural_notes": [],
   "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-add-one-or-more-white-latex-beast-enemy-entities-to-the-3d-gameplay-at-minimum-in-the-hive-scene-that-visually-read-as-glossy-white-latex-creatures-and-that-actively-move-patrol-wander-and-then-chase-the-player-when-within-an-aggro-radius",
-      "title": "Add one or more \"White Latex Beast\" enemy entities to the 3D gameplay (at minimum in the hive scene) that visually read as glossy white latex creatures and that actively move (patrol/wander) and then chase the player when within an aggro radius.",
+      "id": "feature-update-the-whitelatexbeast-enemy-ai-to-include-an-ambush-phase-that-triggers-before-chasing-when-the-enemy-decides-to-engage-the-player-it-must-play-an-ambush-animation-state-and-then-transition-into-chase-immediately-after-the-ambush-animation-ends",
+      "title": "Update the WhiteLatexBeast enemy AI to include an \"ambush\" phase that triggers before chasing: when the enemy decides to engage the player, it must play an ambush animation/state and then transition into chase immediately after the ambush animation ends.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-implement-a-player-transfur-transformation-encounter-mechanic-triggered-by-enemy-contact-when-an-enemy-reaches-the-player-show-a-clear-non-graphic-transformation-event-e-g-brief-screen-effect-message-and-apply-an-in-game-consequence-e-g-respawn-in-the-hive-spawn-position-and-or-trust-ending-impacting-state-change-use-english-for-any-on-screen-text",
-      "title": "Implement a player \"transfur\" (transformation) encounter mechanic triggered by enemy contact: when an enemy reaches the player, show a clear, non-graphic transformation event (e.g., brief screen effect + message) and apply an in-game consequence (e.g., respawn in the hive spawn position and/or trust/ending-impacting state change). Use English for any on-screen text.",
+      "id": "feature-during-the-chase-phase-make-whitelatexbeast-continuously-track-the-player-s-current-position-each-frame-i-e-chase-direction-updates-in-real-time-based-on-the-player-s-latest-position",
+      "title": "During the chase phase, make WhiteLatexBeast continuously track the player's current position each frame (i.e., chase direction updates in real time based on the player's latest position).",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
     },
     {
-      "id": "feature-persist-transformation-encounter-outcomes-in-the-backend-game-state-so-the-app-can-remember-that-the-player-has-been-transfurred-or-how-many-times-across-reloads-continue-game-update-backend-gamestate-associated-apis-and-frontend-state-hydration-sync-to-include-these-new-fields",
-      "title": "Persist transformation encounter outcomes in the backend game state so the app can remember that the player has been \"transfurred\" (or how many times) across reloads/continue game. Update backend GameState, associated APIs, and frontend state hydration/sync to include these new fields.",
+      "id": "feature-change-chase-termination-so-that-once-the-enemy-has-begun-chasing-after-ambush-it-continues-chasing-until-the-player-escapes-beyond-a-configured-escape-distance-at-which-point-the-enemy-stops-chasing-and-returns-to-wandering-behavior",
+      "title": "Change chase termination so that once the enemy has begun chasing (after ambush), it continues chasing until the player escapes beyond a configured escape distance, at which point the enemy stops chasing and returns to wandering behavior.",
       "reqIds": [
         "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-adjust-enemy-tuning-constants-in-frontend-src-game-enemies-types-ts-to-support-ambush-escape-based-chase-e-g-an-ambush-duration-and-an-escape-radius-distance-and-ensure-the-hivescene-behavior-remains-stable-with-multiple-enemies-and-while-transfur-encounter-ui-is-active-disabled-enemies-must-not-progress-ambush-chase-timers-or-move",
+      "title": "Add/adjust enemy tuning constants in frontend/src/game/enemies/types.ts to support ambush + escape-based chase (e.g., an ambush duration and an escape radius/distance), and ensure the HiveScene behavior remains stable with multiple enemies and while transfur encounter UI is active (disabled enemies must not progress ambush/chase timers or move).",
+      "reqIds": [
+        "REQ-4"
       ],
       "version": 1
     }
@@ -34,12 +42,12 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Add white latex beast enemies that attempt to 'transfur' (transform) the player",
+      "summary": "White latex enemies chase player immediately after ambush, continuously tracking player position, ending when player escapes a set distance.",
       "reqIds": [],
       "status": "pending"
     }
   ],
-  "projectName": "Add white latex beast enemies that attempt to transform (“transfur”) the player",
+  "projectName": "Add ambush-triggered chase that continuously tracks the player and ends on escape distance",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

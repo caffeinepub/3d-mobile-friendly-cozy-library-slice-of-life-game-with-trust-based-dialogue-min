@@ -1,94 +1,72 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "White Latex Beast enemies + non-graphic transfur encounter with persisted outcome sync",
+  "title": "WhiteLatexBeast ambush-to-chase AI with continuous tracking and escape-distance termination",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Add glossy white \"White Latex Beast\" 3D enemies in the hive that patrol/wander and chase the player within an aggro radius.",
+      "summary": "Add an ambush phase that plays immediately when the enemy first engages, then transitions directly into chase when ambush completes.",
       "acceptanceCriteria": [
-        "When the player enters the hive scene, at least one enemy is present/spawned and visible as a glossy white creature (not just a static prop).",
-        "Enemies have continuous movement behavior: idle/patrol when far, chase when within a defined distance.",
-        "Enemy movement updates every frame without causing major frame drops (no obvious stutter beyond existing scene performance)."
+        "When an enemy first engages the player (per the existing engage logic in WhiteLatexBeast), it enters an ambush state before chase.",
+        "After the ambush state/animation completes, the chase begins immediately (no added delay).",
+        "Capture logic (ENEMY_CONSTANTS.CAPTURE_RADIUS) continues to function and can still trigger during chase as it does today."
       ],
       "file_operations": [
         {
           "path": "frontend/src/game/enemies/WhiteLatexBeast.tsx",
-          "operation": "create",
-          "description": "Create a reusable react-three-fiber enemy component that renders as a glossy white latex creature and implements lightweight per-frame AI (wander/patrol vs chase) based on distance to the player. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/game/enemies/types.ts",
-          "operation": "create",
-          "description": "Add shared enemy-related types/constants (e.g., aggro radius, capture radius, movement speeds) to keep tuning centralized and avoid duplicated magic numbers across scenes. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/game/scene/HiveScene.tsx",
           "operation": "modify",
-          "description": "Spawn and render one or more White Latex Beast enemies in the hive scene; wire player world position into the enemy AI and ensure enemies update movement every frame while respecting existing scene bounds/performance constraints. Verify the component's usage instructions before implementing."
+          "description": "Refactor WhiteLatexBeast AI into explicit phases (e.g., wander/ambush/chase) so that on first engagement (transition into aggro) the enemy enters an ambush state, plays an ambush animation/state for a configured duration, and then transitions immediately into chase when that ambush completes. Ensure capture checks still run and can trigger during chase."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Trigger a non-graphic transfur encounter on enemy contact that temporarily disables controls, shows an English message/screen effect, and respawns the player to a defined hive spawn position.",
+      "summary": "Ensure chase continuously updates direction and facing toward the player’s latest position every frame.",
       "acceptanceCriteria": [
-        "When an enemy collides with (or gets within a small capture radius of) the player, a transformation encounter is triggered.",
-        "During the encounter, player controls are temporarily disabled or effectively prevented from continuing normal movement until the encounter resolves.",
-        "After the encounter resolves, the player is placed into a well-defined post-encounter state (e.g., respawned to hiveSpawnPosition) and a visible English message indicates what happened."
+        "While chasing, the enemy's movement direction updates continuously using the latest provided playerPosition (not a single stored target position).",
+        "Enemy rotation/facing while chasing continues to align with the current direction toward the player."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/game/state/useGameStore.ts",
+          "path": "frontend/src/game/enemies/WhiteLatexBeast.tsx",
           "operation": "modify",
-          "description": "Add transfur encounter UI/runtime state (e.g., isInTransfurEncounter, lastTransfurMessage) and actions to start/resolve an encounter, including pausing gameplay, setting a clear English message, and setting hiveSpawnPosition for a deterministic respawn. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/game/ui/TransfurOverlay.tsx",
-          "operation": "create",
-          "description": "Create a small overlay UI (screen tint/flash + message) to clearly indicate a non-graphic transformation encounter in English while controls are disabled. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/game/GameView.tsx",
-          "operation": "modify",
-          "description": "Render the TransfurOverlay above the Canvas when an encounter is active and ensure pause/controls disabling is applied consistently (leveraging existing isPaused behavior). Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/game/scene/HiveScene.tsx",
-          "operation": "modify",
-          "description": "Detect enemy capture/collision with the player (distance-based capture radius) and trigger the transfur encounter flow; on resolution, respawn the player at hiveSpawnPosition and prevent immediate re-triggering via a short cooldown. Verify the component's usage instructions before implementing."
+          "description": "During the chase phase, compute chase direction each frame from the current enemy position to the latest playerPosition, and use that direction for both movement and rotation/facing so tracking remains real-time."
         }
       ]
     },
     {
       "id": "REQ-3",
-      "summary": "Sync persisted transfur outcome fields with the backend-pro տրամ  state (transfurred / timesTransfurred) during load/continue and record new encounters when online.",
+      "summary": "Change chase termination to persist until the player exceeds a configured escape distance, then return to wandering.",
       "acceptanceCriteria": [
-        "Backend GameState includes new fields for transformation tracking (e.g., a boolean flag and/or a counter) and these values are returned by getGameState/continueGame.",
-        "A new backend update method (or an extension of an existing one) allows the frontend to record a transformation encounter without trapping.",
-        "Frontend updates the persisted local game store to reflect backend-provided transformation fields when continuing/loading.",
-        "If the canister state schema changes, a conditional migration is added in backend/migration.mo so existing saves do not trap on upgrade."
+        "After chase has started, the enemy does not stop chasing merely because the player exits the original aggro radius; it only stops when the player exceeds the configured escape distance.",
+        "Once the player exceeds the escape distance, the enemy transitions out of chase and resumes the existing wander behavior."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/game/state/useGameStore.ts",
+          "path": "frontend/src/game/enemies/WhiteLatexBeast.tsx",
           "operation": "modify",
-          "description": "Add persisted fields for transfurred and timesTransfurred and a hydration action that maps backend GameState into the local Zustand store (including bigint->number conversions where needed). Verify the component's usage instructions before implementing."
+          "description": "Update chase state machine so that once chase begins (after ambush), it continues regardless of AGGRO_RADIUS and only terminates when distanceToPlayer exceeds a configured escape distance; on termination, reset to the existing wander behavior (including wander direction timing)."
+        }
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "summary": "Add tuning constants for ambush and escape-distance chase, and ensure disabled enemies do not move or advance timers/state while transfur UI is active.",
+      "acceptanceCriteria": [
+        "Enemy constants include values necessary to configure the ambush phase and escape distance without hardcoding magic numbers inside WhiteLatexBeast.tsx.",
+        "When HiveScene sets disabled={isInTransfurEncounter}, WhiteLatexBeast does not move or advance its AI state until re-enabled.",
+        "No backend changes are required for this behavior."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/game/enemies/types.ts",
+          "operation": "modify",
+          "description": "Add/adjust ENEMY_CONSTANTS to include ambush and escape-based chase tuning (e.g., AMBUSH_DURATION, ESCAPE_DISTANCE/ESCAPE_RADIUS) so WhiteLatexBeast can reference them without hardcoded numbers."
         },
         {
-          "path": "frontend/src/hooks/useQueries.ts",
+          "path": "frontend/src/game/enemies/WhiteLatexBeast.tsx",
           "operation": "modify",
-          "description": "Add a React Query mutation hook to record a transfur encounter when online (wrapping the existing backend capability) and invalidate/refetch game state as appropriate. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Wire backend GameState hydration into the existing new-game/continue flows by applying returned/queried state to the local game store (including transfur tracking fields), while keeping offline mode fully local. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/game/scene/HiveScene.tsx",
-          "operation": "modify",
-          "description": "On transfur encounter resolution, invoke the new recordTransfurred mutation when online (and update local state immediately for responsiveness), while ensuring offline mode still increments local tracking without backend calls. Verify the component's usage instructions before implementing."
+          "description": "Ensure all AI state progression (ambush timers, chase persistence checks, wander timers) and all movement/rotation updates are fully paused when disabled is true (early return before any timer/state changes), preserving stable behavior with multiple enemies and while the transfur encounter UI is active."
         }
       ]
     }

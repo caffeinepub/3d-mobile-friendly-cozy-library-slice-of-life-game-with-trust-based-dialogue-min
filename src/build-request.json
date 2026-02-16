@@ -1,73 +1,88 @@
 {
   "kind": "build_request",
-  "title": "Add white latex beast enemies that attempt to transform (“transfur”) the player",
+  "title": "Add ambush-triggered chase that continuously tracks the player and ends on escape distance",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Add one or more \"White Latex Beast\" enemy entities to the 3D gameplay (at minimum in the hive scene) that visually read as glossy white latex creatures and that actively move (patrol/wander) and then chase the player when within an aggro radius.",
+      "text": "Update the WhiteLatexBeast enemy AI to include an \"ambush\" phase that triggers before chasing: when the enemy decides to engage the player, it must play an ambush animation/state and then transition into chase immediately after the ambush animation ends.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-user-1"
+          "msg-1"
         ],
         "quotes": [
-          "Try to make white latex beasts that try to transfur me"
+          "Make the white latexes start chasing the player after ambushing them",
+          "Immediately"
         ]
       },
       "acceptanceCriteria": [
-        "When the player enters the hive scene, at least one enemy is present/spawned and visible as a glossy white creature (not just a static prop).",
-        "Enemies have continuous movement behavior: idle/patrol when far, chase when within a defined distance.",
-        "Enemy movement updates every frame without causing major frame drops (no obvious stutter beyond existing scene performance)."
+        "When an enemy first engages the player (per the existing engage logic in WhiteLatexBeast), it enters an ambush state before chase.",
+        "After the ambush state/animation completes, the chase begins immediately (no added delay).",
+        "Capture logic (ENEMY_CONSTANTS.CAPTURE_RADIUS) continues to function and can still trigger during chase as it does today."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Implement a player \"transfur\" (transformation) encounter mechanic triggered by enemy contact: when an enemy reaches the player, show a clear, non-graphic transformation event (e.g., brief screen effect + message) and apply an in-game consequence (e.g., respawn in the hive spawn position and/or trust/ending-impacting state change). Use English for any on-screen text.",
+      "text": "During the chase phase, make WhiteLatexBeast continuously track the player's current position each frame (i.e., chase direction updates in real time based on the player's latest position).",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-user-1"
+          "msg-1"
         ],
         "quotes": [
-          "Try to make white latex beasts that try to transfur me"
+          "They continuously track the player's location"
         ]
       },
       "acceptanceCriteria": [
-        "When an enemy collides with (or gets within a small capture radius of) the player, a transformation encounter is triggered.",
-        "During the encounter, player controls are temporarily disabled or effectively prevented from continuing normal movement until the encounter resolves.",
-        "After the encounter resolves, the player is placed into a well-defined post-encounter state (e.g., respawned to hiveSpawnPosition) and a visible English message indicates what happened."
+        "While chasing, the enemy's movement direction updates continuously using the latest provided playerPosition (not a single stored target position).",
+        "Enemy rotation/facing while chasing continues to align with the current direction toward the player."
       ]
     },
     {
       "id": "REQ-3",
-      "text": "Persist transformation encounter outcomes in the backend game state so the app can remember that the player has been \"transfurred\" (or how many times) across reloads/continue game. Update backend GameState, associated APIs, and frontend state hydration/sync to include these new fields.",
-      "target": "both",
+      "text": "Change chase termination so that once the enemy has begun chasing (after ambush), it continues chasing until the player escapes beyond a configured escape distance, at which point the enemy stops chasing and returns to wandering behavior.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-user-1"
+          "msg-1"
         ],
         "quotes": [
-          "Try to make white latex beasts that try to transfur me"
+          "And to end the chase make the player have to escape some distance"
         ]
       },
       "acceptanceCriteria": [
-        "Backend GameState includes new fields for transformation tracking (e.g., a boolean flag and/or a counter) and these values are returned by getGameState/continueGame.",
-        "A new backend update method (or an extension of an existing one) allows the frontend to record a transformation encounter without trapping.",
-        "Frontend updates the persisted local game store to reflect backend-provided transformation fields when continuing/loading.",
-        "If the canister state schema changes, a conditional migration is added in backend/migration.mo so existing saves do not trap on upgrade."
+        "After chase has started, the enemy does not stop chasing merely because the player exits the original aggro radius; it only stops when the player exceeds the configured escape distance.",
+        "Once the player exceeds the escape distance, the enemy transitions out of chase and resumes the existing wander behavior."
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "Add/adjust enemy tuning constants in frontend/src/game/enemies/types.ts to support ambush + escape-based chase (e.g., an ambush duration and an escape radius/distance), and ensure the HiveScene behavior remains stable with multiple enemies and while transfur encounter UI is active (disabled enemies must not progress ambush/chase timers or move).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "Build it"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Enemy constants include values necessary to configure the ambush phase and escape distance without hardcoding magic numbers inside WhiteLatexBeast.tsx.",
+        "When HiveScene sets disabled={isInTransfurEncounter}, WhiteLatexBeast does not move or advance its AI state until re-enabled.",
+        "No backend changes are required for this behavior."
       ]
     }
   ],
   "constraints": [
-    "Backend must remain a single Motoko actor in backend/main.mo; add backend/migration.mo only if required for existing state upgrades.",
-    "Do not edit files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or any files in frontend/src/components/ui (compose them instead).",
-    "Use English for any user-facing UI text."
+    "Do not edit files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui (compose instead of modifying).",
+    "Keep all backend logic in the single Motoko actor (backend/main.mo); do not introduce additional backend services."
   ],
   "nonGoals": [
-    "Do not add explicit/graphic sexual content; keep the transformation encounter non-graphic and game-appropriate.",
-    "Do not add multiplayer, real-time networking, or external database services.",
-    "Do not add third-party authentication providers beyond Internet Identity."
+    "Do not add multiplayer, real-time networking, or WebSocket-based synchronization.",
+    "Do not change the transfur overlay messaging/content beyond what is necessary for the chase/ambush mechanics.",
+    "Do not add new authentication providers beyond Internet Identity."
   ],
   "imageRequirements": {
     "required": [],

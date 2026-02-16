@@ -1,70 +1,30 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-16T01:12:08.960Z",
-  "summary": "Implemented a new WhiteLatexBeast enemy with wander/chase AI in the hive scene and added a transfur overlay + local transfur encounter state. Backend state types and a migration module were extended to include transfur tracking fields, but the diff evidence is insufficient to confirm the backend API method(s) and the required post-encounter respawn/state resolution behavior. Several unrelated features (URL/session param utilities, admin token handling, offline mode/diagnostics UI behavior) were added beyond the request.",
-  "missing_requirements": [
-    {
-      "id": "REQ-2",
-      "requirement": "After the transfur encounter resolves, the player is placed into a well-defined post-encounter state (e.g., respawned to hiveSpawnPosition) and a visible English message indicates what happened.",
-      "reason": "The diff shows the encounter starting (message selection, overlay component, and movement disabled during encounter), but it does not show what happens on resolve (e.g., teleporting/respawning the player to hiveSpawnPosition or any other explicit post-encounter placement). GameView references resolveTransfurEncounter and the store defines it, but the relevant implementation details are truncated/not shown.",
-      "evidence": [
-        "frontend/src/game/scene/HiveScene.tsx",
-        "frontend/src/game/GameView.tsx",
-        "frontend/src/game/state/useGameStore.ts",
-        "frontend/src/game/ui/TransfurOverlay.tsx"
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "requirement": "Backend provides APIs to record a transformation encounter and returns the transfur tracking fields via getGameState/continueGame (and migration prevents trapping on upgrade).",
-      "reason": "Backend GameState type and default fields (transfurred, timesTransfurred) and a migration module are present, and the frontend calls actor.recordTransfurred(), but the diff excerpt does not include evidence that backend methods getGameState/continueGame return these new fields nor that a recordTransfurred method is actually implemented in backend/main.mo.",
-      "evidence": [
-        "backend/main.mo",
-        "backend/migration.mo",
-        "frontend/src/hooks/useQueries.ts"
-      ]
-    }
-  ],
+  "generatedAt": "2026-02-16T01:23:06.237Z",
+  "summary": "Diff implements an AI phase state machine for WhiteLatexBeast with a new ambush phase, adds enemy constants for ambush duration and escape distance, and updates chase behavior to track the player continuously and terminate on escape distance. Also includes unrelated project metadata/summary file updates not requested in the BuildRequest.",
+  "missing_requirements": [],
   "hallucinated_features": [
     {
-      "description": "Added URL/query/hash parameter parsing and sessionStorage persistence utilities (including functions intended for storing/removing sensitive tokens).",
-      "reason": "Not requested by any REQ; unrelated to enemies/transfur mechanics or persistence of transfur outcomes.",
+      "description": "Updated/added project metadata tracking for the feature request (project_state.json)",
+      "reason": "BuildRequest only asked for gameplay/AI changes and constants; it did not request maintaining a separate project state tracking file.",
       "evidence": [
-        "frontend/src/utils/urlParams.ts"
+        "project_state.json"
       ]
     },
     {
-      "description": "Modified actor creation flow to read an admin token from URL params and call _initializeAccessControlWithSecret; added query invalidation/refetch logic tied to actor changes.",
-      "reason": "BuildRequest did not ask for admin token handling or access-control initialization changes; also violates the stated constraint of not editing frontend/src/hooks/useActor.ts.",
+      "description": "Updated a generated/aggregate frontend file summary listing many components unrelated to the requested enemy AI change",
+      "reason": "BuildRequest does not mention modifying documentation/summary artifacts; only specifies enemy AI/constants behavior changes and constraints.",
       "evidence": [
-        "frontend/src/hooks/useActor.ts"
-      ]
-    },
-    {
-      "description": "Added/expanded offline mode flow, backend availability monitoring, diagnostics tracking, and related TitleScreen/App behaviors.",
-      "reason": "Not part of REQ-1/2/3; the request focused on enemy AI, encounter mechanic, and persistence of transfur outcomes.",
-      "evidence": [
-        "frontend/src/App.tsx",
-        "frontend-file-summaries.txt (TitleScreen/App summaries)"
+        "frontend-file-summaries.txt"
       ]
     }
   ],
-  "confidence": 0.72,
+  "confidence": 0.74,
   "changed_files": [
-    "backend/main.mo",
-    "backend/migration.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/App.tsx",
-    "frontend/src/game/GameView.tsx",
     "frontend/src/game/enemies/WhiteLatexBeast.tsx",
     "frontend/src/game/enemies/types.ts",
-    "frontend/src/game/scene/HiveScene.tsx",
-    "frontend/src/game/state/useGameStore.ts",
-    "frontend/src/game/ui/TransfurOverlay.tsx",
-    "frontend/src/hooks/useActor.ts",
-    "frontend/src/hooks/useQueries.ts",
-    "frontend/src/utils/urlParams.ts",
     "project_state.json"
   ]
 }
