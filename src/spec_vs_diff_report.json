@@ -1,45 +1,32 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-16T00:46:06.845Z",
-  "summary": "Diff adds a new HiveScene R3F component and wires scene switching in GameView. LibraryScene appears updated to detect proximity to Puro and (intended) teleport with one-shot/cooldown guards. However, several acceptance-criteria details (admin-unlock removal, click-to-dialogue preserved, and the actual teleport action/spawn placement) are not fully evidenced in the provided truncated diff.",
+  "generatedAt": "2026-02-16T00:53:18.141Z",
+  "summary": "The diff adds a right-side touch look area in `MobileControlsOverlay.tsx` with touch tracking and uses the existing `updateLook` pipeline while respecting the paused/terminal disabled state. However, the provided (truncated) diff does not show touch-end/reset handling needed to fully satisfy REQ-2 (and part of REQ-1’s “no drift” behavior).",
   "missing_requirements": [
     {
       "id": "REQ-2",
-      "requirement": "Teleport-on-touch with Puro must transition from library to hive and place player at a defined spawn point in the hive, with controls/camera continuing to function.",
-      "reason": "While GameView switches scenes based on `currentScene` and HiveScene reads `hiveSpawnPosition`, the diff snippet does not show the `teleportToHive` action implementation (e.g., setting `currentScene` to 'hive' and setting spawn position) or the exact call site that triggers it.",
+      "requirement": "Reset look drag state and neutralize look delta on touch end so subsequent drags don’t jump and camera doesn’t drift.",
+      "reason": "The diff shows initialization on touch start (`lookTouchRef.current = { id, lastX, lastY }`) and applying deltas on move (`updateLook(-deltaX, -deltaY)`), but does not show any `touchend`/`touchcancel` handler that clears `lookTouchRef` and sets look delta back to neutral (e.g., `updateLook(0,0)`). Because the file is truncated, this may exist below, but it is not evidenced in the provided diff.",
       "evidence": [
-        "frontend/src/game/scene/LibraryScene.tsx",
-        "frontend/src/game/state/useGameStore.ts",
-        "frontend/src/game/GameView.tsx",
-        "frontend/src/game/scene/HiveScene.tsx"
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "requirement": "Replace the existing 'touch Puro unlocks admin mode' secret in LibraryScene with teleport-to-hive; clicking Puro should still open dialogue; any teleport feedback text must be English.",
-      "reason": "The truncated LibraryScene diff shows new proximity-detection state, but does not include the section where the old `attemptUnlock('ADMIN')` behavior is removed/replaced, nor does it show whether clicking Puro still triggers dialogue (Puro component behavior/click handler not shown in diff), nor any English teleport feedback text (toast content not visible in the snippet).",
-      "evidence": [
-        "frontend/src/game/scene/LibraryScene.tsx"
+        "frontend/src/game/controls/MobileControlsOverlay.tsx (truncated snippet shows handleLookStart/handleLookMove but no end/reset logic)"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "Additional guarded initialization logic in GameView (hasInitialized/lastInitMode refs; split audio playback effect) beyond the requested hive/teleport change.",
-      "reason": "BuildRequest focuses on adding the hive scene and teleport trigger; initialization/audioplay guard refactors are not requested.",
+      "description": "Updated internal/project documentation/tracking files (`frontend-file-summaries.txt`, `project_state.json`).",
+      "reason": "These changes are not part of the BuildRequest requirements (which focus on mobile look controls behavior) and appear to be meta/project bookkeeping rather than requested functionality.",
       "evidence": [
-        "frontend/src/game/GameView.tsx"
+        "frontend-file-summaries.txt",
+        "project_state.json"
       ]
     }
   ],
   "confidence": 0.62,
   "changed_files": [
     "frontend-file-summaries.txt",
-    "frontend/src/game/GameView.tsx",
-    "frontend/src/game/scene/HiveScene.tsx",
-    "frontend/src/game/scene/LibraryScene.tsx",
-    "frontend/src/game/state/useGameStore.ts",
+    "frontend/src/game/controls/MobileControlsOverlay.tsx",
     "project_state.json"
   ]
 }

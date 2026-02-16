@@ -1,63 +1,38 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Teleport from Library to procedurally generated Hive (white latex forest) on Puro touch",
+  "title": "Mobile right-side screen-drag look controls",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Add a new React Three Fiber “hive” 3D scene with an original, procedurally generated white/latex-like forest environment.",
+      "summary": "Replace the small mobile Look widget with a large right-side touch drag area that drives the existing look delta pipeline without affecting the left movement joystick, and respects pause/terminal disable rules.",
       "acceptanceCriteria": [
-        "A new React Three Fiber scene component exists for the white latex forest environment (the hive).",
-        "The hive scene renders without requiring external model downloads or third-party assets.",
-        "Visuals communicate a white/latex-like forest through lighting, palette, and materials while remaining clearly original (not a ripped recreation)."
+        "On touch devices, dragging a finger on the right side of the screen produces continuous camera rotation (yaw/pitch) using the existing look delta pipeline (usePlayerControls -> usePlayerControlsStore -> scene camera rotation).",
+        "The look drag area covers the right portion of the screen (e.g., right half), not just the small 32x32 circle.",
+        "The left joystick area remains dedicated to movement input and is not impacted by the new look area.",
+        "The look control is disabled while the game is paused or the diagnostic terminal is open (consistent with existing isDisabled behavior)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/game/scene/HiveScene.tsx",
-          "operation": "create",
-          "description": "Create a new 3D scene component that procedurally generates an original “white latex forest” look (e.g., instanced smooth trunks, glossy/physical materials, fog, and lighting), using only code-defined geometry/materials (no external models/assets)."
+          "path": "frontend/src/game/controls/MobileControlsOverlay.tsx",
+          "operation": "modify",
+          "description": "Expand the look input surface from the current small circular Look element into a large right-side screen touch area (e.g., right half of the viewport) that captures drag movement and calls updateLook with scaled deltas. Ensure the left joystick remains on the left and continues to receive its own touch interactions without interference (including layering/pointer-events so the right-side look area does not block the joystick). Also ensure look drag handling is gated by the existing isDisabled (paused/terminal open) behavior and resets look deltas to neutral when disabled."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Implement teleport-on-touch with Puro to transition from the library scene to the hive scene and spawn the player at a defined hive start position with a one-shot/cooldown guard.",
+      "summary": "Fix right-side look drag initialization/reset so each new touch drag starts smoothly from the initial touch point, ends cleanly, and never leaves residual look drift.",
       "acceptanceCriteria": [
-        "Touching/entering the existing Puro proximity radius triggers a scene change to the hive.",
-        "Teleport trigger uses a one-shot + cooldown/hysteresis guard so it does not repeatedly fire every frame while in contact.",
-        "After teleport, the camera and player controls continue to function normally in the hive scene."
+        "Starting a new drag on the right-side look area immediately begins tracking deltas from the initial touch point.",
+        "Lifting the finger ends the look drag and resets any stored last-touch state so a subsequent drag does not jump.",
+        "Releasing touch sets look delta back to neutral (no continued camera drift after the drag ends)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/game/state/useGameStore.ts",
+          "path": "frontend/src/game/controls/MobileControlsOverlay.tsx",
           "operation": "modify",
-          "description": "Add persistent in-game scene state (e.g., currentScene: 'library'|'hive') and actions to request a teleport to hive while storing a defined hive spawn position so the next scene can place the player consistently."
-        },
-        {
-          "path": "frontend/src/game/scene/LibraryScene.tsx",
-          "operation": "modify",
-          "description": "Update the Puro proximity check to trigger a one-shot teleport action (with cooldown/hysteresis retained) that switches the current scene to 'hive' and records the hive spawn; keep collision radius behavior and ensure user-facing teleport feedback text (if shown) is English."
-        },
-        {
-          "path": "frontend/src/game/GameView.tsx",
-          "operation": "modify",
-          "description": "Wire scene switching so the Canvas renders LibraryScene or HiveScene based on the store’s currentScene; ensure HiveScene consumes the stored spawn position and initializes player/camera accordingly so controls continue to work after transition."
-        }
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "summary": "Replace the library scene’s Puro proximity admin-unlock secret with teleport-to-hive behavior while keeping Puro click dialogue unchanged and ensuring English-only feedback text.",
-      "acceptanceCriteria": [
-        "In the library scene, Puro proximity no longer calls `attemptUnlock('ADMIN')` as its primary effect.",
-        "If a toast/overlay is shown for teleport, its text is English-only.",
-        "Clicking Puro still opens dialogue as before (teleport is specifically on touch/proximity, not on click)."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/game/scene/LibraryScene.tsx",
-          "operation": "modify",
-          "description": "Remove/replace the existing proximity secret that unlocks admin mode (including `attemptUnlock('ADMIN')` and related toast) so proximity instead triggers teleport-to-hive; preserve Puro’s onClick behavior by not changing the Puro component’s click handler semantics."
+          "description": "Update the look drag state machine to initialize on touchstart (store initial touch position and the active touch identifier), compute deltas on touchmove relative to the last stored position, and fully reset on touchend/touchcancel (clear last-touch state and active identifier, call updateLook(0, 0)). Ensure a new drag always starts from its own initial touch point (no 'move once' requirement) and that multi-touch (e.g., joystick + look) does not cause the look handler to read the wrong touch."
         }
       ]
     }

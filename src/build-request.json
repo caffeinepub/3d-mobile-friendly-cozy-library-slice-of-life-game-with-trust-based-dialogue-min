@@ -1,79 +1,53 @@
 {
   "kind": "build_request",
-  "title": "Teleport to generated 3D White Latex Forest (“the hive”) when touching Puro",
+  "title": "Change mobile look controls to right-side screen drag",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Add a new 3D scene representing “the hive”: a generated 3D “white latex forest” environment inspired by the *Changed* (DragonSnow) white latex forest, using only original/procedurally generated geometry/materials (no copyrighted assets).",
+      "text": "Update the mobile look/aim control so the player looks around by dragging on the right side of the screen (a large right-side touch area), rather than only inside the small circular \"Look\" widget.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-1"
         ],
         "quotes": [
-          "The hive is the white latex forest",
-          "Make a 3d version",
-          "generate it",
-          "The white latex forest is from changed by dragonsnow"
+          "Make looking around dragging around the right side of the screen."
         ]
       },
       "acceptanceCriteria": [
-        "A new React Three Fiber scene component exists for the white latex forest environment (the hive).",
-        "The hive scene renders without requiring external model downloads or third-party assets.",
-        "Visuals communicate a white/latex-like forest through lighting, palette, and materials while remaining clearly original (not a ripped recreation)."
+        "On touch devices, dragging a finger on the right side of the screen produces continuous camera rotation (yaw/pitch) using the existing look delta pipeline (usePlayerControls -> usePlayerControlsStore -> scene camera rotation).",
+        "The look drag area covers the right portion of the screen (e.g., right half), not just the small 32x32 circle.",
+        "The left joystick area remains dedicated to movement input and is not impacted by the new look area.",
+        "The look control is disabled while the game is paused or the diagnostic terminal is open (consistent with existing isDisabled behavior)."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Implement player teleport-on-touch with Puro: when the player avatar collides/enters proximity with the existing Puro 3D model, transition gameplay from the library scene to the hive (white latex forest) scene and place the player at a defined spawn point in the hive.",
+      "text": "Ensure the right-side look drag area correctly initializes and resets drag state on touch start/end so the first movement after touching down results in smooth look deltas (no requirement to \"move once\" before it starts responding).",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-1"
         ],
         "quotes": [
-          "Make it teleport you to the hive if you touch puro",
-          "A 3d model that you added",
-          "Build it"
+          "Make looking around dragging around the right side of the screen."
         ]
       },
       "acceptanceCriteria": [
-        "Touching/entering the existing Puro proximity radius triggers a scene change to the hive.",
-        "Teleport trigger uses a one-shot + cooldown/hysteresis guard so it does not repeatedly fire every frame while in contact.",
-        "After teleport, the camera and player controls continue to function normally in the hive scene."
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "text": "Replace the current “touch Puro unlocks admin mode” proximity secret in `frontend/src/game/scene/LibraryScene.tsx` with the new teleport-to-hive behavior (so touching Puro teleports instead of unlocking admin mode). Any user-facing feedback text related to teleport must be in English.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "Make it teleport you to the hive if you touch puro",
-          "Build it"
-        ]
-      },
-      "acceptanceCriteria": [
-        "In the library scene, Puro proximity no longer calls `attemptUnlock('ADMIN')` as its primary effect.",
-        "If a toast/overlay is shown for teleport, its text is English-only.",
-        "Clicking Puro still opens dialogue as before (teleport is specifically on touch/proximity, not on click)."
+        "Starting a new drag on the right-side look area immediately begins tracking deltas from the initial touch point.",
+        "Lifting the finger ends the look drag and resets any stored last-touch state so a subsequent drag does not jump.",
+        "Releasing touch sets look delta back to neutral (no continued camera drift after the drag ends)."
       ]
     }
   ],
   "constraints": [
-    "Do not edit files under `frontend/src/hooks/useInternetIdentity.ts`, `frontend/src/hooks/useInternetIdentity.tsx`, `frontend/src/hooks/useActor.ts`, `frontend/src/main.tsx`, or anything inside `frontend/src/components/ui` (compose them instead).",
-    "Keep all backend logic in the existing single Motoko actor (`backend/main.mo`) if any backend changes are later required; do not introduce additional backend services.",
-    "User-facing text introduced by this change must be in English."
+    "Frontend immutable paths must not be edited: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui.",
+    "Keep all backend logic in the single Motoko actor (no backend changes expected for this request)."
   ],
   "nonGoals": [
-    "Do not implement or integrate external 3D models/maps from *Changed* or any copyrighted asset extraction.",
-    "Do not add multiplayer, real-time networking, chat, or web sockets.",
-    "Do not add third-party authentication beyond Internet Identity.",
-    "Do not redesign unrelated UI panels/mini-games beyond what is necessary to support the new hive scene and teleport transition."
+    "Changing keyboard/mouse look behavior for desktop users (unless required incidentally by the right-side drag implementation).",
+    "Adding new gameplay features (combat, enemies, new scenes, etc.)."
   ],
   "imageRequirements": {
     "required": [],

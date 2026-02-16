@@ -10,14 +10,20 @@ export default function MobileControlsOverlay() {
   const { isPaused } = useGameStore();
   const { isOpen: isTerminalOpen } = useTerminalStore();
   const joystickRef = useRef<HTMLDivElement>(null);
-  const lookRef = useRef<HTMLDivElement>(null);
+  const lookAreaRef = useRef<HTMLDivElement>(null);
   const [joystickActive, setJoystickActive] = useState(false);
   const [joystickPos, setJoystickPos] = useState({ x: 0, y: 0 });
+  
+  // Track active look touch
+  const lookTouchRef = useRef<{ id: number; lastX: number; lastY: number } | null>(null);
 
   useEffect(() => {
     setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
   }, []);
 
+  const isDisabled = isPaused || isTerminalOpen;
+
+  // Joystick handling
   useEffect(() => {
     if (!isTouchDevice) return;
 
@@ -62,38 +68,102 @@ export default function MobileControlsOverlay() {
     };
   }, [isTouchDevice, joystickActive, updateJoystick]);
 
+  // Look area handling - right side of screen
   useEffect(() => {
-    if (!isTouchDevice || !lookRef.current) return;
+    if (!isTouchDevice || !lookAreaRef.current) return;
 
-    let lastTouch = { x: 0, y: 0 };
+    const lookElement = lookAreaRef.current;
 
-    const handleLookMove = (e: TouchEvent) => {
-      e.preventDefault();
-      const touch = e.touches[0];
+    const handleLookStart = (e: TouchEvent) => {
+      if (isDisabled) return;
       
-      if (lastTouch.x !== 0) {
-        const deltaX = (touch.clientX - lastTouch.x) * 0.002;
-        const deltaY = (touch.clientY - lastTouch.y) * 0.002;
-        updateLook(-deltaX, -deltaY);
+      // Find a touch that started in the look area
+      for (let i = 0; i < e.touches.length; i++) {
+        const touch = e.touches[i];
+        const rect = lookElement.getBoundingClientRect();
+        
+        if (
+          touch.clientX >= rect.left &&
+          touch.clientX <= rect.right &&
+          touch.clientY >= rect.top &&
+          touch.clientY <= rect.bottom
+        ) {
+          // Initialize look tracking with this touch
+          lookTouchRef.current = {
+            id: touch.identifier,
+            lastX: touch.clientX,
+            lastY: touch.clientY,
+          };
+          break;
+        }
       }
-
-      lastTouch = { x: touch.clientX, y: touch.clientY };
     };
 
-    const handleLookEnd = () => {
-      lastTouch = { x: 0, y: 0 };
+    const handleLookMove = (e: TouchEvent) => {
+      if (isDisabled || !lookTouchRef.current) return;
+      
+      // Find the tracked touch
+      for (let i = 0; i < e.touches.length; i++) {
+        const touch = e.touches[i];
+        if (touch.identifier === lookTouchRef.current.id) {
+          e.preventDefault();
+          
+          const deltaX = (touch.clientX - lookTouchRef.current.lastX) * 0.003;
+          const deltaY = (touch.clientY - lookTouchRef.current.lastY) * 0.003;
+          
+          updateLook(-deltaX, -deltaY);
+          
+          // Update last position
+          lookTouchRef.current.lastX = touch.clientX;
+          lookTouchRef.current.lastY = touch.clientY;
+          break;
+        }
+      }
+    };
+
+    const handleLookEnd = (e: TouchEvent) => {
+      if (!lookTouchRef.current) return;
+      
+      // Check if our tracked touch ended
+      let touchEnded = true;
+      for (let i = 0; i < e.touches.length; i++) {
+        if (e.touches[i].identifier === lookTouchRef.current.id) {
+          touchEnded = false;
+          break;
+        }
+      }
+      
+      if (touchEnded) {
+        lookTouchRef.current = null;
+        updateLook(0, 0);
+      }
+    };
+
+    const handleLookCancel = () => {
+      lookTouchRef.current = null;
       updateLook(0, 0);
     };
 
-    const lookElement = lookRef.current;
+    lookElement.addEventListener('touchstart', handleLookStart, { passive: true });
     lookElement.addEventListener('touchmove', handleLookMove, { passive: false });
-    lookElement.addEventListener('touchend', handleLookEnd);
+    lookElement.addEventListener('touchend', handleLookEnd, { passive: true });
+    lookElement.addEventListener('touchcancel', handleLookCancel, { passive: true });
 
     return () => {
+      lookElement.removeEventListener('touchstart', handleLookStart);
       lookElement.removeEventListener('touchmove', handleLookMove);
       lookElement.removeEventListener('touchend', handleLookEnd);
+      lookElement.removeEventListener('touchcancel', handleLookCancel);
     };
-  }, [isTouchDevice, updateLook]);
+  }, [isTouchDevice, updateLook, isDisabled]);
+
+  // Reset look when disabled
+  useEffect(() => {
+    if (isDisabled) {
+      lookTouchRef.current = null;
+      updateLook(0, 0);
+    }
+  }, [isDisabled, updateLook]);
 
   const handleJumpClick = () => {
     triggerJump();
@@ -101,12 +171,10 @@ export default function MobileControlsOverlay() {
 
   if (!isTouchDevice) return null;
 
-  const isDisabled = isPaused || isTerminalOpen;
-
   return (
     <>
-      {/* Joystick */}
-      <div className="absolute bottom-8 left-8 pointer-events-auto">
+      {/* Joystick - left side */}
+      <div className="absolute bottom-8 left-8 pointer-events-auto z-10">
         <div
           ref={joystickRef}
           onTouchStart={() => !isDisabled && setJoystickActive(true)}
@@ -121,8 +189,8 @@ export default function MobileControlsOverlay() {
         </div>
       </div>
 
-      {/* Jump Button */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 pointer-events-auto">
+      {/* Jump Button - center */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 pointer-events-auto z-10">
         <Button
           size="lg"
           onClick={handleJumpClick}
@@ -133,13 +201,14 @@ export default function MobileControlsOverlay() {
         </Button>
       </div>
 
-      {/* Look area */}
+      {/* Look area - right half of screen */}
       <div
-        ref={lookRef}
-        className="absolute bottom-8 right-8 w-32 h-32 rounded-full bg-muted/40 backdrop-blur-sm border-2 border-muted-foreground/20 pointer-events-auto flex items-center justify-center"
-      >
-        <span className="text-xs text-muted-foreground">Look</span>
-      </div>
+        ref={lookAreaRef}
+        className="absolute top-0 right-0 w-1/2 h-full pointer-events-auto"
+        style={{
+          touchAction: 'none',
+        }}
+      />
     </>
   );
 }

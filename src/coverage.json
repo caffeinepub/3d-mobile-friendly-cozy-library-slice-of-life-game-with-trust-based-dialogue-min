@@ -1,50 +1,35 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-16T00:46:06.848Z",
+  "generatedAt": "2026-02-16T00:53:18.143Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 3,
-    "implemented": 3,
+    "total": 2,
+    "implemented": 2,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Add a new 3D scene representing “the hive”: a generated 3D “white latex forest” environment inspired by the *Changed* (DragonSnow) white latex forest, using only original/procedurally generated geometry/materials (no copyrighted assets).",
+        "summary": "Update the mobile look/aim control so the player looks around by dragging on the right side of the screen (a large right-side touch area), rather than only inside the small circular \"Look\" widget.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/game/scene/HiveScene.tsx"
+          "frontend/src/game/controls/MobileControlsOverlay.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/game/scene/HiveScene.tsx"
+          "frontend/src/game/controls/MobileControlsOverlay.tsx"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "Implement player teleport-on-touch with Puro: when the player avatar collides/enters proximity with the existing Puro 3D model, transition gameplay from the library scene to the hive (white latex forest) scene and place the player at a defined spawn point in the hive.",
+        "summary": "Ensure the right-side look drag area correctly initializes and resets drag state on touch start/end so the first movement after touching down results in smooth look deltas (no requirement to \"move once\" before it starts responding).",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/game/state/useGameStore.ts",
-          "frontend/src/game/scene/LibraryScene.tsx",
-          "frontend/src/game/GameView.tsx"
+          "frontend/src/game/controls/MobileControlsOverlay.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/game/state/useGameStore.ts",
-          "frontend/src/game/scene/LibraryScene.tsx",
-          "frontend/src/game/GameView.tsx"
-        ]
-      },
-      {
-        "id": "REQ-3",
-        "summary": "Replace the current “touch Puro unlocks admin mode” proximity secret in `frontend/src/game/scene/LibraryScene.tsx` with the new teleport-to-hive behavior (so touching Puro teleports instead of unlocking admin mode). Any user-facing feedback text related to teleport must be in English.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/game/scene/LibraryScene.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/game/scene/LibraryScene.tsx"
+          "frontend/src/game/controls/MobileControlsOverlay.tsx"
         ]
       }
     ]
@@ -54,10 +39,7 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/game/GameView.tsx",
-    "frontend/src/game/scene/HiveScene.tsx",
-    "frontend/src/game/scene/LibraryScene.tsx",
-    "frontend/src/game/state/useGameStore.ts",
+    "frontend/src/game/controls/MobileControlsOverlay.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

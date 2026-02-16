@@ -1,35 +1,24 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "3D scene/game featuring Puro; touching Puro teleports the player to the hive (a generated 3D \"white latex forest\" inspired by Changed by DragonSnow).",
-  "architectural_notes": [
-    "Project is a 3D scene/game with player collision/touch triggers.",
-    "The hive destination is a generated 3D \"white latex forest\" environment."
-  ],
+  "summary": "New project",
+  "architectural_notes": [],
   "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-add-a-new-3d-scene-representing-the-hive-a-generated-3d-white-latex-forest-environment-inspired-by-the-changed-dragonsnow-white-latex-forest-using-only-original-procedurally-generated-geometry-materials-no-copyrighted-assets",
-      "title": "Add a new 3D scene representing “the hive”: a generated 3D “white latex forest” environment inspired by the *Changed* (DragonSnow) white latex forest, using only original/procedurally generated geometry/materials (no copyrighted assets).",
+      "id": "feature-update-the-mobile-look-aim-control-so-the-player-looks-around-by-dragging-on-the-right-side-of-the-screen-a-large-right-side-touch-area-rather-than-only-inside-the-small-circular-look-widget",
+      "title": "Update the mobile look/aim control so the player looks around by dragging on the right side of the screen (a large right-side touch area), rather than only inside the small circular \"Look\" widget.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-implement-player-teleport-on-touch-with-puro-when-the-player-avatar-collides-enters-proximity-with-the-existing-puro-3d-model-transition-gameplay-from-the-library-scene-to-the-hive-white-latex-forest-scene-and-place-the-player-at-a-defined-spawn-point-in-the-hive",
-      "title": "Implement player teleport-on-touch with Puro: when the player avatar collides/enters proximity with the existing Puro 3D model, transition gameplay from the library scene to the hive (white latex forest) scene and place the player at a defined spawn point in the hive.",
+      "id": "feature-ensure-the-right-side-look-drag-area-correctly-initializes-and-resets-drag-state-on-touch-start-end-so-the-first-movement-after-touching-down-results-in-smooth-look-deltas-no-requirement-to-move-once-before-it-starts-responding",
+      "title": "Ensure the right-side look drag area correctly initializes and resets drag state on touch start/end so the first movement after touching down results in smooth look deltas (no requirement to \"move once\" before it starts responding).",
       "reqIds": [
         "REQ-2"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-replace-the-current-touch-puro-unlocks-admin-mode-proximity-secret-in-frontend-src-game-scene-libraryscene-tsx-with-the-new-teleport-to-hive-behavior-so-touching-puro-teleports-instead-of-unlocking-admin-mode-any-user-facing-feedback-text-related-to-teleport-must-be-in-english",
-      "title": "Replace the current “touch Puro unlocks admin mode” proximity secret in `frontend/src/game/scene/LibraryScene.tsx` with the new teleport-to-hive behavior (so touching Puro teleports instead of unlocking admin mode). Any user-facing feedback text related to teleport must be in English.",
-      "reqIds": [
-        "REQ-3"
       ],
       "version": 1
     }
@@ -37,19 +26,12 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Teleport player to the hive (white latex forest) when touching/colliding with Puro 3D model",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-2",
-      "summary": "Generate/build a 3D version of the hive: the white latex forest (inspired by Changed by DragonSnow)",
+      "summary": "Change look/aim controls so the player looks around by dragging on the right side of the screen",
       "reqIds": [],
       "status": "pending"
     }
   ],
-  "gameProjectType": "3d",
-  "projectName": "Teleport to generated 3D White Latex Forest (“the hive”) when touching Puro",
+  "projectName": "Change mobile look controls to right-side screen drag",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }
